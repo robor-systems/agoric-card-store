@@ -9,10 +9,10 @@
   "scripts": {
     "build": "yarn build:ses && yarn build:react",
     "build:ses": "cp ../node_modules/ses/dist/lockdown.umd.js public/",
-    "build:react": "react-scripts build",
+    "build:react": "craco build",
     "lint-check": "eslint '**/*.{js,jsx}'",
     "lint-fix": "eslint --fix '**/*.{js,jsx}'",
-    "start": "yarn build:ses && react-scripts start",
+    "start": "yarn build:ses && craco start",
     "test": "exit 0",
     "eject": "react-scripts eject"
   },
@@ -96,6 +96,7 @@
     "@agoric/marshal": "*",
     "@agoric/notifier": "*",
     "@agoric/ui-components": "*",
+    "@craco/craco": "^6.4.3",
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
     "react": "^16.8.0",
@@ -104,7 +105,10 @@
     "ses": "^0.12.6"
   },
   "devDependencies": {
+    "@babel/eslint-plugin": "^7.12.1",
     "agoric": "*",
+    "autoprefixer": "^9.8.6",
+    "babel-eslint": "^10.1.0",
     "eslint": "^7.23.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-prettier": "^8.1.0",
@@ -114,10 +118,10 @@
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-react": "^7.23.1",
     "eslint-plugin-react-hooks": "^4.2.0",
+    "postcss": "^7.0.36",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
-    "@babel/eslint-plugin": "^7.12.1",
-    "babel-eslint": "^10.1.0"
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.14"
   },
   "prettier": {
     "trailingComma": "all",

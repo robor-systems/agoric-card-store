@@ -1,50 +1,43 @@
-import React from 'react';
-import Typography from '@material-ui/core/Typography';
-import PowerSettingsNewIcon from '@material-ui/icons/PowerSettingsNew';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
+import React, { useState } from 'react';
 
-import { makeStyles } from '@material-ui/core/styles';
-
-const useStyles = makeStyles((theme) => {
-  return {
-    root: {
-      paddingBottom: theme.spacing(3),
-    },
-    status: {
-      marginRight: theme.spacing(2),
-      textAlign: 'right',
-    },
-    title: {
-      marginRight: theme.spacing(3),
-    },
-    icon: {
-      marginRight: theme.spacing(1),
-      marginLeft: 'auto',
-    },
+const Header = ({ walletConnected }) => {
+  const [activeTab, setActiveTab] = useState(0);
+  const walletStatus = walletConnected ? 'Connected' : 'Not connected';
+  // const dappStatus = dappApproved ? 'Approved' : 'Not approved';
+  console.log(activeTab);
+  const TabButton = ({ tabIndex, text, width }) => {
+    return (
+      <div
+        onClick={() => {
+          setActiveTab(tabIndex);
+        }}
+        className={`flex flex-col justify-center relative h-20 ${width}`}
+      >
+        <span>{text}</span>
+        <div
+          className={`w-full h-1 bg-secondary rounded-md absolute bottom-0 ${
+            tabIndex === activeTab ? 'block' : 'hidden'
+          }`}
+        ></div>
+      </div>
+    );
   };
-});
-
-const Header = ({ walletConnected, dappApproved }) => {
-  const classes = useStyles();
-
-  const walletStatus = walletConnected ? 'Connected' : 'Disconnected';
-  const dappStatus = dappApproved ? 'Approved' : 'Not approved';
   return (
-    <div className={classes.root}>
-      <AppBar position="sticky">
-        <Toolbar>
-          <Typography variant="h6" className={classes.title}>
-            Baseball Card Store
-          </Typography>
-
-          <PowerSettingsNewIcon className={classes.icon} />
-
-          <div className={classes.status}>Wallet {walletStatus}</div>
-          <PowerSettingsNewIcon className={classes.icon} />
-          <div className={classes.status}>Dapp {dappStatus}</div>
-        </Toolbar>
-      </AppBar>
+    <div className="flex justify-between nav-shadow items-center w-full h-20 px-14 text-base">
+      <p className="text-xl">Baseball Card Store</p>
+      <div className="flex text-base  text-center">
+        <TabButton tabIndex={0} text="My Cards" width="w-32" />
+        <TabButton tabIndex={1} text="Marketplace" width="w-36" />
+        <TabButton tabIndex={2} text="Primary Sales" width="w-40" />
+      </div>
+      <div>
+        Agoric Wallet: {walletStatus}
+        <span
+          className={`inline-block ml-1.5 w-2.5 h-2.5 rounded-full ${
+            walletConnected ? 'bg-secondary' : 'bg-alternative'
+          }`}
+        ></span>
+      </div>
     </div>
   );
 };

@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --color-secondary: #3EB2FF;
+    --color-secondary-dark: #29A9FF;
+    --color-alternative: #EB5757;
+    --color-alternative-light: #CFCFCF;
+    --color-primary: #363636;
+    --color-primary-light: #A1A1A1;
+}
+
+
+@layer utilities {
+    .nav-shadow{
+        box-shadow: 0px 3px 8px #0000001F;
+    }
+    
+    .modal-shadow{
+        box-shadow: 0px 6px 16px #00000029;
+    }
+    .outlined-btn-shadow{
+        box-shadow: 0px 3px 6px #00000029;
+    }
+    .card {
+        width:360px;
+        height:490px;
+    }
+    .card:hover{
+        box-shadow: 0px 6px 18px #00000029;
+    }
+    .card-media{
+        width:336px;
+        min-height:336px;
+    }
+    .media-action,
+    .overlay,
+    .media-action-expand{
+        visibility:hidden;
+    }
+    .card-media:hover .overlay, 
+    .card-media:hover .media-action, 
+    .card-media:hover .media-action-expand {
+        visibility:visible;
+    }
+}

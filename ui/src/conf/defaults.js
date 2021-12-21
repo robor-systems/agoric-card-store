@@ -1,18 +1,19 @@
-// GENERATED FROM /Users/katesills/code/dapp-card-store/api/deploy.js
+// GENERATED FROM /home/haseeb/agoric/dapps/my-card-store/api/deploy.js
 export default {
-  "INSTANCE_BOARD_ID": "794977354",
-  "INSTALLATION_BOARD_ID": "379944443",
-  "SELL_ITEMS_INSTALLATION_BOARD_ID": "1530295560",
-  "INVITE_BRAND_BOARD_ID": "1456154132",
+  "INSTANCE_BOARD_ID": "688500812",
+  "INSTALLATION_BOARD_ID": "529406044",
+  "AUCTION_ITEMS_INSTALLATION_BOARD_ID": "715805464",
+  "INVITE_BRAND_BOARD_ID": "1265655452",
+  "BRIDGE_URL": "agoric-lookup:https://local.agoric.com?append=/bridge",
   "brandBoardIds": {
-    "Card": "529406044",
-    "Money": "1576549616"
+    "Card": "112440918",
+    "Money": "1532665031"
   },
   "issuerBoardIds": {
-    "Card": "715805464",
-    "Money": "1667979430"
+    "Card": "1675202761",
+    "Money": "1576549616"
   },
-  "BRIDGE_URL": "http://127.0.0.1:8000",
+  "minBidPerCard": 1000000,
   "API_URL": "http://127.0.0.1:8000",
   "CONTRACT_NAME": "cardStore"
 };

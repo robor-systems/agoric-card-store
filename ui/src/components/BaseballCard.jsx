@@ -1,59 +1,59 @@
-import React, { Fragment } from 'react';
-import Card from '@material-ui/core/Card';
-import CardMedia from '@material-ui/core/CardMedia';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
-
-import { makeStyles } from '@material-ui/core/styles';
-
+import React from 'react';
+import Tag from '../assets/icons/tag.png';
+import User from '../assets/icons/user.png';
+import Expand from '../assets/icons/expand.png';
 import { images } from '../images';
 
-const useStyles = makeStyles((theme) => {
-  return {
-    baseballCard: {
-      fontWeight: 'bold',
-      position: 'relative',
-      margin: theme.spacing(2),
-    },
-    media: {
-      height: 0,
-      paddingTop: '100%',
-    },
-    cardWrapper: {},
-    cardText: {},
-  };
-});
-
-const BaseballCard = ({ playerName, handleClick }) => {
-  const classes = useStyles();
-  const CardContainer = handleClick ? CardActionArea : Fragment;
-  const containerProps = handleClick
-    ? {
-        onClick: () => handleClick(playerName),
-      }
-    : {};
+const BaseballCard = ({ playerName }) => {
+  // const CardContainer = handleClick ? CardActionArea : Fragment;
+  // const containerProps = handleClick
+  //   ? {
+  //       onClick: () => handleClick(playerName),
+  //     }
+  //   : {};
 
   return (
-    <Card className={classes.baseballCard}>
-      <CardContainer {...containerProps}>
-        <CardMedia
-          className={classes.media}
-          image={images[playerName]}
-          title={playerName}
+    <div className="transition-all duration-300 flex flex-col p-3 border border-alternativeLight card card-shadow rounded-md">
+      <div className="card-media mb-3 relative">
+        <img
+          className="h-full w-full rounded-md"
+          src={images[playerName]}
+          alt={playerName}
         />
-        <CardContent>
-          <Typography
-            gutterBottom
-            variant="h5"
-            component="h2"
-            className={classes.cardText}
-          >
-            {playerName}
-          </Typography>
-        </CardContent>
-      </CardContainer>
-    </Card>
+        <div className="overlay absolute top-0 left-0 w-full h-full bg-primary opacity-50"></div>
+        <button className="transition-all duration-300 media-action absolute bottom-6 w-52 left-16 text-lg font-medium text-white h-12 bg-secondary hover:bg-secondaryDark rounded-md">
+          Sell
+        </button>
+        <img
+          src={Expand}
+          className="media-action-expand cursor-pointer w-12 h-12 absolute top-2 right-2"
+          alt="expand"
+        />
+      </div>
+      <div className="mb-2.5">
+        <div>
+          <div className="flex justify-between items-center">
+            <p className="text-lg mb-1">{playerName}</p>
+            <img className="w-6 h-6" src={Tag} alt="sale-tag" />
+          </div>
+          <div className="flex items-center">
+            <img className="w-6 h-6 mr-2" src={User} alt="user-icon" />
+            <span className="text-secondary">jane_doe</span>
+          </div>
+        </div>
+      </div>
+      <hr className="bg-alternativeLight" />
+      <div className="mt-1 flex items-center justify-between">
+        <div>
+          <p className="text-base text-primaryLight">Bought For</p>
+          <p className="text-lg">99 RUN</p>
+        </div>
+        <div>
+          <p className="text-base text-primaryLight">Sale Ending In</p>
+          <p className="text-lg">8 hours</p>
+        </div>
+      </div>
+    </div>
   );
 };
 

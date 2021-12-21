@@ -3,13 +3,13 @@ import { makeCapTP, E } from '@agoric/captp';
 import { makeAsyncIterableFromNotifier as iterateNotifier } from '@agoric/notifier';
 import { Far } from '@agoric/marshal';
 
+import './styles/global.css';
+
 import {
   activateWebSocket,
   deactivateWebSocket,
   getActiveSocket,
 } from './utils/fetch-websocket.js';
-
-import './App.css';
 
 import Header from './components/Header.jsx';
 import CardDisplay from './components/CardDisplay.jsx';

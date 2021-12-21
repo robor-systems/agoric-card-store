@@ -30,7 +30,7 @@ const CardDisplay = ({ playerNames, handleClick }) => {
   const isReady = playerNames && playerNames.length > 0;
 
   const cards = playerNames.map((playerName) => (
-    <Grid item sm={5} md={3} key={playerName}>
+    <Grid item sm={5} md={4} key={playerName}>
       <BaseballCard
         playerName={playerName}
         key={playerName}
@@ -59,6 +59,7 @@ const CardDisplay = ({ playerNames, handleClick }) => {
           alignItems="stretch"
           direction="row"
           justify="space-evenly"
+          className="gap-y-10 justify-items-center"
         >
           {cards}
         </Grid>
