@@ -177,9 +177,8 @@ function App() {
     setNeedToApproveOffer(false);
     setBoughtCard(false);
   };
-
   return (
-    <div className="App">
+    <div className="App relative">
       <Header walletConnected={walletConnected} dappApproved={dappApproved} />
       <CardDisplay playerNames={availableCards} handleClick={handleCardClick} />
       <CardDetailModal

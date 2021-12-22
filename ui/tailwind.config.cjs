@@ -1,7 +1,7 @@
 module.exports = {
   purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
-   darkMode: false, // or 'media' or 'class'
-   theme: {
+  darkMode: false, // or 'media' or 'class'
+  theme: {
     extend: {
       colors: {
         primary: 'var(--color-primary)',
@@ -10,7 +10,7 @@ module.exports = {
         secondary: 'var(--color-secondary)',
         secondaryDark: 'var(--color-secondary-dark)',
         primaryLight: 'var(--color-primary-light)',
-
+        fieldBg: 'var(--color-field)',
       },
       fontFamily: {
         sans: [
@@ -31,9 +31,9 @@ module.exports = {
         ],
       },
     },
-   },
-   variants: {
-     extend: {},
-   },
-   plugins: [],
- }
+  },
+  variants: {
+    extend: {},
+  },
+  plugins: [],
+};

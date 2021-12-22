@@ -4,7 +4,7 @@ import User from '../assets/icons/user.png';
 import Expand from '../assets/icons/expand.png';
 import { images } from '../images';
 
-const BaseballCard = ({ playerName }) => {
+const BaseballCard = ({ imageOnly, playerName, handleClick }) => {
   // const CardContainer = handleClick ? CardActionArea : Fragment;
   // const containerProps = handleClick
   //   ? {
@@ -13,25 +13,40 @@ const BaseballCard = ({ playerName }) => {
   //   : {};
 
   return (
-    <div className="transition-all duration-300 flex flex-col p-3 border border-alternativeLight card card-shadow rounded-md">
-      <div className="card-media mb-3 relative">
+    <div
+      className={`transition-all duration-300 flex flex-col py-3 border border-alternativeLight card card-shadow rounded-md ${
+        imageOnly && 'card-image-only'
+      }`}
+    >
+      <div
+        className={`card-media mb-3 relative self-center ${
+          imageOnly && 'card-media-small'
+        }`}
+      >
         <img
           className="h-full w-full rounded-md"
           src={images[playerName]}
           alt={playerName}
         />
-        <div className="overlay absolute top-0 left-0 w-full h-full bg-primary opacity-50"></div>
-        <button className="transition-all duration-300 media-action absolute bottom-6 w-52 left-16 text-lg font-medium text-white h-12 bg-secondary hover:bg-secondaryDark rounded-md">
-          Sell
-        </button>
-        <img
-          src={Expand}
-          className="media-action-expand cursor-pointer w-12 h-12 absolute top-2 right-2"
-          alt="expand"
-        />
+        {!imageOnly && (
+          <>
+            <div className="overlay absolute top-0 left-0 w-full h-full bg-primary opacity-50"></div>
+            <button className="transition-all duration-300 media-action absolute bottom-6 w-52 left-16 text-lg font-medium text-white h-12 bg-secondary hover:bg-secondaryDark rounded-md">
+              Sell
+            </button>
+            <img
+              onClick={() => {
+                handleClick(playerName);
+              }}
+              src={Expand}
+              className="media-action-expand cursor-pointer w-12 h-12 absolute top-2 right-2"
+              alt="expand"
+            />
+          </>
+        )}
       </div>
-      <div className="mb-2.5">
-        <div>
+      <div>
+        <div className="px-3">
           <div className="flex justify-between items-center">
             <p className="text-lg mb-1">{playerName}</p>
             <img className="w-6 h-6" src={Tag} alt="sale-tag" />
@@ -42,17 +57,21 @@ const BaseballCard = ({ playerName }) => {
           </div>
         </div>
       </div>
-      <hr className="bg-alternativeLight" />
-      <div className="mt-1 flex items-center justify-between">
-        <div>
-          <p className="text-base text-primaryLight">Bought For</p>
-          <p className="text-lg">99 RUN</p>
-        </div>
-        <div>
-          <p className="text-base text-primaryLight">Sale Ending In</p>
-          <p className="text-lg">8 hours</p>
-        </div>
-      </div>
+      {!imageOnly && (
+        <>
+          <hr className="mt-2.5 mb-1 bg-alternativeLight" />
+          <div className="flex items-center justify-between px-3">
+            <div>
+              <p className="text-base text-primaryLight">Bought For</p>
+              <p className="text-lg">99 RUN</p>
+            </div>
+            <div>
+              <p className="text-base text-primaryLight">Sale Ending In</p>
+              <p className="text-lg">8 hours</p>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

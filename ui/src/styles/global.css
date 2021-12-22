@@ -13,10 +13,39 @@
     --color-secondary-dark: #29A9FF;
     --color-alternative: #EB5757;
     --color-alternative-light: #CFCFCF;
+    --color-field:#F1F1F1;
     --color-primary: #363636;
     --color-primary-light: #A1A1A1;
 }
 
+@layer base{
+    p,span,h1,h2{
+        @apply text-primary;
+    }
+
+    select{
+        appearance:none;
+        -moz-appearance:none;
+        -webkit-appearance:none;
+    }
+
+    input::placeholder{
+        color:var(--color-primary-light)
+    }
+    
+    select::placeholder{
+        color:var(--color-primary)
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        display: none;
+        -webkit-appearance: none;
+    }
+}
 
 @layer utilities {
     .nav-shadow{
@@ -26,28 +55,52 @@
     .modal-shadow{
         box-shadow: 0px 6px 16px #00000029;
     }
-    .outlined-btn-shadow{
+
+    .btn-shadow:hover{
         box-shadow: 0px 3px 6px #00000029;
     }
+
     .card {
         width:360px;
         height:490px;
     }
+
+    .card-image-only{
+        width:308px !important;
+        height: 377px !important;;
+    }
+
     .card:hover{
         box-shadow: 0px 6px 18px #00000029;
     }
+
     .card-media{
         width:336px;
-        min-height:336px;
+        height:336px;
     }
+
+    .card-media-small{
+        width: 288px !important;;
+        height: 288px !important;
+    }
+
     .media-action,
     .overlay,
     .media-action-expand{
         visibility:hidden;
     }
+
     .card-media:hover .overlay, 
     .card-media:hover .media-action, 
     .card-media:hover .media-action-expand {
         visibility:visible;
+    }
+
+    .display-card{
+        margin: 72px 0px ;
+    }
+
+    .form{
+        width:336px;
     }
 }
