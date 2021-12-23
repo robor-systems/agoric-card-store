@@ -3,11 +3,12 @@ import React from 'react';
 // import Typography from '@material-ui/core/Typography';
 // import Paper from '@material-ui/core/Paper';
 // import Container from '@material-ui/core/Container';
-import CircularProgress from '@material-ui/core/CircularProgress';
+// import CircularProgress from '@material-ui/core/CircularProgress';
 
 // import { makeStyles } from '@material-ui/core/styles';
 
 import BaseballCard from './BaseballCard.jsx';
+import Loader from './common/Loader.jsx';
 
 // const useStyles = makeStyles((theme) => {
 //   return {
@@ -64,8 +65,8 @@ const CardDisplay = ({ playerNames, handleClick }) => {
     // </Container>
     <div className="display-card flex flex-col items-center">
       <h1 className="text-3xl font-semibold mb-14">My Cards</h1>
-      <div>
-        {!isReady && <CircularProgress size="2rem" />}
+      <div className="flex flex-col items-center">
+        {!isReady && <Loader />}
         {!isReady && 'Fetching card list...'}
       </div>
       <div className="grid grid-cols-3 gap-x-8 gap-y-10">{cards}</div>

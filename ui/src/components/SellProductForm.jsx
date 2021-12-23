@@ -8,9 +8,9 @@ function SellProductForm() {
   return (
     <div className="form flex flex-col gap-y-6 self">
       <Select />
-      <Input />
+      <Input label="Price" />
       <DateTimeField />
-      <Button styles="w-full mt-auto" />
+      <Button text="Place in Marketplace" styles="w-full mt-auto" />
     </div>
   );
 }

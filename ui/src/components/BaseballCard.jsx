@@ -3,6 +3,7 @@ import Tag from '../assets/icons/tag.png';
 import User from '../assets/icons/user.png';
 import Expand from '../assets/icons/expand.png';
 import { images } from '../images';
+import Button from './common/Button';
 
 const BaseballCard = ({ imageOnly, playerName, handleClick }) => {
   // const CardContainer = handleClick ? CardActionArea : Fragment;
@@ -15,7 +16,7 @@ const BaseballCard = ({ imageOnly, playerName, handleClick }) => {
   return (
     <div
       className={`transition-all duration-300 flex flex-col py-3 border border-alternativeLight card card-shadow rounded-md ${
-        imageOnly && 'card-image-only'
+        imageOnly && 'card-image-only py-2.5'
       }`}
     >
       <div
@@ -30,14 +31,14 @@ const BaseballCard = ({ imageOnly, playerName, handleClick }) => {
         />
         {!imageOnly && (
           <>
-            <div className="overlay absolute top-0 left-0 w-full h-full bg-primary opacity-50"></div>
-            <button className="transition-all duration-300 media-action absolute bottom-6 w-52 left-16 text-lg font-medium text-white h-12 bg-secondary hover:bg-secondaryDark rounded-md">
-              Sell
-            </button>
+            <div className="overlay rounded-md absolute top-0 left-0 w-full h-full bg-primary opacity-50"></div>
+            <Button
+              styles="media-action absolute bottom-6 w-52 left-16"
+              onClick={() => handleClick(playerName, false)}
+              text="Sell"
+            />
             <img
-              onClick={() => {
-                handleClick(playerName);
-              }}
+              onClick={() => handleClick(playerName, true)}
               src={Expand}
               className="media-action-expand cursor-pointer w-12 h-12 absolute top-2 right-2"
               alt="expand"

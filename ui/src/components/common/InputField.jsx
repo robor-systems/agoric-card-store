@@ -1,10 +1,10 @@
 import React from 'react';
 import RUN from '../../assets/icons/RUN-logo.png';
 
-function Input() {
+function Input({ label }) {
   return (
     <div>
-      <span className="text-lg leading-none">Price</span>
+      <span className="text-lg leading-none">{label}</span>
       <div className="flex justify-between pr-4 border border-alternativeLight rounded items-center">
         <input
           type="number"

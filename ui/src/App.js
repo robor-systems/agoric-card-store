@@ -20,7 +20,9 @@ import EnableAppDialog from './components/EnableAppDialog.jsx';
 import { getCardAuctionDetail, makeBidOfferForCard } from './auction.js';
 
 import dappConstants from './lib/constants.js';
-import CardDetailModal from './components/CardDetailModal.jsx';
+import ModalWrapper from './components/ModalWrapper';
+import ModalContent from './components/ModalContent';
+import { images } from './images';
 
 const {
   INSTANCE_BOARD_ID,
@@ -41,6 +43,7 @@ function App() {
   const [activeCard, setActiveCard] = useState(null);
   const [tokenDisplayInfo, setTokenDisplayInfo] = useState(null);
   const [tokenPetname, setTokenPetname] = useState(null);
+  const [openExpandModal, setOpenExpandModal] = useState(false);
 
   const handleDialogClose = () => setOpenEnableAppDialog(false);
 
@@ -143,8 +146,9 @@ function App() {
     return deactivateWebSocket;
   }, []);
 
-  const handleCardClick = (name) => {
+  const handleCardClick = (name, bool) => {
     setActiveCard(name);
+    setOpenExpandModal(bool);
   };
 
   const handleCardModalClose = () => {
@@ -177,12 +181,13 @@ function App() {
     setNeedToApproveOffer(false);
     setBoughtCard(false);
   };
+
   return (
     <div className="App relative">
       <Header walletConnected={walletConnected} dappApproved={dappApproved} />
       <CardDisplay playerNames={availableCards} handleClick={handleCardClick} />
-      <CardDetailModal
-        open={!!activeCard}
+      <ModalWrapper
+        open={activeCard && !openExpandModal}
         onClose={handleCardModalClose}
         onGetCardDetail={handleGetCardDetail}
         onBidCard={submitCardOffer}
@@ -190,7 +195,19 @@ function App() {
         tokenPurses={tokenPurses}
         tokenPetname={tokenPetname}
         tokenDisplayInfo={tokenDisplayInfo}
-      />
+        style="modal"
+      >
+        <ModalContent playerName={activeCard} type="Sell Product" />
+      </ModalWrapper>
+      <ModalWrapper
+        open={openExpandModal && activeCard}
+        onClose={handleCardModalClose}
+        style="modal-img"
+      >
+        <div className="pb-12 w-full h-full object-cover flex justify-center items-center">
+          <img src={images[activeCard]} alt="Card Media" />
+        </div>
+      </ModalWrapper>
       <EnableAppDialog
         open={openEnableAppDialog}
         handleClose={handleDialogClose}
