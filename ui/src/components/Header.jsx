@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-const Header = ({ walletConnected }) => {
-  const [activeTab, setActiveTab] = useState(0);
+const Header = ({ walletConnected, activeTab, setActiveTab }) => {
   const walletStatus = walletConnected ? 'Connected' : 'Not connected';
   // const dappStatus = dappApproved ? 'Approved' : 'Not approved';
   console.log(activeTab);
@@ -11,7 +10,7 @@ const Header = ({ walletConnected }) => {
         onClick={() => {
           setActiveTab(tabIndex);
         }}
-        className={`flex flex-col justify-center relative h-20 ${width}`}
+        className={`cursor-pointer flex flex-col justify-center relative h-20 ${width}`}
       >
         <span>{text}</span>
         <div

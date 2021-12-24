@@ -44,7 +44,9 @@ function App() {
   const [tokenDisplayInfo, setTokenDisplayInfo] = useState(null);
   const [tokenPetname, setTokenPetname] = useState(null);
   const [openExpandModal, setOpenExpandModal] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
 
+  const handleTabChange = (index) => setActiveTab(index);
   const handleDialogClose = () => setOpenEnableAppDialog(false);
 
   const walletPRef = useRef(undefined);
@@ -181,11 +183,20 @@ function App() {
     setNeedToApproveOffer(false);
     setBoughtCard(false);
   };
-
+  console.log(availableCards, 'available cards');
   return (
     <div className="App relative">
-      <Header walletConnected={walletConnected} dappApproved={dappApproved} />
-      <CardDisplay playerNames={availableCards} handleClick={handleCardClick} />
+      <Header
+        walletConnected={walletConnected}
+        dappApproved={dappApproved}
+        activeTab={activeTab}
+        setActiveTab={handleTabChange}
+      />
+      <CardDisplay
+        activeTab={activeTab}
+        playerNames={availableCards}
+        handleClick={handleCardClick}
+      />
       <ModalWrapper
         open={activeCard && !openExpandModal}
         onClose={handleCardModalClose}

@@ -37,8 +37,14 @@
         color:var(--color-primary)
     }
 
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
     input[type=number] {
-        -moz-appearance: textfield;
+        appearance: none;
+        -moz-appearance: none;
     }
 
     input[type="date"]::-webkit-calendar-picker-indicator {
@@ -109,7 +115,7 @@
     }
 
     .display-card{
-        margin: 72px 0px ;
+        margin: 72px auto ;
     }
 
     .form{
