@@ -45,7 +45,7 @@ function App() {
   const [tokenPetname, setTokenPetname] = useState(null);
   const [openExpandModal, setOpenExpandModal] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-
+  const [type, setType] = useState('Sell Product');
   const handleTabChange = (index) => setActiveTab(index);
   const handleDialogClose = () => setOpenEnableAppDialog(false);
 
@@ -118,14 +118,19 @@ function App() {
       const instance = await E(board).getValue(INSTANCE_BOARD_ID);
       const publicFacet = E(zoe).getPublicFacet(instance);
       publicFacetRef.current = publicFacet;
-
+      /*
+       *get the current items for sale in the proposal
+       *Currenly these will me primary marketplace cards
+       */
       const availableItemsNotifier = E(
         publicFacetRef.current,
       ).getAvailableItemsNotifier();
 
+      /* Using the public faucet we get all the current Nfts offered for sale */
       for await (const cardsAvailableAmount of iterateNotifier(
         availableItemsNotifier,
       )) {
+        console.log('available Cards:', cardsAvailableAmount);
         setAvailableCards(cardsAvailableAmount.value);
       }
     };
@@ -191,11 +196,13 @@ function App() {
         dappApproved={dappApproved}
         activeTab={activeTab}
         setActiveTab={handleTabChange}
+        setType={setType}
       />
       <CardDisplay
         activeTab={activeTab}
         playerNames={availableCards}
         handleClick={handleCardClick}
+        type={type}
       />
       <ModalWrapper
         open={activeCard && !openExpandModal}
@@ -208,7 +215,7 @@ function App() {
         tokenDisplayInfo={tokenDisplayInfo}
         style="modal"
       >
-        <ModalContent playerName={activeCard} type="Sell Product" />
+        <ModalContent playerName={activeCard} type={type} />
       </ModalWrapper>
       <ModalWrapper
         open={openExpandModal && activeCard}

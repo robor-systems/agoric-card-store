@@ -4,3 +4,5 @@ _agstate/yarn-links/
 ui/.cache/
 ui/dist/
 ui/build
+ui/src/conf/installationConstants.js
+ui/src/conf/defaults.js

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Header = ({ walletConnected, activeTab, setActiveTab }) => {
+const Header = ({ walletConnected, activeTab, setActiveTab, setType }) => {
   const walletStatus = walletConnected ? 'Connected' : 'Not connected';
   // const dappStatus = dappApproved ? 'Approved' : 'Not approved';
   console.log(activeTab);
@@ -9,6 +9,8 @@ const Header = ({ walletConnected, activeTab, setActiveTab }) => {
       <div
         onClick={() => {
           setActiveTab(tabIndex);
+          console.log(tabIndex);
+          tabIndex === 0 ? setType('Sell Product') : setType('Buy Product');
         }}
         className={`cursor-pointer flex flex-col justify-center relative h-20 ${width}`}
       >

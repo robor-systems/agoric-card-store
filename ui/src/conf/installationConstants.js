@@ -1,7 +1,7 @@
-// GENERATED FROM /home/haseeb/agoric/dapps/my-card-store/contract/deploy.js
+// GENERATED FROM /home/test/Repos/agoric-dapps/agoric-card-store/contract/deploy.js
 export default {
   "CONTRACT_NAME": "cardStore",
-  "INSTALLATION_BOARD_ID": "931423413",
-  "AUCTION_INSTALLATION_BOARD_ID": "1168060102",
-  "AUCTION_ITEMS_INSTALLATION_BOARD_ID": "940953141"
+  "INSTALLATION_BOARD_ID": "474502210",
+  "AUCTION_INSTALLATION_BOARD_ID": "112440918",
+  "AUCTION_ITEMS_INSTALLATION_BOARD_ID": "688500812"
 };

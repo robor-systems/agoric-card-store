@@ -26,7 +26,7 @@ import Loader from './common/Loader.jsx';
 //   };
 // });
 
-const CardDisplay = ({ activeTab, playerNames, handleClick }) => {
+const CardDisplay = ({ activeTab, playerNames, handleClick, type }) => {
   const isReady = playerNames && playerNames.length > 0;
 
   const cards = playerNames.map((playerName) => (
@@ -35,6 +35,7 @@ const CardDisplay = ({ activeTab, playerNames, handleClick }) => {
         playerName={playerName}
         key={playerName}
         handleClick={handleClick}
+        type={type}
       />
     </div>
   ));
