@@ -62,27 +62,31 @@ const CardDisplay = ({ activeTab, playerNames, handleClick }) => {
     //     </Grid>
     //   </Grid>
     // </Container>
-    <div className="display-card flex flex-col items-center w-10/12">
+    <div className="display-card flex flex-col items-center max-w-7xl">
       <h1 className="text-3xl font-semibold mb-14">
         {activeTab === 0 && 'My Cards'}
         {activeTab === 1 && 'Marketplace'}
         {activeTab === 2 && 'Primary Sales'}
       </h1>
       {activeTab !== 0 && (
-        <div className="flex gap-x-4 justify-center w-full px-2 mb-14">
-          <div className="flex w-3/4 border justify-between px-4 border-alternativeLight rounded items-center">
+        <div className="flex gap-x-4 w-full mb-14">
+          <div
+            style={{ width: '76.92%' }}
+            className="flex border justify-between border-alternativeLight rounded items-center"
+          >
             <input
-              className="outline-none focus:outline-none rounded h-12 text-lg"
+              className="outline-none focus:outline-none pl-4 rounded h-12 text-lg"
               placeholder="Search"
             />
             <img
-              className="w-4 h-4 relative"
+              className=" h-4 mr-4 relative"
               src={SearchIcon}
               alt="search-icon"
             />
           </div>
           <select
             style={{
+              width: '23.07%',
               backgroundImage: `url(${FilterIcon})`,
               backgroundSize: '25px',
               backgroundPositionY: 'center',
@@ -98,7 +102,9 @@ const CardDisplay = ({ activeTab, playerNames, handleClick }) => {
         {!isReady && <Loader />}
         {!isReady && 'Fetching card list...'}
       </div>
-      <div className="grid grid-cols-3 gap-x-8 gap-y-10">{cards}</div>
+      <div className="w-full justify-items-center grid grid-cols-3 gap-x-8 gap-y-10">
+        {cards}
+      </div>
     </div>
   );
 };
