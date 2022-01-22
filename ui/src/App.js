@@ -19,17 +19,22 @@ import EnableAppDialog from './components/EnableAppDialog.jsx';
 
 import { getCardAuctionDetail, makeBidOfferForCard } from './auction.js';
 
+import installationConstants from './conf/installationConstants';
 import dappConstants from './lib/constants.js';
 import ModalWrapper from './components/ModalWrapper';
 import ModalContent from './components/ModalContent';
 import { images } from './images';
+// import { Buy } from './buy';
 
 const {
   INSTANCE_BOARD_ID,
   INSTALLATION_BOARD_ID,
-  issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID },
+  issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID, Money: MONEY_ISSUER_BOARD_ID },
   brandBoardIds: { Money: MONEY_BRAND_BOARD_ID, Card: CARD_BRAND_BOARD_ID },
+  ATOMICSWAP_CONTRACT_INSTANCE_BOARD_ID: atomicSwapInstanceId,
 } = dappConstants;
+
+const { ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID } = installationConstants;
 
 function App() {
   const [walletConnected, setWalletConnected] = useState(false);
@@ -118,14 +123,15 @@ function App() {
       const instance = await E(board).getValue(INSTANCE_BOARD_ID);
       const publicFacet = E(zoe).getPublicFacet(instance);
       publicFacetRef.current = publicFacet;
-
+      const availableItems = await E(publicFacet).getAvailableItems();
       const availableItemsNotifier = E(
         publicFacetRef.current,
       ).getAvailableItemsNotifier();
-
+      console.log(availableItems, 'public assetavail');
       for await (const cardsAvailableAmount of iterateNotifier(
         availableItemsNotifier,
       )) {
+        console.log(cardsAvailableAmount, 'cards available amount');
         setAvailableCards(cardsAvailableAmount.value);
       }
     };
@@ -147,6 +153,49 @@ function App() {
     });
     return deactivateWebSocket;
   }, []);
+  console.log(
+    tokenPurses,
+    tokenDisplayInfo,
+    tokenPetname,
+    cardPurse,
+    'purses info',
+  );
+
+  const handleBuyClick = async () => {
+    const zoe = await E(walletPRef.current).getZoe();
+    const board = await E(walletPRef.current).getBoard();
+    const atomicSwapContractInstance = await E(board).getValue(
+      atomicSwapInstanceId,
+    );
+    // const moneyIssuer = await E(board).getValue(MONEY_ISSUER_BOARD_ID);
+    // const atomicSwapLogicInstallation = await E(board).getValue(
+    //   ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID,
+    // );
+    const publicFacet = await E(zoe).getPublicFacet(atomicSwapContractInstance);
+    const { random } = await E(publicFacet).randomVal();
+    console.log(random);
+    console.log(MONEY_ISSUER_BOARD_ID, ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID);
+    // const test = await E(publicFacet).createInstance(
+    //   [cardCID],
+    //   moneyIssuer,
+    //   atomicSwapLogicInstallation,
+    // );
+    // console.log(test);
+    // const { invitationP } = E(publicFacet).getBuyerInvitation(
+    //   [cardCID],
+    //   moneyIssuer,
+    //   atomicSwapLogicInstallation,
+    // );
+
+    // console.log(invitationP);
+    // Buy({
+    //   cardCID,
+    //   walletP: walletPRef.current,
+    //   cardPurse,
+    //   tokenPurse: tokenPurses[0],
+    // });
+    // Buy(cardCID, zoe, board, cardPurse, tokenPurses[0]);
+  };
 
   const handleCardClick = (name, bool) => {
     setActiveCard(name);
@@ -156,7 +205,6 @@ function App() {
   const handleCardModalClose = () => {
     setActiveCard(null);
   };
-
   const handleGetCardDetail = (name) => {
     // XXX for now, everytime user call this, we will create a new invitation
     return getCardAuctionDetail({
@@ -208,7 +256,11 @@ function App() {
         tokenDisplayInfo={tokenDisplayInfo}
         style="modal"
       >
-        <ModalContent playerName={activeCard} type="Sell Product" />
+        <ModalContent
+          handleBuyClick={handleBuyClick}
+          playerName={activeCard}
+          type="Buy Product"
+        />
       </ModalWrapper>
       <ModalWrapper
         open={openExpandModal && activeCard}

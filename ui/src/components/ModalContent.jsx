@@ -5,7 +5,7 @@ import EditProductForm from './EditProductForm';
 import SellProductForm from './SellProductForm';
 // import Button from './common/Button';
 
-function ModalContent({ type, playerName }) {
+function ModalContent({ type, playerName, handleBuyClick }) {
   const populateContent = () => {
     switch (type) {
       case 'Sell Product':
@@ -24,9 +24,13 @@ function ModalContent({ type, playerName }) {
         );
       case 'Buy Product':
         return (
-          <div className="flex flex-col gap-y-10 mt-11 mx-12 mb-12">
+          <div className="flex flex-col gap-y-10 mt-11 mx-12 mb-11">
             <BaseballCard playerName={playerName} />
-            <Button text="Buy for 99 RUN" style="w-full" />
+            <Button
+              onClick={() => handleBuyClick(playerName)}
+              text="Buy for 99 RUN"
+              style="w-full"
+            />
           </div>
         );
       default:
