@@ -50,7 +50,7 @@ function App() {
   const [tokenPetname, setTokenPetname] = useState(null);
   const [openExpandModal, setOpenExpandModal] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-
+  const [type, setType] = useState('Sell Product');
   const handleTabChange = (index) => setActiveTab(index);
   const handleDialogClose = () => setOpenEnableAppDialog(false);
 
@@ -128,14 +128,19 @@ function App() {
         publicFacetRef.current,
       ).getAvailableItemsNotifier();
       console.log(availableItems, 'public assetavail');
+      /*
+       *get the current items for sale in the proposal
+       *Currenly these will me primary marketplace cards
+       */
+
+      /* Using the public faucet we get all the current Nfts offered for sale */
       for await (const cardsAvailableAmount of iterateNotifier(
         availableItemsNotifier,
       )) {
-        console.log(cardsAvailableAmount, 'cards available amount');
+        console.log('available Cards:', cardsAvailableAmount);
         setAvailableCards(cardsAvailableAmount.value);
       }
     };
-
     const onDisconnect = () => {
       setWalletConnected(false);
       walletAbort && walletAbort();
@@ -239,11 +244,13 @@ function App() {
         dappApproved={dappApproved}
         activeTab={activeTab}
         setActiveTab={handleTabChange}
+        setType={setType}
       />
       <CardDisplay
         activeTab={activeTab}
         playerNames={availableCards}
         handleClick={handleCardClick}
+        type={type}
       />
       <ModalWrapper
         open={activeCard && !openExpandModal}
@@ -261,6 +268,7 @@ function App() {
           playerName={activeCard}
           type="Buy Product"
         />
+        <ModalContent playerName={activeCard} type={type} />
       </ModalWrapper>
       <ModalWrapper
         open={openExpandModal && activeCard}

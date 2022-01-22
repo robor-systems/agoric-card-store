@@ -6,7 +6,7 @@ import Expand from '../assets/icons/expand.png';
 // import { images } from '../images';
 import Button from './common/Button';
 
-const BaseballCard = ({ imageOnly, playerName, handleClick }) => {
+const BaseballCard = ({ imageOnly, playerName, handleClick, type }) => {
   const [CardDetails, setCardDetails] = useState(null);
   // const CardContainer = handleClick ? CardActionArea : Fragment;
   // const containerProps = handleClick
@@ -73,17 +73,27 @@ const BaseballCard = ({ imageOnly, playerName, handleClick }) => {
         </div>
         {!imageOnly && (
           <>
-            <hr className="mt-2.5 mb-1 bg-alternativeLight" />
-            <div className="flex items-center justify-between px-3">
-              <div>
-                <p className="text-base text-primaryLight">Bought For</p>
-                <p className="text-lg">99 RUN</p>
-              </div>
-              <div>
-                <p className="text-base text-primaryLight">Sale Ending In</p>
-                <p className="text-lg">8 hours</p>
-              </div>
-            </div>
+            <div className="overlay rounded-md absolute top-0 left-0 w-full h-full bg-primary opacity-50"></div>
+            {type === 'Sell Product' && (
+              <Button
+                styles="media-action absolute bottom-6 w-52 left-16"
+                onClick={() => handleClick(playerName, false)}
+                text="Sell"
+              />
+            )}
+            {type === 'Buy Product' && (
+              <Button
+                styles="media-action absolute bottom-6 w-52 left-16"
+                onClick={() => handleClick(playerName, false)}
+                text="Buy"
+              />
+            )}
+            <img
+              onClick={() => handleClick(playerName, true)}
+              src={Expand}
+              className="media-action-expand cursor-pointer w-12 h-12 absolute top-2 right-2"
+              alt="expand"
+            />
           </>
         )}
       </div>

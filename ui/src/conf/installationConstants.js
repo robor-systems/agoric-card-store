@@ -1,4 +1,4 @@
-// GENERATED FROM /home/haseeb/agoric/dapps/my-card-store/contract/deploy.js
+// GENERATED FROM /home/test/Repos/agoric-dapps/agoric-card-store/contract/deploy.js
 export default {
   "CONTRACT_NAME": "cardStore",
   "INSTALLATION_BOARD_ID": "974906046",

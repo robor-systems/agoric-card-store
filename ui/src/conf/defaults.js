@@ -1,4 +1,4 @@
-// GENERATED FROM /home/haseeb/agoric/dapps/my-card-store/api/deploy.js
+// GENERATED FROM /home/test/Repos/agoric-dapps/agoric-card-store/api/deploy.js
 export default {
   "INSTANCE_BOARD_ID": "232882126",
   "INSTALLATION_BOARD_ID": "974906046",
