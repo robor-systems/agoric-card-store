@@ -70,6 +70,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     INSTALLATION_BOARD_ID,
     AUCTION_INSTALLATION_BOARD_ID,
     AUCTION_ITEMS_INSTALLATION_BOARD_ID,
+    ATOMICSWAP_INSTALLATION_BOARD_ID,
     CONTRACT_NAME,
   } = installationConstants;
   const installation = await E(board).getValue(INSTALLATION_BOARD_ID);
@@ -79,7 +80,9 @@ export default async function deployApi(homePromise, { pathResolve }) {
   const auctionInstallation = await E(board).getValue(
     AUCTION_INSTALLATION_BOARD_ID,
   );
-
+  const atomicSwapContractInstallation = await E(board).getValue(
+    ATOMICSWAP_INSTALLATION_BOARD_ID,
+  );
   // Second, we can use the installation to create a new instance of
   // our contract code on Zoe. A contract instance is a running
   // program that can take offers through Zoe. Making an instance will
@@ -89,6 +92,11 @@ export default async function deployApi(homePromise, { pathResolve }) {
   const { creatorFacet: baseballCardSellerFacet } = await E(zoe).startInstance(
     installation,
   );
+
+  const {
+    instance: atomicSwapContractInstance,
+    publicFacet: atomicSwapContractPublicFacet,
+  } = await E(zoe).startInstance(atomicSwapContractInstallation);
 
   /**
    * @type {ERef<Issuer>}
@@ -140,6 +148,8 @@ export default async function deployApi(homePromise, { pathResolve }) {
     MONEY_BRAND_BOARD_ID,
     MONEY_ISSUER_BOARD_ID,
     INVITE_BRAND_BOARD_ID,
+    ATOMICSWAP_CONTRACT_INSTANCE_BOARD_ID,
+    ATOMICSWAP_CONTRACT_PUBLIC_FACET_BOARD_ID,
   ] = await Promise.all([
     E(board).getId(instance),
     E(board).getId(cardBrand),
@@ -147,12 +157,20 @@ export default async function deployApi(homePromise, { pathResolve }) {
     E(board).getId(moneyBrand),
     E(board).getId(moneyIssuer),
     E(board).getId(invitationBrand),
+    E(board).getId(atomicSwapContractInstance),
+    E(board).getId(atomicSwapContractPublicFacet),
   ]);
 
   console.log(`-- Contract Name: ${CONTRACT_NAME}`);
   console.log(`-- INSTANCE_BOARD_ID: ${INSTANCE_BOARD_ID}`);
   console.log(`-- CARD_ISSUER_BOARD_ID: ${CARD_ISSUER_BOARD_ID}`);
   console.log(`-- CARD_BRAND_BOARD_ID: ${CARD_BRAND_BOARD_ID}`);
+  console.log(
+    `-- ATOMICSWAP_CONTRACT_INSTANCE_BOARD_ID: ${ATOMICSWAP_CONTRACT_INSTANCE_BOARD_ID}`,
+  );
+  console.log(
+    `-- ATOMICSWAP_CONTRACT_PUBLIC_FACET_BOARD_ID: ${ATOMICSWAP_CONTRACT_PUBLIC_FACET_BOARD_ID}`,
+  );
 
   const API_URL = process.env.API_URL || `http://127.0.0.1:${API_PORT || 8000}`;
 
@@ -174,6 +192,8 @@ export default async function deployApi(homePromise, { pathResolve }) {
     minBidPerCard: Number(moneyValue),
     API_URL,
     CONTRACT_NAME,
+    ATOMICSWAP_CONTRACT_INSTANCE_BOARD_ID,
+    ATOMICSWAP_CONTRACT_PUBLIC_FACET_BOARD_ID,
   };
   const defaultsFile = pathResolve(`../ui/src/conf/defaults.js`);
   console.log('writing', defaultsFile);

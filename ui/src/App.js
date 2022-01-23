@@ -50,13 +50,13 @@ function App() {
   const [tokenPetname, setTokenPetname] = useState(null);
   const [openExpandModal, setOpenExpandModal] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [type, setType] = useState('Sell Product');
+  const [type, setType] = useState('Buy Product');
   const handleTabChange = (index) => setActiveTab(index);
   const handleDialogClose = () => setOpenEnableAppDialog(false);
 
   const walletPRef = useRef(undefined);
   const publicFacetRef = useRef(undefined);
-
+  const publicFacetAtomicSwapRef = useRef(undefined);
   useEffect(() => {
     // Receive callbacks from the wallet connection.
     const otherSide = Far('otherSide', {
@@ -121,8 +121,11 @@ function App() {
       const zoe = E(walletP).getZoe();
       const board = E(walletP).getBoard();
       const instance = await E(board).getValue(INSTANCE_BOARD_ID);
+      const atomicSwapInstance = await E(board).getValue(atomicSwapInstanceId);
       const publicFacet = E(zoe).getPublicFacet(instance);
+      const publicFacetAtomicSwap = E(zoe).getPublicFacet(atomicSwapInstance);
       publicFacetRef.current = publicFacet;
+      publicFacetAtomicSwapRef.current = publicFacetAtomicSwap;
       const availableItems = await E(publicFacet).getAvailableItems();
       const availableItemsNotifier = E(
         publicFacetRef.current,
@@ -166,20 +169,29 @@ function App() {
     'purses info',
   );
 
-  const handleBuyClick = async () => {
-    const zoe = await E(walletPRef.current).getZoe();
-    const board = await E(walletPRef.current).getBoard();
-    const atomicSwapContractInstance = await E(board).getValue(
+  const handleBuyClick = async (cardCID) => {
+    console.log(
+      MONEY_ISSUER_BOARD_ID,
+      ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID,
       atomicSwapInstanceId,
     );
+    const temp = await E(publicFacetRef.current).getSessionDetailsForKey(
+      cardCID,
+    );
+    console.log(temp);
+    // const zoe = await E(walletPRef.current).getZoe();
+    // const board = await E(walletPRef.current).getBoard();
+    // const atomicSwapContractInstance = await E(board).getValue(
+    //   atomicSwapInstanceId,
+    // );
     // const moneyIssuer = await E(board).getValue(MONEY_ISSUER_BOARD_ID);
     // const atomicSwapLogicInstallation = await E(board).getValue(
     //   ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID,
     // );
-    const publicFacet = await E(zoe).getPublicFacet(atomicSwapContractInstance);
-    const { random } = await E(publicFacet).randomVal();
-    console.log(random);
-    console.log(MONEY_ISSUER_BOARD_ID, ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID);
+    // const publicFacet = await E(zoe).getPublicFacet(atomicSwapContractInstance);
+    // const { random } = await E(publicFacetAtomicSwapRef.current).randomVal();
+    // console.log(random);
+    // console.log(random);
     // const test = await E(publicFacet).createInstance(
     //   [cardCID],
     //   moneyIssuer,
@@ -266,9 +278,8 @@ function App() {
         <ModalContent
           handleBuyClick={handleBuyClick}
           playerName={activeCard}
-          type="Buy Product"
+          type={type}
         />
-        <ModalContent playerName={activeCard} type={type} />
       </ModalWrapper>
       <ModalWrapper
         open={openExpandModal && activeCard}

@@ -79,6 +79,25 @@ export default async function deployContract(
   const auctionBundle = await bundleSource(auctionBundlePath);
   const auctionInstallation = await E(zoe).install(auctionBundle);
 
+  // Deploying AtomicSwap
+  const atomicSwapBundleUrl = await importMetaResolve(
+    './src/atomicSwap.js',
+    import.meta.url,
+  );
+  const atomicSwapBundlePath = new URL(atomicSwapBundleUrl).pathname;
+  const atomicSwapBundle = await bundleSource(atomicSwapBundlePath);
+  const atomicSwapInstallation = await E(zoe).install(atomicSwapBundle);
+
+  // Deploying AtomicSwap Logic
+  const atomicSwapLogicBundleURL = await await importMetaResolve(
+    '@agoric/zoe/src/contracts/atomicSwap.js',
+    import.meta.url,
+  );
+  const atomicSwapLogicPath = new URL(atomicSwapLogicBundleURL).pathname;
+  const atomicSwapLogicBundle = await bundleSource(atomicSwapLogicPath);
+  const atomicSwapLogicInstallation = await E(zoe).install(
+    atomicSwapLogicBundle,
+  );
   // Let's share this installation with other people, so that
   // they can run our contract code by making a contract
   // instance (see the api deploy script in this repo to see an
@@ -96,6 +115,12 @@ export default async function deployContract(
   const AUCTION_INSTALLATION_BOARD_ID = await E(board).getId(
     auctionInstallation,
   );
+  const ATOMICSWAP_INSTALLATION_BOARD_ID = await E(board).getId(
+    atomicSwapInstallation,
+  );
+  const ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID = await E(board).getId(
+    atomicSwapLogicInstallation,
+  );
   console.log('- SUCCESS! contract code installed on Zoe');
   console.log(`-- Contract Name: ${CONTRACT_NAME}`);
   console.log(`-- Installation Board Id: ${INSTALLATION_BOARD_ID}`);
@@ -105,6 +130,12 @@ export default async function deployContract(
   console.log(
     `-- Auction Items Installation Board Id: ${AUCTION_ITEMS_INSTALLATION_BOARD_ID}`,
   );
+  console.log(
+    `-- Atomic Swap Installation Board Id: ${ATOMICSWAP_INSTALLATION_BOARD_ID}`,
+  );
+  console.log(
+    `-- Atomic Swap Logic Installation Board Id: ${ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID}`,
+  );
 
   // Save the constants somewhere where the UI and api can find it.
   const dappConstants = {
@@ -112,6 +143,8 @@ export default async function deployContract(
     INSTALLATION_BOARD_ID,
     AUCTION_INSTALLATION_BOARD_ID,
     AUCTION_ITEMS_INSTALLATION_BOARD_ID,
+    ATOMICSWAP_INSTALLATION_BOARD_ID,
+    ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID,
   };
   const defaultsFolder = pathResolve(`../ui/src/conf`);
   const defaultsFile = pathResolve(`../ui/src/conf/installationConstants.js`);
