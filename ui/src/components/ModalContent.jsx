@@ -12,7 +12,6 @@ function ModalContent({
   onGetCardDetail,
   onBidCard,
   tokenPurses,
-  cardPurse,
   tokenPetname,
   tokenDisplayInfo,
 }) {
@@ -22,7 +21,7 @@ function ModalContent({
       case 'Sell Product':
         return (
           <div className="flex gap-x-10 mt-11 mx-12 mb-12">
-            <BaseballCard imageOnly={true} playerName={cardPurse} />
+            <BaseballCard imageOnly={true} playerName={playerName} />
             <SellProductForm />
           </div>
         );
@@ -38,15 +37,18 @@ function ModalContent({
         return (
           <>
             {!hidden && (
-              <CardDetailModal
-                onClose={onClose}
-                onGetCardDetail={onGetCardDetail}
-                onBidCard={onBidCard}
-                playerName={playerName}
-                tokenPurses={tokenPurses}
-                tokenPetname={tokenPetname}
-                tokenDisplayInfo={tokenDisplayInfo}
-              />
+              <>
+                <h1 className="text-2xl font-semibold text-center">{type}</h1>
+                <CardDetailModal
+                  onClose={onClose}
+                  onGetCardDetail={onGetCardDetail}
+                  onBidCard={onBidCard}
+                  playerName={playerName}
+                  tokenPurses={tokenPurses}
+                  tokenPetname={tokenPetname}
+                  tokenDisplayInfo={tokenDisplayInfo}
+                />
+              </>
             )}
             {hidden && (
               <>

@@ -128,7 +128,7 @@ const CardDetailModal = ({
           />
         </>
       ) : (
-        <Box textAlign="center" marginTop="40px">
+        <Box textAlign="center" marginTop="40px" padding="120px">
           <CircularProgress size="2rem" />
           <Typography>Fetching details...</Typography>
         </Box>
