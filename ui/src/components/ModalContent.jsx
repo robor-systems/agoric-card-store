@@ -6,6 +6,7 @@ import SellProductForm from './SellProductForm';
 import CardDetailModal from './CardDetailModal';
 
 function ModalContent({
+  makeSwapInvitation,
   onClose,
   type,
   playerName,
@@ -22,7 +23,7 @@ function ModalContent({
         return (
           <div className="flex gap-x-10 mt-11 mx-12 mb-12">
             <BaseballCard imageOnly={true} playerName={playerName} />
-            <SellProductForm />
+            <SellProductForm makeSwapInvitation={makeSwapInvitation} />
           </div>
         );
       case 'Edit Product':

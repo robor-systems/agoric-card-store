@@ -61,6 +61,14 @@ export default async function deployContract(
   const bundle = await bundleSource(pathResolve(`./src/contract.js`));
   const installation = await E(zoe).install(bundle);
 
+  const swapbundleUrl = await importMetaResolve(
+    './src/swapAssets.js',
+    import.meta.url,
+  );
+  const swapbundlePath = new URL(swapbundleUrl).pathname;
+  const swapBundle = await bundleSource(swapbundlePath);
+  const swapInstallation = await E(zoe).install(swapBundle);
+
   // We also need to bundle and install the auctionItems contract
   const bundleUrl = await importMetaResolve(
     './src/auctionItems.js',
@@ -90,6 +98,7 @@ export default async function deployContract(
   // strings to objects.
   const CONTRACT_NAME = 'cardStore';
   const INSTALLATION_BOARD_ID = await E(board).getId(installation);
+  const SWAP_INSTALLATION_BOARD_ID = await E(board).getId(swapInstallation);
   const AUCTION_ITEMS_INSTALLATION_BOARD_ID = await E(board).getId(
     auctionItemsInstallation,
   );
@@ -105,6 +114,7 @@ export default async function deployContract(
   console.log(
     `-- Auction Items Installation Board Id: ${AUCTION_ITEMS_INSTALLATION_BOARD_ID}`,
   );
+  console.log(`-- Swap Installation Board Id: ${SWAP_INSTALLATION_BOARD_ID}`);
 
   // Save the constants somewhere where the UI and api can find it.
   const dappConstants = {
@@ -112,6 +122,7 @@ export default async function deployContract(
     INSTALLATION_BOARD_ID,
     AUCTION_INSTALLATION_BOARD_ID,
     AUCTION_ITEMS_INSTALLATION_BOARD_ID,
+    SWAP_INSTALLATION_BOARD_ID,
   };
   const defaultsFolder = pathResolve(`../ui/src/conf`);
   const defaultsFile = pathResolve(`../ui/src/conf/installationConstants.js`);

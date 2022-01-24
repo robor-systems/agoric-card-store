@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { makeCapTP, E } from '@agoric/captp';
 import { makeAsyncIterableFromNotifier as iterateNotifier } from '@agoric/notifier';
 import { Far } from '@agoric/marshal';
-
 import './styles/global.css';
 
 import {
@@ -22,11 +21,14 @@ import dappConstants from './lib/constants.js';
 import ModalWrapper from './components/ModalWrapper';
 import ModalContent from './components/ModalContent';
 import { images } from './images';
+import { makeSwapInvitation } from './swapInvitation';
 
 const {
   INSTANCE_BOARD_ID,
   INSTALLATION_BOARD_ID,
-  issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID },
+  SWAP_INSTANCE_BOARD_ID,
+  CARD_MINTER_BOARD_ID,
+  issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID, Money: MONEY_ISSUER_BOARD_ID },
   brandBoardIds: { Money: MONEY_BRAND_BOARD_ID, Card: CARD_BRAND_BOARD_ID },
 } = dappConstants;
 
@@ -152,7 +154,34 @@ function App() {
     });
     return deactivateWebSocket;
   }, []);
-
+  const GetSwapObject = async () => {
+    const board = E(walletPRef.current).getBoard();
+    const swapInstallation = await E(board).getValue(SWAP_INSTANCE_BOARD_ID);
+    const moneyIssuer = await E(board).getValue(MONEY_ISSUER_BOARD_ID);
+    const cardIssuer = await E(board).getValue(CARD_ISSUER_BOARD_ID);
+    const cardBrand = await E(board).getValue(CARD_BRAND_BOARD_ID);
+    const moneyBrand = await E(board).getValue(MONEY_BRAND_BOARD_ID);
+    const cardMinter = await E(board).getValue(CARD_MINTER_BOARD_ID);
+    const issuerKeywordRecord = {
+      Items: cardIssuer,
+      Money: moneyIssuer,
+    };
+    return {
+      sellingPrice: 3n,
+      cardName: activeCard,
+      cardBrand,
+      cardPurse,
+      moneyBrand,
+      swapInstallation,
+      issuerKeywordRecord,
+      walletP: walletPRef.current,
+      cardMinter,
+    };
+  };
+  const swapInvitation = async () => {
+    const obj = await makeSwapInvitation(await GetSwapObject());
+    console.log('printing output:', obj);
+  };
   const handleCardClick = (name, bool) => {
     setActiveCard(name);
     setOpenExpandModal(bool);
@@ -217,6 +246,7 @@ function App() {
         style="modal"
       >
         <ModalContent
+          makeSwapInvitation={swapInvitation}
           playerName={activeCard}
           type={type}
           onOpen={handleCardBidOpen}
