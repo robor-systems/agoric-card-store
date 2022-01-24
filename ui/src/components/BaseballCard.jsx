@@ -2,7 +2,7 @@ import React from 'react';
 import Tag from '../assets/icons/tag.png';
 import User from '../assets/icons/user.png';
 import Expand from '../assets/icons/expand.png';
-import { images } from '../images';
+// import { images } from '../images';
 import Button from './common/Button';
 
 const BaseballCard = ({ imageOnly, playerName, handleClick, type }) => {
@@ -12,7 +12,8 @@ const BaseballCard = ({ imageOnly, playerName, handleClick, type }) => {
   //       onClick: () => handleClick(playerName),
   //     }
   //   : {};
-
+  console.log(playerName, 'image from baseball card component');
+  console.log(type, 'baseballcard type btn');
   return (
     <div
       className={`transition-all duration-300 flex flex-col py-3 border border-alternativeLight card card-shadow rounded-md ${
@@ -26,7 +27,7 @@ const BaseballCard = ({ imageOnly, playerName, handleClick, type }) => {
       >
         <img
           className="h-full w-full rounded-md"
-          src={images[playerName]}
+          src={`https://gateway.pinata.cloud/ipfs/${playerName.image}`}
           alt={playerName}
         />
         {!imageOnly && (
@@ -58,7 +59,7 @@ const BaseballCard = ({ imageOnly, playerName, handleClick, type }) => {
       <div>
         <div className="px-3">
           <div className="flex justify-between items-center">
-            <p className="text-lg mb-1">{playerName}</p>
+            <p className="text-lg mb-1">{playerName.name}</p>
             <img className="w-6 h-6" src={Tag} alt="sale-tag" />
           </div>
           <div className="flex items-center">

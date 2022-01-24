@@ -26,58 +26,19 @@ import Loader from './common/Loader.jsx';
 //   };
 // });
 
-const CardDisplay = ({
-  activeTab,
-  playerNames,
-  handleClick,
-  type,
-  cardPurse,
-}) => {
+const CardDisplay = ({ activeTab, playerNames, handleClick, type }) => {
   const isReady = playerNames && playerNames.length > 0;
 
-  let cards;
-  switch (activeTab) {
-    case 0:
-      cards =
-        cardPurse?.currentAmount?.value?.length > 0 ? (
-          <div className="grid grid-cols-3 gap-x-8 gap-y-10">
-            {cardPurse?.currentAmount.value.map((playerName) => (
-              <div key={playerName}>
-                <BaseballCard
-                  playerName={playerName}
-                  key={playerName}
-                  handleClick={handleClick}
-                  type={type}
-                />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <h1> There are no cards in your wallet </h1>
-        );
-      break;
-    case 1:
-      cards = <h1>No nfts for sale currently</h1>;
-      break;
-    case 2:
-      cards = (
-        <div className="grid grid-cols-3 gap-x-8 gap-y-10">
-          {playerNames.map((playerName) => (
-            <div key={playerName}>
-              <BaseballCard
-                playerName={playerName}
-                key={playerName}
-                handleClick={handleClick}
-                type={type}
-              />
-            </div>
-          ))}
-        </div>
-      );
-      break;
-    default:
-      break;
-  }
+  const cards = playerNames.map((playerName) => (
+    <div key={playerName.name}>
+      <BaseballCard
+        playerName={playerName}
+        key={playerName}
+        handleClick={handleClick}
+        type={type}
+      />
+    </div>
+  ));
 
   return (
     // <Container>
@@ -102,21 +63,21 @@ const CardDisplay = ({
     //     </Grid>
     //   </Grid>
     // </Container>
-    <div className="display-card flex flex-col items-center w-10/12">
+    <div className="display-card flex flex-col max-w-7xl items-center">
       <h1 className="text-3xl font-semibold mb-14">
         {activeTab === 0 && 'My Cards'}
         {activeTab === 1 && 'Marketplace'}
         {activeTab === 2 && 'Primary Sales'}
       </h1>
       {activeTab !== 0 && (
-        <div className="flex gap-x-4 justify-center w-full px-2 mb-14">
-          <div className="flex w-3/4 border justify-between px-4 border-alternativeLight rounded items-center">
+        <div className="flex gap-x-4 justify-center w-full mb-14">
+          <div className="flex w-3/4 border justify-between  border-alternativeLight rounded items-center">
             <input
-              className="outline-none focus:outline-none rounded h-12 text-lg"
+              className="outline-none focus:outline-none ml-4 rounded h-12 text-lg"
               placeholder="Search"
             />
             <img
-              className="w-4 h-4 relative"
+              className="w-4 h-4 mr-4 relative"
               src={SearchIcon}
               alt="search-icon"
             />
@@ -130,7 +91,7 @@ const CardDisplay = ({
             }}
             className="bg-no-repeat cursor-pointer text-primaryLight border border-alternativeLight bg-white rounded w-1/5 h-12 px-3.5 text-lg outline-none focus:outline-none font-normal"
           >
-            <option></option>
+            <option>Filter</option>
           </select>
         </div>
       )}
@@ -138,7 +99,9 @@ const CardDisplay = ({
         {!isReady && <Loader />}
         {!isReady && 'Fetching card list...'}
       </div>
-      {isReady && <>{cards}</>}
+      <div className="w-full justify-items-center grid grid-cols-3 gap-x-8 gap-y-10">
+        {cards}
+      </div>
     </div>
   );
 };

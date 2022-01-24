@@ -23,7 +23,7 @@ import { getCardAuctionDetail, makeBidOfferForCard } from './auction.js';
 import dappConstants from './lib/constants.js';
 import ModalWrapper from './components/ModalWrapper';
 import ModalContent from './components/ModalContent';
-import { images } from './images';
+// import { images } from './images';
 // import { Buy } from './buy';
 
 const {
@@ -144,7 +144,7 @@ function App() {
       for await (const cardsAvailableAmount of iterateNotifier(
         availableItemsNotifier,
       )) {
-        console.log('available Cards:', cardsAvailableAmount);
+        // console.log('available Cards:', cardsAvailableAmount);
         setAvailableCards(cardsAvailableAmount.value);
       }
     };
@@ -172,7 +172,7 @@ function App() {
     cardPurse,
     'purses info',
   );
-
+  console.log(activeCard, 'activeTab');
   // const handleBuyClick = async (cardCID) => {
   //   console.log(
   //     MONEY_ISSUER_BOARD_ID,
@@ -299,7 +299,10 @@ function App() {
         style="modal-img"
       >
         <div className="pb-12 w-full h-full object-cover flex justify-center items-center">
-          <img src={images[activeCard]} alt="Card Media" />
+          <img
+            src={`https://gateway.pinata.cloud/ipfs/${activeCard?.image}`}
+            alt="Card Media"
+          />
         </div>
       </ModalWrapper>
       <EnableAppDialog
