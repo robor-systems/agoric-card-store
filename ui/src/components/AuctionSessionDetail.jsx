@@ -7,6 +7,14 @@ import { stringifyValue } from '../utils/amount';
 
 const toDateString = (bigIntTs) => {
   const ts = parseInt(bigIntTs.toString(), 10);
+  const d = new Date(ts * 1000);
+  console.log(
+    'date:',
+    d.getDate().toISOString(),
+    d.getMonth(),
+    d.getYear(),
+    d.getTime(),
+  );
   return new Date(ts * 1000).toISOString();
 };
 

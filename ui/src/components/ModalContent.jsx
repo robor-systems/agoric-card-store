@@ -1,21 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import BaseballCard from './BaseballCard';
 import Button from './common/Button';
 import EditProductForm from './EditProductForm';
 import SellProductForm from './SellProductForm';
-// import Button from './common/Button';
+import CardDetailModal from './CardDetailModal';
 
-function ModalContent({ type, playerName }) {
+function ModalContent({
+  onClose,
+  type,
+  playerName,
+  onGetCardDetail,
+  onBidCard,
+  tokenPurses,
+  cardPurse,
+  tokenPetname,
+  tokenDisplayInfo,
+}) {
+  const [hidden, setHidden] = useState(true);
   const populateContent = () => {
     switch (type) {
       case 'Sell Product':
         return (
           <div className="flex gap-x-10 mt-11 mx-12 mb-12">
-            <BaseballCard imageOnly={true} playerName={playerName} />
+            <BaseballCard imageOnly={true} playerName={cardPurse} />
             <SellProductForm />
           </div>
         );
       case 'Edit Product':
+        setHidden(false);
         return (
           <div className="flex gap-x-10 mt-11 mx-12 mb-12">
             <BaseballCard imageOnly={true} playerName={playerName} />
@@ -24,21 +36,40 @@ function ModalContent({ type, playerName }) {
         );
       case 'Buy Product':
         return (
-          <div className="flex flex-col gap-y-10 mt-11 mx-12 mb-12">
-            <BaseballCard playerName={playerName} />
-            <Button text="Buy for 99 RUN" style="w-full" />
-          </div>
+          <>
+            {!hidden && (
+              <CardDetailModal
+                onClose={onClose}
+                onGetCardDetail={onGetCardDetail}
+                onBidCard={onBidCard}
+                playerName={playerName}
+                tokenPurses={tokenPurses}
+                tokenPetname={tokenPetname}
+                tokenDisplayInfo={tokenDisplayInfo}
+              />
+            )}
+            {hidden && (
+              <>
+                <h1 className="text-2xl font-semibold text-center">{type}</h1>
+                <div className="flex flex-col gap-y-10 mt-11 mx-12 mb-8">
+                  <BaseballCard playerName={playerName} />
+                  <Button
+                    onClick={() => {
+                      setHidden(false);
+                    }}
+                    text="Buy"
+                    style="w-full text-white"
+                  />
+                </div>
+              </>
+            )}
+          </>
         );
       default:
         return '';
     }
   };
-  return (
-    <>
-      <h1 className="text-2xl font-semibold text-center">{type}</h1>
-      {populateContent()}
-    </>
-  );
+  return <>{populateContent()}</>;
 }
 
 export default ModalContent;

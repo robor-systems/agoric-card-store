@@ -18,7 +18,6 @@ import BoughtCardSnackbar from './components/BoughtCardSnackbar.jsx';
 import EnableAppDialog from './components/EnableAppDialog.jsx';
 
 import { getCardAuctionDetail, makeBidOfferForCard } from './auction.js';
-
 import dappConstants from './lib/constants.js';
 import ModalWrapper from './components/ModalWrapper';
 import ModalContent from './components/ModalContent';
@@ -41,6 +40,7 @@ function App() {
   const [needToApproveOffer, setNeedToApproveOffer] = useState(false);
   const [boughtCard, setBoughtCard] = useState(false);
   const [activeCard, setActiveCard] = useState(null);
+  const [activeCardBid, setActiveCardBid] = useState(null);
   const [tokenDisplayInfo, setTokenDisplayInfo] = useState(null);
   const [tokenPetname, setTokenPetname] = useState(null);
   const [openExpandModal, setOpenExpandModal] = useState(false);
@@ -96,12 +96,12 @@ function App() {
         setTokenDisplayInfo(newTokenPurses[0].displayInfo);
         setTokenPetname(newTokenPurses[0].brandPetname);
         setCardPurse(newCardPurse);
+        console.log('printing card purse:', newCardPurse);
+        console.log('printing all cards:', availableCards);
       };
-
       async function watchPurses() {
         const pn = E(walletP).getPursesNotifier();
         for await (const purses of iterateNotifier(pn)) {
-          // dispatch(setPurses(purses));
           processPurses(purses);
         }
       }
@@ -161,6 +161,10 @@ function App() {
   const handleCardModalClose = () => {
     setActiveCard(null);
   };
+  const handleCardBidOpen = () => {
+    console.log(activeCardBid);
+    setActiveCardBid(true);
+  };
 
   const handleGetCardDetail = (name) => {
     // XXX for now, everytime user call this, we will create a new invitation
@@ -179,7 +183,9 @@ function App() {
       cardPurse,
       tokenPurse: selectedPurse || tokenPurses[0],
       price: BigInt(price),
-    }).then(() => {
+    }).then((result) => {
+      // getSellerSession({ publicFacet: publicFacetRef.current });
+      console.log('Your offer id for this current offer:', result);
       setNeedToApproveOffer(true);
     });
   };
@@ -201,21 +207,26 @@ function App() {
       <CardDisplay
         activeTab={activeTab}
         playerNames={availableCards}
+        cardPurse={cardPurse}
         handleClick={handleCardClick}
         type={type}
       />
       <ModalWrapper
         open={activeCard && !openExpandModal}
         onClose={handleCardModalClose}
-        onGetCardDetail={handleGetCardDetail}
-        onBidCard={submitCardOffer}
-        playerName={activeCard}
-        tokenPurses={tokenPurses}
-        tokenPetname={tokenPetname}
-        tokenDisplayInfo={tokenDisplayInfo}
         style="modal"
       >
-        <ModalContent playerName={activeCard} type={type} />
+        <ModalContent
+          playerName={activeCard}
+          type={type}
+          onOpen={handleCardBidOpen}
+          onClose={handleCardModalClose}
+          onGetCardDetail={handleGetCardDetail}
+          onBidCard={submitCardOffer}
+          tokenPurses={tokenPurses}
+          tokenPetname={tokenPetname}
+          tokenDisplayInfo={tokenDisplayInfo}
+        />
       </ModalWrapper>
       <ModalWrapper
         open={openExpandModal && activeCard}

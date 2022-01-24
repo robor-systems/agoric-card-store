@@ -26,19 +26,58 @@ import Loader from './common/Loader.jsx';
 //   };
 // });
 
-const CardDisplay = ({ activeTab, playerNames, handleClick, type }) => {
+const CardDisplay = ({
+  activeTab,
+  playerNames,
+  handleClick,
+  type,
+  cardPurse,
+}) => {
   const isReady = playerNames && playerNames.length > 0;
 
-  const cards = playerNames.map((playerName) => (
-    <div key={playerName}>
-      <BaseballCard
-        playerName={playerName}
-        key={playerName}
-        handleClick={handleClick}
-        type={type}
-      />
-    </div>
-  ));
+  let cards;
+  switch (activeTab) {
+    case 0:
+      cards =
+        cardPurse?.currentAmount?.value?.length > 0 ? (
+          <div className="grid grid-cols-3 gap-x-8 gap-y-10">
+            {cardPurse?.currentAmount.value.map((playerName) => (
+              <div key={playerName}>
+                <BaseballCard
+                  playerName={playerName}
+                  key={playerName}
+                  handleClick={handleClick}
+                  type={type}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <h1> There are no cards in your wallet </h1>
+        );
+      break;
+    case 1:
+      cards = <h1>No nfts for sale currently</h1>;
+      break;
+    case 2:
+      cards = (
+        <div className="grid grid-cols-3 gap-x-8 gap-y-10">
+          {playerNames.map((playerName) => (
+            <div key={playerName}>
+              <BaseballCard
+                playerName={playerName}
+                key={playerName}
+                handleClick={handleClick}
+                type={type}
+              />
+            </div>
+          ))}
+        </div>
+      );
+      break;
+    default:
+      break;
+  }
 
   return (
     // <Container>
@@ -99,7 +138,7 @@ const CardDisplay = ({ activeTab, playerNames, handleClick, type }) => {
         {!isReady && <Loader />}
         {!isReady && 'Fetching card list...'}
       </div>
-      <div className="grid grid-cols-3 gap-x-8 gap-y-10">{cards}</div>
+      {isReady && <>{cards}</>}
     </div>
   );
 };

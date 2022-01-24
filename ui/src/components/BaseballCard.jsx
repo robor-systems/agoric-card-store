@@ -72,7 +72,9 @@ const BaseballCard = ({ imageOnly, playerName, handleClick, type }) => {
           <hr className="mt-2.5 mb-1 bg-alternativeLight" />
           <div className="flex items-center justify-between px-3">
             <div>
-              <p className="text-base text-primaryLight">Bought For</p>
+              <p className="text-base text-primaryLight">
+                {type === 'Sell Product' ? 'Bought For' : 'Sale Price'}
+              </p>
               <p className="text-lg">99 RUN</p>
             </div>
             <div>
