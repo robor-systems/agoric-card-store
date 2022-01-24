@@ -188,10 +188,15 @@ const start = (zcf) => {
     return session.makeBidInvitation();
   };
 
+  const getSellerSession = async () => {
+    return Far('seller', {
+      showseller: () => sellerSessions,
+    });
+  };
+
   const getSessionDetailsForKey = async (itemKey) => {
     assert.typeof(itemKey, 'string');
     const session = sellerSessions[itemKey];
-
     if (!session) {
       // session is not started, try to return general data,
       // The trade-off here is we have to fake the session data,
@@ -206,9 +211,9 @@ const start = (zcf) => {
         bidDuration,
         timeAuthority,
         bids: [],
+        fake: 'This is fake data',
       });
     }
-
     return session.getSessionDetails();
   };
 
@@ -226,6 +231,7 @@ const start = (zcf) => {
     getAvailableItemsNotifier,
     getItemsIssuer: () => issuers.Items,
     makeBidInvitationForKey,
+    getSellerSession,
     getCompletedPromiseForKey,
     getSessionDetailsForKey,
   });

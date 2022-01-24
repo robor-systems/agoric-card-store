@@ -19,7 +19,7 @@ import EnableAppDialog from './components/EnableAppDialog.jsx';
 
 import { getCardAuctionDetail, makeBidOfferForCard } from './auction.js';
 
-import installationConstants from './conf/installationConstants';
+// import installationConstants from './conf/installationConstants';
 import dappConstants from './lib/constants.js';
 import ModalWrapper from './components/ModalWrapper';
 import ModalContent from './components/ModalContent';
@@ -29,12 +29,15 @@ import { images } from './images';
 const {
   INSTANCE_BOARD_ID,
   INSTALLATION_BOARD_ID,
-  issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID, Money: MONEY_ISSUER_BOARD_ID },
+  issuerBoardIds: {
+    Card: CARD_ISSUER_BOARD_ID,
+    //  Money: MONEY_ISSUER_BOARD_ID
+  },
   brandBoardIds: { Money: MONEY_BRAND_BOARD_ID, Card: CARD_BRAND_BOARD_ID },
   ATOMICSWAP_CONTRACT_INSTANCE_BOARD_ID: atomicSwapInstanceId,
 } = dappConstants;
 
-const { ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID } = installationConstants;
+// const { ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID } = installationConstants;
 
 function App() {
   const [walletConnected, setWalletConnected] = useState(false);
@@ -46,6 +49,7 @@ function App() {
   const [needToApproveOffer, setNeedToApproveOffer] = useState(false);
   const [boughtCard, setBoughtCard] = useState(false);
   const [activeCard, setActiveCard] = useState(null);
+  const [activeCardBid, setActiveCardBid] = useState(null);
   const [tokenDisplayInfo, setTokenDisplayInfo] = useState(null);
   const [tokenPetname, setTokenPetname] = useState(null);
   const [openExpandModal, setOpenExpandModal] = useState(false);
@@ -101,12 +105,12 @@ function App() {
         setTokenDisplayInfo(newTokenPurses[0].displayInfo);
         setTokenPetname(newTokenPurses[0].brandPetname);
         setCardPurse(newCardPurse);
+        console.log('printing card purse:', newCardPurse);
+        console.log('printing all cards:', availableCards);
       };
-
       async function watchPurses() {
         const pn = E(walletP).getPursesNotifier();
         for await (const purses of iterateNotifier(pn)) {
-          // dispatch(setPurses(purses));
           processPurses(purses);
         }
       }
@@ -169,50 +173,50 @@ function App() {
     'purses info',
   );
 
-  const handleBuyClick = async (cardCID) => {
-    console.log(
-      MONEY_ISSUER_BOARD_ID,
-      ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID,
-      atomicSwapInstanceId,
-    );
-    const temp = await E(publicFacetRef.current).getSessionDetailsForKey(
-      cardCID,
-    );
-    console.log(temp);
-    // const zoe = await E(walletPRef.current).getZoe();
-    // const board = await E(walletPRef.current).getBoard();
-    // const atomicSwapContractInstance = await E(board).getValue(
-    //   atomicSwapInstanceId,
-    // );
-    // const moneyIssuer = await E(board).getValue(MONEY_ISSUER_BOARD_ID);
-    // const atomicSwapLogicInstallation = await E(board).getValue(
-    //   ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID,
-    // );
-    // const publicFacet = await E(zoe).getPublicFacet(atomicSwapContractInstance);
-    // const { random } = await E(publicFacetAtomicSwapRef.current).randomVal();
-    // console.log(random);
-    // console.log(random);
-    // const test = await E(publicFacet).createInstance(
-    //   [cardCID],
-    //   moneyIssuer,
-    //   atomicSwapLogicInstallation,
-    // );
-    // console.log(test);
-    // const { invitationP } = E(publicFacet).getBuyerInvitation(
-    //   [cardCID],
-    //   moneyIssuer,
-    //   atomicSwapLogicInstallation,
-    // );
+  // const handleBuyClick = async (cardCID) => {
+  //   console.log(
+  //     MONEY_ISSUER_BOARD_ID,
+  //     ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID,
+  //     atomicSwapInstanceId,
+  //   );
+  //   const temp = await E(publicFacetRef.current).getSessionDetailsForKey(
+  //     cardCID,
+  //   );
+  //   console.log(temp);
+  // const zoe = await E(walletPRef.current).getZoe();
+  // const board = await E(walletPRef.current).getBoard();
+  // const atomicSwapContractInstance = await E(board).getValue(
+  //   atomicSwapInstanceId,
+  // );
+  // const moneyIssuer = await E(board).getValue(MONEY_ISSUER_BOARD_ID);
+  // const atomicSwapLogicInstallation = await E(board).getValue(
+  //   ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID,
+  // );
+  // const publicFacet = await E(zoe).getPublicFacet(atomicSwapContractInstance);
+  // const { random } = await E(publicFacetAtomicSwapRef.current).randomVal();
+  // console.log(random);
+  // console.log(random);
+  // const test = await E(publicFacet).createInstance(
+  //   [cardCID],
+  //   moneyIssuer,
+  //   atomicSwapLogicInstallation,
+  // );
+  // console.log(test);
+  // const { invitationP } = E(publicFacet).getBuyerInvitation(
+  //   [cardCID],
+  //   moneyIssuer,
+  //   atomicSwapLogicInstallation,
+  // );
 
-    // console.log(invitationP);
-    // Buy({
-    //   cardCID,
-    //   walletP: walletPRef.current,
-    //   cardPurse,
-    //   tokenPurse: tokenPurses[0],
-    // });
-    // Buy(cardCID, zoe, board, cardPurse, tokenPurses[0]);
-  };
+  // console.log(invitationP);
+  // Buy({
+  //   cardCID,
+  //   walletP: walletPRef.current,
+  //   cardPurse,
+  //   tokenPurse: tokenPurses[0],
+  // });
+  // Buy(cardCID, zoe, board, cardPurse, tokenPurses[0]);
+  // };
 
   const handleCardClick = (name, bool) => {
     setActiveCard(name);
@@ -222,6 +226,11 @@ function App() {
   const handleCardModalClose = () => {
     setActiveCard(null);
   };
+  const handleCardBidOpen = () => {
+    console.log(activeCardBid);
+    setActiveCardBid(true);
+  };
+
   const handleGetCardDetail = (name) => {
     // XXX for now, everytime user call this, we will create a new invitation
     return getCardAuctionDetail({
@@ -239,7 +248,9 @@ function App() {
       cardPurse,
       tokenPurse: selectedPurse || tokenPurses[0],
       price: BigInt(price),
-    }).then(() => {
+    }).then((result) => {
+      // getSellerSession({ publicFacet: publicFacetRef.current });
+      console.log('Your offer id for this current offer:', result);
       setNeedToApproveOffer(true);
     });
   };
@@ -261,24 +272,25 @@ function App() {
       <CardDisplay
         activeTab={activeTab}
         playerNames={availableCards}
+        cardPurse={cardPurse}
         handleClick={handleCardClick}
         type={type}
       />
       <ModalWrapper
         open={activeCard && !openExpandModal}
         onClose={handleCardModalClose}
-        onGetCardDetail={handleGetCardDetail}
-        onBidCard={submitCardOffer}
-        playerName={activeCard}
-        tokenPurses={tokenPurses}
-        tokenPetname={tokenPetname}
-        tokenDisplayInfo={tokenDisplayInfo}
         style="modal"
       >
         <ModalContent
-          handleBuyClick={handleBuyClick}
           playerName={activeCard}
           type={type}
+          onOpen={handleCardBidOpen}
+          onClose={handleCardModalClose}
+          onGetCardDetail={handleGetCardDetail}
+          onBidCard={submitCardOffer}
+          tokenPurses={tokenPurses}
+          tokenPetname={tokenPetname}
+          tokenDisplayInfo={tokenDisplayInfo}
         />
       </ModalWrapper>
       <ModalWrapper

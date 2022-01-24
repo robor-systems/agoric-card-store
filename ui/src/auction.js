@@ -13,8 +13,12 @@ const makeBidOfferForCard = async ({
   tokenPurse,
   price,
 }) => {
+  console.log(walletP, card, publicFacet, cardPurse, tokenPurse, price);
   assert(card, X`At least one card must be chosen to purchase`);
   const invitation = await E(publicFacet).makeBidInvitationForKey(card);
+  const zoe = E(walletP).getZoe();
+  const invitationValue = await E(zoe).getInvitationDetails(invitation);
+  console.log('Printing Invitation:', invitationValue);
 
   const offerConfig = {
     // JSONable ID for this offer.  This is scoped to the origin.
@@ -35,8 +39,12 @@ const makeBidOfferForCard = async ({
       },
     },
   };
-
   return E(walletP).addOffer(offerConfig);
 };
 
-export { makeBidOfferForCard, getCardAuctionDetail };
+const getSellerSession = async ({ publicFacet }) => {
+  const seller = await E(publicFacet).getSellerSession();
+  const sellerSession = await E(seller).showseller();
+  console.log('session:', sellerSession);
+};
+export { makeBidOfferForCard, getCardAuctionDetail, getSellerSession };
