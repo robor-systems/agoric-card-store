@@ -76,7 +76,7 @@ const CardDetailModal = ({
       return cancelFn;
     }
 
-    onGetCardDetail(playerName)
+    onGetCardDetail(playerName.name)
       .then((result) => {
         if (!isActive) {
           return;

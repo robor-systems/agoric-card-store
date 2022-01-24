@@ -174,7 +174,7 @@ const start = (zcf) => {
   };
 
   const getOrCreateAuctionSession = async (itemKey) => {
-    assert.typeof(itemKey, 'string');
+    // assert.typeof(itemKey, 'string');
 
     if (!sellerSessions[itemKey]) {
       sellerSessions[itemKey] = await startAuctioningItem(itemKey);

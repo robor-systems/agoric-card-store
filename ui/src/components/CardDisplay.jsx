@@ -63,17 +63,17 @@ const CardDisplay = ({ activeTab, playerNames, handleClick, type }) => {
     //     </Grid>
     //   </Grid>
     // </Container>
-    <div className="display-card flex flex-col max-w-7xl items-center">
+    <div className="display-card flex flex-col mx-auto max-w-6xl items-center">
       <h1 className="text-3xl font-semibold mb-14">
         {activeTab === 0 && 'My Cards'}
         {activeTab === 1 && 'Marketplace'}
         {activeTab === 2 && 'Primary Sales'}
       </h1>
       {activeTab !== 0 && (
-        <div className="flex gap-x-4 justify-center w-full mb-14">
-          <div className="flex w-3/4 border justify-between  border-alternativeLight rounded items-center">
+        <div className="flex gap-x-4 justify-between w-full mb-14">
+          <div className="flex w-full border justify-between  border-alternativeLight rounded items-center">
             <input
-              className="outline-none focus:outline-none ml-4 rounded h-12 text-lg"
+              className="outline-none focus:outline-none ml-4 rounded h-12 w-full text-lg"
               placeholder="Search"
             />
             <img
@@ -89,7 +89,7 @@ const CardDisplay = ({ activeTab, playerNames, handleClick, type }) => {
               backgroundPositionY: 'center',
               backgroundPositionX: '95%',
             }}
-            className="bg-no-repeat cursor-pointer text-primaryLight border border-alternativeLight bg-white rounded w-1/5 h-12 px-3.5 text-lg outline-none focus:outline-none font-normal"
+            className="bg-no-repeat cursor-pointer text-primaryLight border border-alternativeLight bg-white rounded w-60 h-12 px-3.5 text-lg outline-none focus:outline-none font-normal"
           >
             <option>Filter</option>
           </select>
