@@ -35,6 +35,7 @@ const start = (zcf) => {
     // Note that the proposal `want` is empty because we don't know
     // how many cards will be sold, so we don't know how much money we
     // will make in total.
+    // https://github.com/Agoric/agoric-sdk/issues/855
     const proposal = harden({
       give: { Items: newCardsForSaleAmount },
     });
@@ -46,7 +47,7 @@ const start = (zcf) => {
     });
 
     const auctionItemsTerms = harden({
-      bidDuration: 300n,
+      bidDuration: 1n,
       winnerPriceOption: FIRST_PRICE,
       ...zcf.getTerms(),
       auctionInstallation,
@@ -79,6 +80,7 @@ const start = (zcf) => {
 
   const creatorFacet = Far('Card store creator', {
     auctionCards,
+    getMinter: () => mint,
     getIssuer: () => issuer,
   });
 

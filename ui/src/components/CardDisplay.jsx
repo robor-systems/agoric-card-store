@@ -26,16 +26,9 @@ import Loader from './common/Loader.jsx';
 //   };
 // });
 
-const CardDisplay = ({
-  activeTab,
-  userCards,
-  playerNames,
-  handleClick,
-  type,
-}) => {
-  const cardsToDisplay = activeTab === 0 ? userCards : playerNames;
-  const isReady = cardsToDisplay && cardsToDisplay.length > 0;
-  const cards = cardsToDisplay.map((card) => (
+const CardDisplay = ({ activeTab, cardsList, handleClick, type }) => {
+  const isReady = Boolean(cardsList);
+  const cards = cardsList?.map((card) => (
     <div key={card.name}>
       <BaseballCard
         playerName={card}
@@ -45,7 +38,7 @@ const CardDisplay = ({
       />
     </div>
   ));
-
+  console.log(cardsList);
   return (
     // <Container>
     //   <Grid container>
@@ -105,9 +98,13 @@ const CardDisplay = ({
         {!isReady && <Loader />}
         {!isReady && 'Fetching card list...'}
       </div>
-      <div className="w-full justify-items-center grid grid-cols-3 gap-x-8 gap-y-10">
-        {cards}
-      </div>
+      {cardsList?.length === 0 ? (
+        <p className="text-center text-xl">No Cards to show</p>
+      ) : (
+        <div className="w-full text-center justify-items-center grid grid-cols-3 gap-x-8 gap-y-10">
+          {cards}
+        </div>
+      )}
     </div>
   );
 };

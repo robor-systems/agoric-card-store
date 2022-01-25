@@ -70,7 +70,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     INSTALLATION_BOARD_ID,
     AUCTION_INSTALLATION_BOARD_ID,
     AUCTION_ITEMS_INSTALLATION_BOARD_ID,
-    ATOMICSWAP_INSTALLATION_BOARD_ID,
+    SWAP_INSTALLATION_BOARD_ID,
     CONTRACT_NAME,
   } = installationConstants;
   const installation = await E(board).getValue(INSTALLATION_BOARD_ID);
@@ -80,9 +80,8 @@ export default async function deployApi(homePromise, { pathResolve }) {
   const auctionInstallation = await E(board).getValue(
     AUCTION_INSTALLATION_BOARD_ID,
   );
-  const atomicSwapContractInstallation = await E(board).getValue(
-    ATOMICSWAP_INSTALLATION_BOARD_ID,
-  );
+  const swapInstallation = await E(board).getValue(SWAP_INSTALLATION_BOARD_ID);
+  console.log('Successfully read board Id');
   // Second, we can use the installation to create a new instance of
   // our contract code on Zoe. A contract instance is a running
   // program that can take offers through Zoe. Making an instance will
@@ -93,10 +92,10 @@ export default async function deployApi(homePromise, { pathResolve }) {
     installation,
   );
 
-  const {
-    instance: atomicSwapContractInstance,
-    publicFacet: atomicSwapContractPublicFacet,
-  } = await E(zoe).startInstance(atomicSwapContractInstallation);
+  // const {
+  //   instance: atomicSwapContractInstance,
+  //   publicFacet: atomicSwapContractPublicFacet,
+  // } = await E(zoe).startInstance(atomicSwapContractInstallation);
 
   /**
    * @type {ERef<Issuer>}
@@ -128,6 +127,8 @@ export default async function deployApi(homePromise, { pathResolve }) {
     chainTimerService,
   );
 
+  const minter = await E(baseballCardSellerFacet).getMinter();
+  console.log('minter:', minter);
   console.log('- SUCCESS! contract instance is running on Zoe');
 
   console.log('Retrieving Board IDs for issuers and brands');
@@ -140,37 +141,32 @@ export default async function deployApi(homePromise, { pathResolve }) {
     E(cardIssuerP).getBrand(),
     invitationBrandP,
   ]);
-
   const [
     INSTANCE_BOARD_ID,
     CARD_BRAND_BOARD_ID,
     CARD_ISSUER_BOARD_ID,
     MONEY_BRAND_BOARD_ID,
     MONEY_ISSUER_BOARD_ID,
+    CARD_MINTER_BOARD_ID,
     INVITE_BRAND_BOARD_ID,
-    ATOMICSWAP_CONTRACT_INSTANCE_BOARD_ID,
-    ATOMICSWAP_CONTRACT_PUBLIC_FACET_BOARD_ID,
+    SWAP_INSTANCE_BOARD_ID,
   ] = await Promise.all([
     E(board).getId(instance),
     E(board).getId(cardBrand),
     E(board).getId(cardIssuer),
     E(board).getId(moneyBrand),
     E(board).getId(moneyIssuer),
+    E(board).getId(minter),
     E(board).getId(invitationBrand),
-    E(board).getId(atomicSwapContractInstance),
-    E(board).getId(atomicSwapContractPublicFacet),
+    E(board).getId(swapInstallation),
   ]);
 
   console.log(`-- Contract Name: ${CONTRACT_NAME}`);
   console.log(`-- INSTANCE_BOARD_ID: ${INSTANCE_BOARD_ID}`);
   console.log(`-- CARD_ISSUER_BOARD_ID: ${CARD_ISSUER_BOARD_ID}`);
   console.log(`-- CARD_BRAND_BOARD_ID: ${CARD_BRAND_BOARD_ID}`);
-  console.log(
-    `-- ATOMICSWAP_CONTRACT_INSTANCE_BOARD_ID: ${ATOMICSWAP_CONTRACT_INSTANCE_BOARD_ID}`,
-  );
-  console.log(
-    `-- ATOMICSWAP_CONTRACT_PUBLIC_FACET_BOARD_ID: ${ATOMICSWAP_CONTRACT_PUBLIC_FACET_BOARD_ID}`,
-  );
+  console.log(`-- CARD_MINTER_BOARD_ID: ${CARD_MINTER_BOARD_ID}`);
+  console.log(`-- SWAP_INSTANCE_BOARD_ID: ${SWAP_INSTANCE_BOARD_ID}`);
 
   const API_URL = process.env.API_URL || `http://127.0.0.1:${API_PORT || 8000}`;
 
@@ -180,6 +176,8 @@ export default async function deployApi(homePromise, { pathResolve }) {
     INSTALLATION_BOARD_ID,
     AUCTION_ITEMS_INSTALLATION_BOARD_ID,
     INVITE_BRAND_BOARD_ID,
+    CARD_MINTER_BOARD_ID,
+    SWAP_INSTANCE_BOARD_ID,
     BRIDGE_URL: 'agoric-lookup:https://local.agoric.com?append=/bridge',
     brandBoardIds: {
       Card: CARD_BRAND_BOARD_ID,
@@ -192,8 +190,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
     minBidPerCard: Number(moneyValue),
     API_URL,
     CONTRACT_NAME,
-    ATOMICSWAP_CONTRACT_INSTANCE_BOARD_ID,
-    ATOMICSWAP_CONTRACT_PUBLIC_FACET_BOARD_ID,
   };
   const defaultsFile = pathResolve(`../ui/src/conf/defaults.js`);
   console.log('writing', defaultsFile);

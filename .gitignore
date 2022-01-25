@@ -6,3 +6,4 @@ ui/dist/
 ui/build
 ui/src/conf/installationConstants.js
 ui/src/conf/defaults.js
+ui/src/conf/dappConstants.js

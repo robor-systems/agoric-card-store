@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { makeCapTP, E } from '@agoric/captp';
 import { makeAsyncIterableFromNotifier as iterateNotifier } from '@agoric/notifier';
 import { Far } from '@agoric/marshal';
-
 import './styles/global.css';
 
 import {
@@ -24,17 +23,16 @@ import dappConstants from './lib/constants.js';
 import ModalWrapper from './components/ModalWrapper';
 import ModalContent from './components/ModalContent';
 // import { images } from './images';
-// import { Buy } from './buy';
+import { makeSwapInvitation } from './swapInvitation';
 
 const {
   INSTANCE_BOARD_ID,
   INSTALLATION_BOARD_ID,
-  issuerBoardIds: {
-    Card: CARD_ISSUER_BOARD_ID,
-    //  Money: MONEY_ISSUER_BOARD_ID
-  },
+  SWAP_INSTANCE_BOARD_ID,
+  CARD_MINTER_BOARD_ID,
+  issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID, Money: MONEY_ISSUER_BOARD_ID },
   brandBoardIds: { Money: MONEY_BRAND_BOARD_ID, Card: CARD_BRAND_BOARD_ID },
-  ATOMICSWAP_CONTRACT_INSTANCE_BOARD_ID: atomicSwapInstanceId,
+  // ATOMICSWAP_CONTRACT_INSTANCE_BOARD_ID: atomicSwapInstanceId,
 } = dappConstants;
 
 // const { ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID } = installationConstants;
@@ -42,8 +40,8 @@ const {
 function App() {
   const [walletConnected, setWalletConnected] = useState(false);
   const [dappApproved, setDappApproved] = useState(true);
-  const [availableCards, setAvailableCards] = useState([]);
-  const [userCards, setUserCards] = useState([]);
+  const [availableCards, setAvailableCards] = useState(undefined);
+  const [userCards, setUserCards] = useState(undefined);
   const [cardPurse, setCardPurse] = useState(null);
   const [tokenPurses, setTokenPurses] = useState([]);
   const [openEnableAppDialog, setOpenEnableAppDialog] = useState(false);
@@ -61,7 +59,6 @@ function App() {
 
   const walletPRef = useRef(undefined);
   const publicFacetRef = useRef(undefined);
-  const publicFacetAtomicSwapRef = useRef(undefined);
   useEffect(() => {
     // Receive callbacks from the wallet connection.
     const otherSide = Far('otherSide', {
@@ -127,11 +124,11 @@ function App() {
       const zoe = E(walletP).getZoe();
       const board = E(walletP).getBoard();
       const instance = await E(board).getValue(INSTANCE_BOARD_ID);
-      const atomicSwapInstance = await E(board).getValue(atomicSwapInstanceId);
+      // const atomicSwapInstance = await E(board).getValue(atomicSwapInstanceId);
       const publicFacet = E(zoe).getPublicFacet(instance);
-      const publicFacetAtomicSwap = E(zoe).getPublicFacet(atomicSwapInstance);
+      // const publicFacetAtomicSwap = E(zoe).getPublicFacet(atomicSwapInstance);
       publicFacetRef.current = publicFacet;
-      publicFacetAtomicSwapRef.current = publicFacetAtomicSwap;
+      // publicFacetAtomicSwapRef.current = publicFacetAtomicSwap;
       const availableItems = await E(publicFacet).getAvailableItems();
       const availableItemsNotifier = E(
         publicFacetRef.current,
@@ -168,61 +165,34 @@ function App() {
     });
     return deactivateWebSocket;
   }, []);
-  console.log(
-    tokenPurses,
-    tokenDisplayInfo,
-    tokenPetname,
-    cardPurse,
-    'purses info',
-  );
-  console.log(userCards, 'userCards');
-
-  // console.log(activeCard, 'activeTab');
-  // const handleBuyClick = async (cardCID) => {
-  //   console.log(
-  //     MONEY_ISSUER_BOARD_ID,
-  //     ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID,
-  //     atomicSwapInstanceId,
-  //   );
-  //   const temp = await E(publicFacetRef.current).getSessionDetailsForKey(
-  //     cardCID,
-  //   );
-  //   console.log(temp);
-  // const zoe = await E(walletPRef.current).getZoe();
-  // const board = await E(walletPRef.current).getBoard();
-  // const atomicSwapContractInstance = await E(board).getValue(
-  //   atomicSwapInstanceId,
-  // );
-  // const moneyIssuer = await E(board).getValue(MONEY_ISSUER_BOARD_ID);
-  // const atomicSwapLogicInstallation = await E(board).getValue(
-  //   ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID,
-  // );
-  // const publicFacet = await E(zoe).getPublicFacet(atomicSwapContractInstance);
-  // const { random } = await E(publicFacetAtomicSwapRef.current).randomVal();
-  // console.log(random);
-  // console.log(random);
-  // const test = await E(publicFacet).createInstance(
-  //   [cardCID],
-  //   moneyIssuer,
-  //   atomicSwapLogicInstallation,
-  // );
-  // console.log(test);
-  // const { invitationP } = E(publicFacet).getBuyerInvitation(
-  //   [cardCID],
-  //   moneyIssuer,
-  //   atomicSwapLogicInstallation,
-  // );
-
-  // console.log(invitationP);
-  // Buy({
-  //   cardCID,
-  //   walletP: walletPRef.current,
-  //   cardPurse,
-  //   tokenPurse: tokenPurses[0],
-  // });
-  // Buy(cardCID, zoe, board, cardPurse, tokenPurses[0]);
-  // };
-
+  const GetSwapObject = async () => {
+    const board = E(walletPRef.current).getBoard();
+    const swapInstallation = await E(board).getValue(SWAP_INSTANCE_BOARD_ID);
+    const moneyIssuer = await E(board).getValue(MONEY_ISSUER_BOARD_ID);
+    const cardIssuer = await E(board).getValue(CARD_ISSUER_BOARD_ID);
+    const cardBrand = await E(board).getValue(CARD_BRAND_BOARD_ID);
+    const moneyBrand = await E(board).getValue(MONEY_BRAND_BOARD_ID);
+    const cardMinter = await E(board).getValue(CARD_MINTER_BOARD_ID);
+    const issuerKeywordRecord = {
+      Items: cardIssuer,
+      Money: moneyIssuer,
+    };
+    return {
+      sellingPrice: 3n,
+      cardName: activeCard,
+      cardBrand,
+      cardPurse,
+      moneyBrand,
+      swapInstallation,
+      issuerKeywordRecord,
+      walletP: walletPRef.current,
+      cardMinter,
+    };
+  };
+  const swapInvitation = async () => {
+    const obj = await makeSwapInvitation(await GetSwapObject());
+    console.log('printing output:', obj);
+  };
   const handleCardClick = (name, bool) => {
     setActiveCard(name);
     setOpenExpandModal(bool);
@@ -276,8 +246,7 @@ function App() {
       />
       <CardDisplay
         activeTab={activeTab}
-        playerNames={availableCards}
-        userCards={userCards}
+        cardsList={activeTab === 0 ? userCards : availableCards}
         cardPurse={cardPurse}
         handleClick={handleCardClick}
         type={type}
@@ -288,6 +257,7 @@ function App() {
         style="modal"
       >
         <ModalContent
+          makeSwapInvitation={swapInvitation}
           playerName={activeCard}
           type={type}
           onOpen={handleCardBidOpen}
