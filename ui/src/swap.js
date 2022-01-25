@@ -11,7 +11,7 @@ const getSellerSeat = async ({
 }) => {
   const board = E(walletP).getBoard();
   const mainContractInstance = await E(board).getValue(INSTANCE_BOARD_ID);
-  const sellerSeat = await E(publicFacet).getSellerSeat({
+  const matchingSeatInvitation = await E(publicFacet).getSellerSeat({
     cardDetail,
     swapInstallation,
     sellingPrice,
@@ -19,7 +19,17 @@ const getSellerSeat = async ({
     walletP,
     CARD_MINTER_BOARD_ID,
   });
-  return sellerSeat;
+  const invitationP = matchingSeatInvitation.getOfferResult();
+
+  const { installation: bobInstallationId, instance } = E(
+    zoe,
+  ).getInvitationDetails(invitationP);
+  const myExclusiveInvitation = await invitationIssuer.claim(invitationP);
+
+  return matchingSeatInvitation;
 };
+
+
+
 
 export { getSellerSeat };

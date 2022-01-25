@@ -22,15 +22,15 @@ const start = (zcf) => {
   assertIssuerKeywords(zcf, harden(['Items', 'Money']));
 
   /** @type {OfferHandler} */
-  const makeMatchingInvitation = (firstSeat) => {
-    assertProposalShape(firstSeat, {
+  const makeMatchingInvitation = (SellerSeat) => {
+    assertProposalShape(SellerSeat, {
       give: { Items: null },
       want: { Money: null },
     });
-    const { want, give } = firstSeat.getProposal();
+    const { want, give } = SellerSeat.getProposal();
     /** @type {OfferHandler} */
-    const matchingSeatOfferHandler = (matchingSeat) => {
-      const swapResult = swap(zcf, firstSeat, matchingSeat);
+    const matchingSeatOfferHandler = (buyerMatchingSeat) => {
+      const swapResult = swap(zcf, SellerSeat, buyerMatchingSeat);
       return swapResult;
     };
     const matchingSeatInvitation = zcf.makeInvitation(
