@@ -17,10 +17,10 @@ import BoughtCardSnackbar from './components/BoughtCardSnackbar.jsx';
 import EnableAppDialog from './components/EnableAppDialog.jsx';
 
 import { getCardAuctionDetail, makeBidOfferForCard } from './auction.js';
-
 import dappConstants from './lib/constants.js';
 import ModalWrapper from './components/ModalWrapper';
 import ModalContent from './components/ModalContent';
+import { images } from './images';
 import { makeSwapInvitation } from './swapInvitation';
 
 const {
@@ -35,8 +35,7 @@ const {
 function App() {
   const [walletConnected, setWalletConnected] = useState(false);
   const [dappApproved, setDappApproved] = useState(true);
-  const [availableCards, setAvailableCards] = useState(undefined);
-  const [userCards, setUserCards] = useState(undefined);
+  const [availableCards, setAvailableCards] = useState([]);
   const [cardPurse, setCardPurse] = useState(null);
   const [tokenPurses, setTokenPurses] = useState([]);
   const [openEnableAppDialog, setOpenEnableAppDialog] = useState(false);
@@ -48,12 +47,13 @@ function App() {
   const [tokenPetname, setTokenPetname] = useState(null);
   const [openExpandModal, setOpenExpandModal] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [type, setType] = useState('Buy Product');
+  const [type, setType] = useState('Sell Product');
   const handleTabChange = (index) => setActiveTab(index);
   const handleDialogClose = () => setOpenEnableAppDialog(false);
 
   const walletPRef = useRef(undefined);
   const publicFacetRef = useRef(undefined);
+
   useEffect(() => {
     // Receive callbacks from the wallet connection.
     const otherSide = Far('otherSide', {
@@ -98,7 +98,6 @@ function App() {
         setTokenDisplayInfo(newTokenPurses[0].displayInfo);
         setTokenPetname(newTokenPurses[0].brandPetname);
         setCardPurse(newCardPurse);
-        setUserCards(newCardPurse.currentAmount.value);
         console.log('printing card purse:', newCardPurse);
         console.log('printing all cards:', availableCards);
       };
@@ -119,25 +118,21 @@ function App() {
       const zoe = E(walletP).getZoe();
       const board = E(walletP).getBoard();
       const instance = await E(board).getValue(INSTANCE_BOARD_ID);
-      // const atomicSwapInstance = await E(board).getValue(atomicSwapInstanceId);
       const publicFacet = E(zoe).getPublicFacet(instance);
-      // const publicFacetAtomicSwap = E(zoe).getPublicFacet(atomicSwapInstance);
       publicFacetRef.current = publicFacet;
-      // publicFacetAtomicSwapRef.current = publicFacetAtomicSwap;
-      const availableItems = await E(publicFacet).getAvailableItems();
-      const availableItemsNotifier = E(
-        publicFacetRef.current,
-      ).getAvailableItemsNotifier();
-      console.log(availableItems, 'public assetavail');
       /*
        *get the current items for sale in the proposal
        *Currenly these will me primary marketplace cards
        */
+      const availableItemsNotifier = E(
+        publicFacetRef.current,
+      ).getAvailableItemsNotifier();
 
       /* Using the public faucet we get all the current Nfts offered for sale */
       for await (const cardsAvailableAmount of iterateNotifier(
         availableItemsNotifier,
       )) {
+        console.log('available Cards:', cardsAvailableAmount);
         setAvailableCards(cardsAvailableAmount.value);
       }
     };
@@ -146,6 +141,7 @@ function App() {
       setWalletConnected(false);
       walletAbort && walletAbort();
     };
+
     const onMessage = (data) => {
       const obj = JSON.parse(data);
       walletDispatch && walletDispatch(obj);
@@ -217,6 +213,7 @@ function App() {
       tokenPurse: selectedPurse || tokenPurses[0],
       price: BigInt(price),
     }).then((result) => {
+      // getSellerSession({ publicFacet: publicFacetRef.current });
       console.log('Your offer id for this current offer:', result);
       setNeedToApproveOffer(true);
     });
@@ -238,7 +235,7 @@ function App() {
       />
       <CardDisplay
         activeTab={activeTab}
-        cardsList={activeTab === 0 ? userCards : availableCards}
+        cardList={availableCards}
         cardPurse={cardPurse}
         handleClick={handleCardClick}
         type={type}
@@ -267,10 +264,7 @@ function App() {
         style="modal-img"
       >
         <div className="pb-12 w-full h-full object-cover flex justify-center items-center">
-          <img
-            src={`https://gateway.pinata.cloud/ipfs/${activeCard?.image}`}
-            alt="Card Media"
-          />
+          <img src={images[activeCard]} alt="Card Media" />
         </div>
       </ModalWrapper>
       <EnableAppDialog
