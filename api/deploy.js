@@ -92,11 +92,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
     installation,
   );
 
-  // const {
-  //   instance: atomicSwapContractInstance,
-  //   publicFacet: atomicSwapContractPublicFacet,
-  // } = await E(zoe).startInstance(atomicSwapContractInstallation);
-
   /**
    * @type {ERef<Issuer>}
    */

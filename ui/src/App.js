@@ -18,11 +18,9 @@ import EnableAppDialog from './components/EnableAppDialog.jsx';
 
 import { getCardAuctionDetail, makeBidOfferForCard } from './auction.js';
 
-// import installationConstants from './conf/installationConstants';
 import dappConstants from './lib/constants.js';
 import ModalWrapper from './components/ModalWrapper';
 import ModalContent from './components/ModalContent';
-// import { images } from './images';
 import { makeSwapInvitation } from './swapInvitation';
 
 const {
@@ -32,10 +30,7 @@ const {
   CARD_MINTER_BOARD_ID,
   issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID, Money: MONEY_ISSUER_BOARD_ID },
   brandBoardIds: { Money: MONEY_BRAND_BOARD_ID, Card: CARD_BRAND_BOARD_ID },
-  // ATOMICSWAP_CONTRACT_INSTANCE_BOARD_ID: atomicSwapInstanceId,
 } = dappConstants;
-
-// const { ATOMICSWAP_LOGIC_INSTALLATION_BOARD_ID } = installationConstants;
 
 function App() {
   const [walletConnected, setWalletConnected] = useState(false);
@@ -143,7 +138,6 @@ function App() {
       for await (const cardsAvailableAmount of iterateNotifier(
         availableItemsNotifier,
       )) {
-        // console.log('available Cards:', cardsAvailableAmount);
         setAvailableCards(cardsAvailableAmount.value);
       }
     };
@@ -152,7 +146,6 @@ function App() {
       setWalletConnected(false);
       walletAbort && walletAbort();
     };
-    // console.log(cardPurse?.currentAmount, 'current ammount');
     const onMessage = (data) => {
       const obj = JSON.parse(data);
       walletDispatch && walletDispatch(obj);
@@ -224,7 +217,6 @@ function App() {
       tokenPurse: selectedPurse || tokenPurses[0],
       price: BigInt(price),
     }).then((result) => {
-      // getSellerSession({ publicFacet: publicFacetRef.current });
       console.log('Your offer id for this current offer:', result);
       setNeedToApproveOffer(true);
     });

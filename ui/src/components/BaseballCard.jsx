@@ -6,12 +6,6 @@ import Expand from '../assets/icons/expand.png';
 import Button from './common/Button';
 
 const BaseballCard = ({ imageOnly, playerName, handleClick, type }) => {
-  // const CardContainer = handleClick ? CardActionArea : Fragment;
-  // const containerProps = handleClick
-  //   ? {
-  //       onClick: () => handleClick(playerName),
-  //     }
-  //   : {};
   console.log(playerName, 'image from baseball card component');
   console.log(type, 'baseballcard type btn');
   return (

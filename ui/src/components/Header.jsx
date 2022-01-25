@@ -2,7 +2,6 @@ import React from 'react';
 
 const Header = ({ walletConnected, activeTab, setActiveTab, setType }) => {
   const walletStatus = walletConnected ? 'Connected' : 'Not connected';
-  // const dappStatus = dappApproved ? 'Approved' : 'Not approved';
   console.log(activeTab);
   const TabButton = ({ tabIndex, text, width }) => {
     return (

@@ -1,5 +1,4 @@
 import { E } from '@agoric/eventual-send';
-// import { assert, details as X } from '@agoric/assert';
 import { AmountMath } from '@agoric/ertp';
 
 const makeSwapInvitation = async ({
