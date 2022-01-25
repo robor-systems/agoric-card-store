@@ -81,7 +81,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
     AUCTION_INSTALLATION_BOARD_ID,
   );
   const swapInstallation = await E(board).getValue(SWAP_INSTALLATION_BOARD_ID);
-  console.log('Successfully read board Id');
   // Second, we can use the installation to create a new instance of
   // our contract code on Zoe. A contract instance is a running
   // program that can take offers through Zoe. Making an instance will
@@ -121,11 +120,8 @@ export default async function deployApi(homePromise, { pathResolve }) {
     minBidPerCard,
     chainTimerService,
   );
-
   const minter = await E(baseballCardSellerFacet).getMinter();
-  console.log('minter:', minter);
   console.log('- SUCCESS! contract instance is running on Zoe');
-
   console.log('Retrieving Board IDs for issuers and brands');
   const invitationIssuerP = E(zoe).getInvitationIssuer();
   const invitationBrandP = E(invitationIssuerP).getBrand();
@@ -136,6 +132,14 @@ export default async function deployApi(homePromise, { pathResolve }) {
     E(cardIssuerP).getBrand(),
     invitationBrandP,
   ]);
+  const issuerKeywordRecord = harden({
+    Items: cardIssuer,
+    Money: moneyIssuer,
+  });
+  const { publicFacet: SwapItemsPublicFacet } = await E(zoe).startInstance(
+    swapInstallation,
+    issuerKeywordRecord,
+  );
   const [
     INSTANCE_BOARD_ID,
     CARD_BRAND_BOARD_ID,
@@ -145,6 +149,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     CARD_MINTER_BOARD_ID,
     INVITE_BRAND_BOARD_ID,
     SWAP_INSTANCE_BOARD_ID,
+    SWAP_PUBLIC_FAUCET_BOARD_ID,
   ] = await Promise.all([
     E(board).getId(instance),
     E(board).getId(cardBrand),
@@ -154,6 +159,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     E(board).getId(minter),
     E(board).getId(invitationBrand),
     E(board).getId(swapInstallation),
+    E(board).getId(SwapItemsPublicFacet),
   ]);
 
   console.log(`-- Contract Name: ${CONTRACT_NAME}`);
@@ -161,7 +167,9 @@ export default async function deployApi(homePromise, { pathResolve }) {
   console.log(`-- CARD_ISSUER_BOARD_ID: ${CARD_ISSUER_BOARD_ID}`);
   console.log(`-- CARD_BRAND_BOARD_ID: ${CARD_BRAND_BOARD_ID}`);
   console.log(`-- CARD_MINTER_BOARD_ID: ${CARD_MINTER_BOARD_ID}`);
+  console.log(`-- CARD_MINTER_BOARD_ID: ${CARD_MINTER_BOARD_ID}`);
   console.log(`-- SWAP_INSTANCE_BOARD_ID: ${SWAP_INSTANCE_BOARD_ID}`);
+  console.log(`-- SWAP_PUBLIC_FAUCET_BOARD_ID: ${SWAP_PUBLIC_FAUCET_BOARD_ID}`);
 
   const API_URL = process.env.API_URL || `http://127.0.0.1:${API_PORT || 8000}`;
 
@@ -173,6 +181,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     INVITE_BRAND_BOARD_ID,
     CARD_MINTER_BOARD_ID,
     SWAP_INSTANCE_BOARD_ID,
+    SWAP_PUBLIC_FAUCET_BOARD_ID,
     BRIDGE_URL: 'agoric-lookup:https://local.agoric.com?append=/bridge',
     brandBoardIds: {
       Card: CARD_BRAND_BOARD_ID,

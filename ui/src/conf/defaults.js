@@ -1,18 +1,19 @@
 // GENERATED FROM /home/test/Repos/agoric-dapps/agoric-card-store/api/deploy.js
 export default {
-  "INSTANCE_BOARD_ID": "1035074808",
-  "INSTALLATION_BOARD_ID": "940953141",
-  "AUCTION_ITEMS_INSTALLATION_BOARD_ID": "925063544",
+  "INSTANCE_BOARD_ID": "529406044",
+  "INSTALLATION_BOARD_ID": "1221243446",
+  "AUCTION_ITEMS_INSTALLATION_BOARD_ID": "1530295560",
   "INVITE_BRAND_BOARD_ID": "1265655452",
-  "CARD_MINTER_BOARD_ID": "192932059",
-  "SWAP_INSTANCE_BOARD_ID": "1168060102",
+  "CARD_MINTER_BOARD_ID": "688500812",
+  "SWAP_INSTANCE_BOARD_ID": "379944443",
+  "SWAP_PUBLIC_FAUCET_BOARD_ID": "112440918",
   "BRIDGE_URL": "agoric-lookup:https://local.agoric.com?append=/bridge",
   "brandBoardIds": {
-    "Card": "495234043",
+    "Card": "715805464",
     "Money": "1532665031"
   },
   "issuerBoardIds": {
-    "Card": "1572641147",
+    "Card": "474502210",
     "Money": "1576549616"
   },
   "minBidPerCard": 1000000,

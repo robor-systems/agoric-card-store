@@ -20,15 +20,15 @@ import { getCardAuctionDetail, makeBidOfferForCard } from './auction.js';
 import dappConstants from './lib/constants.js';
 import ModalWrapper from './components/ModalWrapper';
 import ModalContent from './components/ModalContent';
-import { images } from './images';
-import { makeSwapInvitation } from './swapInvitation';
+import { getSellerSeat } from './swap';
 
 const {
   INSTANCE_BOARD_ID,
   INSTALLATION_BOARD_ID,
   SWAP_INSTANCE_BOARD_ID,
   CARD_MINTER_BOARD_ID,
-  issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID, Money: MONEY_ISSUER_BOARD_ID },
+  SWAP_PUBLIC_FAUCET_BOARD_ID,
+  issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID },
   brandBoardIds: { Money: MONEY_BRAND_BOARD_ID, Card: CARD_BRAND_BOARD_ID },
 } = dappConstants;
 
@@ -157,33 +157,25 @@ function App() {
   const GetSwapObject = async () => {
     const board = E(walletPRef.current).getBoard();
     const swapInstallation = await E(board).getValue(SWAP_INSTANCE_BOARD_ID);
-    const moneyIssuer = await E(board).getValue(MONEY_ISSUER_BOARD_ID);
-    const cardIssuer = await E(board).getValue(CARD_ISSUER_BOARD_ID);
-    const cardBrand = await E(board).getValue(CARD_BRAND_BOARD_ID);
-    const moneyBrand = await E(board).getValue(MONEY_BRAND_BOARD_ID);
-    const cardMinter = await E(board).getValue(CARD_MINTER_BOARD_ID);
-    const issuerKeywordRecord = {
-      Items: cardIssuer,
-      Money: moneyIssuer,
-    };
+    const publicFacet = await E(board).getValue(SWAP_PUBLIC_FAUCET_BOARD_ID);
     return {
-      sellingPrice: 3n,
-      cardName: activeCard,
-      cardBrand,
-      cardPurse,
-      moneyBrand,
+      CARD_MINTER_BOARD_ID,
+      INSTANCE_BOARD_ID,
+      publicFacet,
+      sellingPrice: 4n,
       swapInstallation,
-      issuerKeywordRecord,
       walletP: walletPRef.current,
-      cardMinter,
+      cardDetail: activeCard,
     };
   };
-  const swapInvitation = async () => {
-    const obj = await makeSwapInvitation(await GetSwapObject());
+  const makeInvitationAndSellerSeat = async () => {
+    await GetSwapObject();
+    const obj = await getSellerSeat(await GetSwapObject());
     console.log('printing output:', obj);
   };
-  const handleCardClick = (name, bool) => {
-    setActiveCard(name);
+  const handleCardClick = (cardDetail, bool) => {
+    console.log('active card:', cardDetail);
+    setActiveCard(cardDetail);
     setOpenExpandModal(bool);
   };
 
@@ -246,7 +238,7 @@ function App() {
         style="modal"
       >
         <ModalContent
-          makeSwapInvitation={swapInvitation}
+          makeSwapInvitation={makeInvitationAndSellerSeat}
           playerName={activeCard}
           type={type}
           onOpen={handleCardBidOpen}
@@ -264,7 +256,10 @@ function App() {
         style="modal-img"
       >
         <div className="pb-12 w-full h-full object-cover flex justify-center items-center">
-          <img src={images[activeCard]} alt="Card Media" />
+          <img
+            src={`https://gateway.pinata.cloud/ipfs/${activeCard?.image}`}
+            alt="Card Media"
+          />
         </div>
       </ModalWrapper>
       <EnableAppDialog
