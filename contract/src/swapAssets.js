@@ -17,10 +17,12 @@ import { AmountMath } from '@agoric/ertp';
  * who should offer { give: { Price: B }, want: { Asset: A } }, with a want
  * amount no greater than the original's give, and a give amount at least as
  * large as the original's want.
+ *
+ * @param zcf
  */
 const start = (zcf) => {
   assertIssuerKeywords(zcf, harden(['Items', 'Money']));
-
+  
   /** @type {OfferHandler} */
   const makeMatchingInvitation = (SellerSeat) => {
     assertProposalShape(SellerSeat, {
@@ -51,7 +53,7 @@ const start = (zcf) => {
 
   const getSellerSeat = async ({
     cardDetail,
-    swapInstallation,
+    // swapInstallation,
     sellingPrice,
     mainContractInstance,
     walletP,
@@ -60,7 +62,7 @@ const start = (zcf) => {
     const zoe = zcf.getZoeService();
     const board = E(walletP).getBoard();
     const brandKeywordRecord = await E(zoe).getBrands(mainContractInstance);
-    const issuerKeywordRecord = await E(zoe).getIssuers(mainContractInstance);
+    // const issuerKeywordRecord = await E(zoe).getIssuers(mainContractInstance);
     const cardMinter = await E(board).getValue(CARD_MINTER_BOARD_ID);
     const cardAmount = AmountMath.make(
       brandKeywordRecord.Items,
@@ -73,10 +75,10 @@ const start = (zcf) => {
     });
     const userCardPayment = E(cardMinter).mintPayment(cardAmount);
     const payment = harden({ Items: userCardPayment });
-    const { creatorInvitation } = await E(zoe).startInstance(
-      swapInstallation,
-      issuerKeywordRecord,
-    );
+    // const { creatorInvitation } = await E(zoe).startInstance(
+    //   swapInstallation,
+    //   issuerKeywordRecord,
+    // );
     const sellerSeat = await E(zoe).offer(creatorInvitation, Proposal, payment);
     return sellerSeat;
   };
