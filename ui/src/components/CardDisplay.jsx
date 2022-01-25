@@ -26,14 +26,20 @@ import Loader from './common/Loader.jsx';
 //   };
 // });
 
-const CardDisplay = ({ activeTab, playerNames, handleClick, type }) => {
-  const isReady = playerNames && playerNames.length > 0;
-
-  const cards = playerNames.map((playerName) => (
-    <div key={playerName.name}>
+const CardDisplay = ({
+  activeTab,
+  userCards,
+  playerNames,
+  handleClick,
+  type,
+}) => {
+  const cardsToDisplay = activeTab === 0 ? userCards : playerNames;
+  const isReady = cardsToDisplay && cardsToDisplay.length > 0;
+  const cards = cardsToDisplay.map((card) => (
+    <div key={card.name}>
       <BaseballCard
-        playerName={playerName}
-        key={playerName}
+        playerName={card}
+        key={card.name}
         handleClick={handleClick}
         type={type}
       />

@@ -43,6 +43,7 @@ function App() {
   const [walletConnected, setWalletConnected] = useState(false);
   const [dappApproved, setDappApproved] = useState(true);
   const [availableCards, setAvailableCards] = useState([]);
+  const [userCards, setUserCards] = useState([]);
   const [cardPurse, setCardPurse] = useState(null);
   const [tokenPurses, setTokenPurses] = useState([]);
   const [openEnableAppDialog, setOpenEnableAppDialog] = useState(false);
@@ -105,6 +106,7 @@ function App() {
         setTokenDisplayInfo(newTokenPurses[0].displayInfo);
         setTokenPetname(newTokenPurses[0].brandPetname);
         setCardPurse(newCardPurse);
+        setUserCards(newCardPurse.currentAmount.value);
         console.log('printing card purse:', newCardPurse);
         console.log('printing all cards:', availableCards);
       };
@@ -148,11 +150,12 @@ function App() {
         setAvailableCards(cardsAvailableAmount.value);
       }
     };
+
     const onDisconnect = () => {
       setWalletConnected(false);
       walletAbort && walletAbort();
     };
-
+    // console.log(cardPurse?.currentAmount, 'current ammount');
     const onMessage = (data) => {
       const obj = JSON.parse(data);
       walletDispatch && walletDispatch(obj);
@@ -172,7 +175,9 @@ function App() {
     cardPurse,
     'purses info',
   );
-  console.log(activeCard, 'activeTab');
+  console.log(userCards, 'userCards');
+
+  // console.log(activeCard, 'activeTab');
   // const handleBuyClick = async (cardCID) => {
   //   console.log(
   //     MONEY_ISSUER_BOARD_ID,
@@ -272,6 +277,7 @@ function App() {
       <CardDisplay
         activeTab={activeTab}
         playerNames={availableCards}
+        userCards={userCards}
         cardPurse={cardPurse}
         handleClick={handleCardClick}
         type={type}
