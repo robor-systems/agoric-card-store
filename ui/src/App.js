@@ -48,11 +48,13 @@ function App() {
   const [openExpandModal, setOpenExpandModal] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [type, setType] = useState('Sell Product');
+  const [userOffers, setUserOffers] = useState([]);
   const handleTabChange = (index) => setActiveTab(index);
   const handleDialogClose = () => setOpenEnableAppDialog(false);
 
   const walletPRef = useRef(undefined);
   const publicFacetRef = useRef(undefined);
+  const publicFacetSwapRef = useRef(undefined);
 
   useEffect(() => {
     // Receive callbacks from the wallet connection.
@@ -120,6 +122,10 @@ function App() {
       const instance = await E(board).getValue(INSTANCE_BOARD_ID);
       const publicFacet = E(zoe).getPublicFacet(instance);
       publicFacetRef.current = publicFacet;
+      const publicFacetSwap = await E(board).getValue(
+        SWAP_PUBLIC_FAUCET_BOARD_ID,
+      );
+      publicFacetSwapRef.current = publicFacetSwap;
       /*
        *get the current items for sale in the proposal
        *Currenly these will me primary marketplace cards
@@ -127,13 +133,27 @@ function App() {
       const availableItemsNotifier = E(
         publicFacetRef.current,
       ).getAvailableItemsNotifier();
-
+      const availableOfferNotifier = await E(
+        publicFacetSwapRef.current,
+      ).getOfferNotifier();
+      console.log(availableOfferNotifier, 'availableOfferNotifier');
+      const offersSwap = await E(
+        publicFacetSwapRef.current,
+      ).getAvailableOffers();
+      console.log(offersSwap, 'offers diresctly');
       /* Using the public faucet we get all the current Nfts offered for sale */
       for await (const cardsAvailableAmount of iterateNotifier(
         availableItemsNotifier,
       )) {
         console.log('available Cards:', cardsAvailableAmount);
         setAvailableCards(cardsAvailableAmount.value);
+      }
+
+      for await (const availableOffers of iterateNotifier(
+        availableOfferNotifier,
+      )) {
+        setUserOffers(availableOffers.value);
+        // console.log('available offers from swap:', availableOffers);
       }
     };
 
@@ -154,10 +174,11 @@ function App() {
     });
     return deactivateWebSocket;
   }, []);
+  console.log(userOffers, 'userOFFER');
   const GetSwapObject = async () => {
     const board = E(walletPRef.current).getBoard();
     const swapInstallation = await E(board).getValue(SWAP_INSTANCE_BOARD_ID);
-    const publicFacet = await E(board).getValue(SWAP_PUBLIC_FAUCET_BOARD_ID);
+    const publicFacet = publicFacetSwapRef.current;
     return {
       CARD_MINTER_BOARD_ID,
       INSTANCE_BOARD_ID,

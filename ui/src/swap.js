@@ -20,14 +20,15 @@ const getSellerSeat = async ({
     walletP,
     CARD_MINTER_BOARD_ID,
   });
-  const invitationP = matchingSeatInvitation.getOfferResult();
-  const invitationIssuer = E(zoe).getInvitationIssuer();
+  const invitationP = await E(matchingSeatInvitation).getOfferResult();
+  // const invitationIssuer = await E(zoe).getInvitationIssuer();
   const { installation: bobInstallationId, instance } = E(
     zoe,
   ).getInvitationDetails(invitationP);
-  const myExclusiveInvitation = await invitationIssuer.claim(invitationP);
-  console.log(bobInstallationId, instance, myExclusiveInvitation);
-  return matchingSeatInvitation;
+  console.log(bobInstallationId, instance);
+  // const myExclusiveInvitation = await invitationIssuer.claim(invitationP);
+  // console.log(bobInstallationId, instance, myExclusiveInvitation);
+  // return matchingSeatInvitation;
 };
 
 export { getSellerSeat };

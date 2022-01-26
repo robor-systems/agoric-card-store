@@ -45,7 +45,7 @@ const CardDisplay = ({ activeTab, cardList, handleClick, type, cardPurse }) => {
             <div key={playerName}>
               <BaseballCard
                 playerName={playerName}
-                key={playerName}
+                key={playerName.name}
                 handleClick={handleClick}
                 type={type}
               />
