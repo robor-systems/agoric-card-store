@@ -20,7 +20,7 @@ import { getCardAuctionDetail, makeBidOfferForCard } from './auction.js';
 import dappConstants from './lib/constants.js';
 import ModalWrapper from './components/ModalWrapper';
 import ModalContent from './components/ModalContent';
-import { getSellerSeat, getBuyerSeat } from './swap';
+import { getSellerSeat, makeMatchingInvitation } from './swap';
 
 const {
   INSTANCE_BOARD_ID,
@@ -170,7 +170,8 @@ function App() {
       cardDetail: activeCard,
     };
     const sellerSeatInvitation = await getSellerSeat(params);
-    await getBuyerSeat({
+    // here add functionality to store sellerSeatInvitation
+    await makeMatchingInvitation({
       cardPurse,
       tokenPurses,
       cardDetail: activeCard,

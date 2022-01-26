@@ -5,7 +5,7 @@ import { E } from '@agoric/eventual-send';
  * secondary market place
  */
 
-const getBuyerSeat = async ({
+const makeMatchingInvitation = async ({
   cardPurse,
   tokenPurses,
   cardDetail,
@@ -82,7 +82,7 @@ const getSellerSeat = async ({
   return sellerSeatInvitation;
 };
 
-export { getSellerSeat, getBuyerSeat };
+export { getSellerSeat, makeMatchingInvitation };
 
 // Unhandled Rejection (Error): The amount could not be subtracted from the allocation because the allocation did not have an amount under the keyword (a string).
 // Unhandled Rejection (Error): The "Money" keyword in proposal.give did not have an associated payment in the paymentKeywordRecord, which had keywords: []
