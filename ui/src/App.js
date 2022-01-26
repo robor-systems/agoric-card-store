@@ -133,13 +133,17 @@ function App() {
       const availableItemsNotifier = E(
         publicFacetRef.current,
       ).getAvailableItemsNotifier();
+
       const availableOfferNotifier = await E(
         publicFacetSwapRef.current,
       ).getOfferNotifier();
+
       console.log(availableOfferNotifier, 'availableOfferNotifier');
+
       const offersSwap = await E(
         publicFacetSwapRef.current,
       ).getAvailableOffers();
+      setUserOffers(offersSwap.value);
       console.log(offersSwap, 'offers diresctly');
       /* Using the public faucet we get all the current Nfts offered for sale */
       for await (const cardsAvailableAmount of iterateNotifier(
@@ -175,6 +179,10 @@ function App() {
     return deactivateWebSocket;
   }, []);
   console.log(userOffers, 'userOFFER');
+  const getAvailableOffers = async () => {
+    const offersSwap = await E(publicFacetSwapRef.current).getAvailableOffers();
+    setUserOffers(offersSwap.value);
+  };
   const GetSwapObject = async () => {
     const board = E(walletPRef.current).getBoard();
     const swapInstallation = await E(board).getValue(SWAP_INSTANCE_BOARD_ID);
@@ -187,8 +195,12 @@ function App() {
       swapInstallation,
       walletP: walletPRef.current,
       cardDetail: activeCard,
+      getAvailableOffers,
     };
   };
+  // const updateMarketPlace =()=>{
+
+  // }
   const makeInvitationAndSellerSeat = async () => {
     await GetSwapObject();
     const obj = await getSellerSeat(await GetSwapObject());
@@ -248,9 +260,10 @@ function App() {
       />
       <CardDisplay
         activeTab={activeTab}
-        cardList={availableCards}
+        cardList={activeTab === 1 ? userOffers : availableCards}
         cardPurse={cardPurse}
         handleClick={handleCardClick}
+        userOffers={userOffers}
         type={type}
       />
       <ModalWrapper

@@ -7,7 +7,7 @@ import Button from './common/Button';
 
 const BaseballCard = ({ imageOnly, playerName, handleClick, type }) => {
   console.log(playerName, 'image from baseball card component');
-  console.log(type, 'baseballcard type btn');
+  // console.log(type, 'baseballcard type btn');
   return (
     <div
       className={`transition-all duration-300 flex flex-col py-3 border border-alternativeLight card card-shadow rounded-md ${

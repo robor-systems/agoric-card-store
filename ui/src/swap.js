@@ -8,6 +8,7 @@ const getSellerSeat = async ({
   INSTANCE_BOARD_ID,
   CARD_MINTER_BOARD_ID,
   publicFacet,
+  getAvailableOffers,
 }) => {
   const zoe = E(walletP).getZoe();
   const board = E(walletP).getBoard();
@@ -22,9 +23,10 @@ const getSellerSeat = async ({
   });
   const invitationP = await E(matchingSeatInvitation).getOfferResult();
   // const invitationIssuer = await E(zoe).getInvitationIssuer();
-  const { installation: bobInstallationId, instance } = E(
+  const { installation: bobInstallationId, instance } = await E(
     zoe,
   ).getInvitationDetails(invitationP);
+  getAvailableOffers();
   console.log(bobInstallationId, instance);
   // const myExclusiveInvitation = await invitationIssuer.claim(invitationP);
   // console.log(bobInstallationId, instance, myExclusiveInvitation);

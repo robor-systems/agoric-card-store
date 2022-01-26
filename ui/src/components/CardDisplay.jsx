@@ -21,10 +21,10 @@ const CardDisplay = ({ activeTab, cardList, handleClick, type, cardPurse }) => {
         cardPurse?.currentAmount?.value?.length > 0 ? (
           <div className="grid grid-cols-3 gap-x-8 gap-y-10">
             {cardPurse?.currentAmount.value.map((playerName) => (
-              <div key={playerName}>
+              <div key={playerName.name}>
                 <BaseballCard
                   playerName={playerName}
-                  key={playerName}
+                  key={playerName.name}
                   handleClick={handleClick}
                   type={type}
                 />
@@ -36,13 +36,41 @@ const CardDisplay = ({ activeTab, cardList, handleClick, type, cardPurse }) => {
         );
       break;
     case 1:
-      cards = <h1>No nfts for sale currently</h1>;
+      console.log(cardList);
+      cards =
+        cardList.length !== 0 ? (
+          <div className="grid grid-cols-3 gap-x-8 gap-y-10">
+            {/* {cardList.map((playerName) => {
+            console.log(playerName, 'inside map ');
+            return (
+              <div key={playerName.id}>
+                <BaseballCard
+                  playerName={playerName}
+                  key={playerName.name}
+                  handleClick={handleClick}
+                  type={type}
+                />
+              </div>
+            );
+          })} */}
+            <div key={cardList[0].id}>
+              <BaseballCard
+                playerName={cardList[0]}
+                key={cardList[0].name}
+                handleClick={handleClick}
+                type={type}
+              />
+            </div>
+          </div>
+        ) : (
+          <h1>No nfts for sale currently</h1>
+        );
       break;
     case 2:
       cards = (
         <div className="grid grid-cols-3 gap-x-8 gap-y-10">
           {cardList.map((playerName) => (
-            <div key={playerName}>
+            <div key={playerName.name}>
               <BaseballCard
                 playerName={playerName}
                 key={playerName.name}
