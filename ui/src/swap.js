@@ -16,7 +16,7 @@ const getBuyerSeat = async ({
   console.log('sellerSeatInvitation', sellerSeatInvitation);
   const zoe = E(walletP).getZoe();
   const invitationP = await E(sellerSeatInvitation).getOfferResult();
-  const { installation: bobInstallationId, instance } = await E(
+  const { installation: buyerInstallationId, instance } = await E(
     zoe,
   ).getInvitationDetails(invitationP);
   const invitationIssuer = await E(zoe).getInvitationIssuer();
@@ -29,7 +29,7 @@ const getBuyerSeat = async ({
   const offerConfig = {
     id: Date.now(),
     instancePetname: 'testing',
-    installation: bobInstallationId,
+    installation: buyerInstallationId,
     instance,
     invitation: BuyerExclusiveInvitation,
     proposalTemplate: {
