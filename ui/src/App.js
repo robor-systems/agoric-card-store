@@ -27,7 +27,7 @@ const {
   INSTALLATION_BOARD_ID,
   SWAP_INSTANCE_BOARD_ID,
   CARD_MINTER_BOARD_ID,
-  SWAP_PUBLIC_FAUCET_BOARD_ID,
+  SWAP_WRAPPER_INSTANCE_BOARD_ID,
   issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID },
   brandBoardIds: { Money: MONEY_BRAND_BOARD_ID, Card: CARD_BRAND_BOARD_ID },
 } = dappConstants;
@@ -55,7 +55,7 @@ function App() {
   const walletPRef = useRef(undefined);
   const publicFacetRef = useRef(undefined);
   const publicFacetSwapRef = useRef(undefined);
-
+  // const availableOfferNotifierRef = useRef(undefined);
   useEffect(() => {
     // Receive callbacks from the wallet connection.
     const otherSide = Far('otherSide', {
@@ -122,10 +122,25 @@ function App() {
       const instance = await E(board).getValue(INSTANCE_BOARD_ID);
       const publicFacet = E(zoe).getPublicFacet(instance);
       publicFacetRef.current = publicFacet;
-      const publicFacetSwap = await E(board).getValue(
-        SWAP_PUBLIC_FAUCET_BOARD_ID,
+      const swapWrapperInstance = await E(board).getValue(
+        SWAP_WRAPPER_INSTANCE_BOARD_ID,
       );
+      const publicFacetSwap = await E(zoe).getPublicFacet(swapWrapperInstance);
       publicFacetSwapRef.current = publicFacetSwap;
+
+      async function watchOffers() {
+        const availableOfferNotifier = await E(
+          publicFacetSwapRef.current,
+        ).getAvailableOfferNotifier();
+
+        for await (const availableOffers of iterateNotifier(
+          availableOfferNotifier,
+        )) {
+          console.log('available offers from swap:', availableOffers);
+          setUserOffers(availableOffers.value);
+        }
+      }
+      watchOffers().catch((err) => console.log('got watchOffer errs', err));
       /*
        *get the current items for sale in the proposal
        *Currenly these will me primary marketplace cards
@@ -134,30 +149,17 @@ function App() {
         publicFacetRef.current,
       ).getAvailableItemsNotifier();
 
-      const availableOfferNotifier = await E(
-        publicFacetSwapRef.current,
-      ).getOfferNotifier();
-
-      console.log(availableOfferNotifier, 'availableOfferNotifier');
-
-      const offersSwap = await E(
-        publicFacetSwapRef.current,
-      ).getAvailableOffers();
-      setUserOffers(offersSwap.value);
-      console.log(offersSwap, 'offers diresctly');
+      // const offersSwap = await E(
+      //   publicFacetSwapRef.current,
+      // ).getAvailableOffers();
+      // setUserOffers(offersSwap.value);
+      // console.log(offersSwap, 'offers diresctly');
       /* Using the public faucet we get all the current Nfts offered for sale */
       for await (const cardsAvailableAmount of iterateNotifier(
         availableItemsNotifier,
       )) {
         console.log('available Cards:', cardsAvailableAmount);
         setAvailableCards(cardsAvailableAmount.value);
-      }
-
-      for await (const availableOffers of iterateNotifier(
-        availableOfferNotifier,
-      )) {
-        setUserOffers(availableOffers.value);
-        // console.log('available offers from swap:', availableOffers);
       }
     };
 
@@ -179,10 +181,14 @@ function App() {
     return deactivateWebSocket;
   }, []);
   console.log(userOffers, 'userOFFER');
-  const getAvailableOffers = async () => {
-    const offersSwap = await E(publicFacetSwapRef.current).getAvailableOffers();
-    setUserOffers(offersSwap.value);
-  };
+
+  // const getAvailableOffers = async () => {
+  //   // console.log('onconnectRunning agin');
+
+  //   // const offersSwap = await E(publicFacetSwapRef.current).getAvailableOffers();
+  //   // setUserOffers(offersSwap.value);
+  // };
+
   const GetSwapObject = async () => {
     const board = E(walletPRef.current).getBoard();
     const swapInstallation = await E(board).getValue(SWAP_INSTANCE_BOARD_ID);
@@ -195,14 +201,12 @@ function App() {
       swapInstallation,
       walletP: walletPRef.current,
       cardDetail: activeCard,
-      getAvailableOffers,
     };
   };
   // const updateMarketPlace =()=>{
 
   // }
   const makeInvitationAndSellerSeat = async () => {
-    await GetSwapObject();
     const obj = await getSellerSeat(await GetSwapObject());
     console.log('printing output:', obj);
   };
