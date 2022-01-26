@@ -19,7 +19,6 @@ export function makeValue(value, displayInfo) {
   const { assetKind = AssetKind.NAT, decimalPlaces = 0 } = displayInfo || {};
   return parseAsValue(value, assetKind, decimalPlaces);
 }
-
 /**
  *
  * @param {any} value

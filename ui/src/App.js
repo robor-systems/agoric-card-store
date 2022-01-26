@@ -20,7 +20,7 @@ import { getCardAuctionDetail, makeBidOfferForCard } from './auction.js';
 import dappConstants from './lib/constants.js';
 import ModalWrapper from './components/ModalWrapper';
 import ModalContent from './components/ModalContent';
-import { getSellerSeat } from './swap';
+import { getSellerSeat, getBuyerSeat } from './swap';
 
 const {
   INSTANCE_BOARD_ID,
@@ -101,6 +101,7 @@ function App() {
         console.log('printing card purse:', newCardPurse);
         console.log('printing all cards:', availableCards);
       };
+
       async function watchPurses() {
         const pn = E(walletP).getPursesNotifier();
         for await (const purses of iterateNotifier(pn)) {
@@ -154,24 +155,32 @@ function App() {
     });
     return deactivateWebSocket;
   }, []);
-  const GetSwapObject = async () => {
+
+  const makeInvitationAndSellerSeat = async ({ price }) => {
     const board = E(walletPRef.current).getBoard();
     const swapInstallation = await E(board).getValue(SWAP_INSTANCE_BOARD_ID);
     const publicFacet = await E(board).getValue(SWAP_PUBLIC_FAUCET_BOARD_ID);
-    return {
+    const params = {
       CARD_MINTER_BOARD_ID,
       INSTANCE_BOARD_ID,
       publicFacet,
-      sellingPrice: 4n,
+      sellingPrice: BigInt(price),
       swapInstallation,
       walletP: walletPRef.current,
       cardDetail: activeCard,
     };
-  };
-  const makeInvitationAndSellerSeat = async () => {
-    await GetSwapObject();
-    const obj = await getSellerSeat(await GetSwapObject());
-    console.log('printing output:', obj);
+    const sellerSeatInvitation = await getSellerSeat(params);
+    await getBuyerSeat({
+      tokenPetname,
+      cardPurse,
+      tokenPurses,
+      cardDetail: activeCard,
+      INSTANCE_BOARD_ID,
+      sellingPrice: BigInt(price),
+      walletP: walletPRef.current,
+      sellerSeatInvitation,
+    });
+    // console.log('makeInvitationAndSellerSeat() result:', result);
   };
   const handleCardClick = (cardDetail, bool) => {
     console.log('active card:', cardDetail);

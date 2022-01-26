@@ -11,7 +11,6 @@ import {
   assertNatAssetKind,
   offerTo,
 } from '@agoric/zoe/src/contractSupport/index.js';
-
 import '@agoric/zoe/exported.js';
 
 /**
@@ -62,17 +61,14 @@ const start = (zcf) => {
     sellerSeat.incrementBy(seat.decrementBy(seat.getCurrentAllocation()));
     zcf.reallocate(sellerSeat, seat);
     seat.exit();
-
     // update current amount
     const addedAmount = sellerSeat.getAmountAllocated('Items', itemBrand);
-
     // XXX the sell method can be call multiple times,
     // so available items should be added to, not updated
     availableItems = AmountMath.add(availableItems, addedAmount);
     availableItemsUpdater.updateState(availableItems);
     return defaultAcceptanceMsg;
   };
-
   // The seller can selectively withdraw any items and/or any amount of money by specifying amounts in their
   // `want`. If no `want` is specified, then all of the `sellerSeat`'s allocation is withdrawn.
   const withdraw = (seat) => {
@@ -84,7 +80,6 @@ const start = (zcf) => {
     seat.incrementBy(sellerSeat.decrementBy(harden(amount)));
     zcf.reallocate(sellerSeat, seat);
     seat.exit();
-
     return 'Withdraw success';
   };
 
@@ -156,7 +151,6 @@ const start = (zcf) => {
         availableItems = AmountMath.subtract(availableItems, itemAmount);
         availableItemsUpdater.updateState(availableItems);
       }
-
       // unset the session, this handles the case auction session was failed
       // then item should be available for a new session
       delete sellerSessions[itemKey];
@@ -211,7 +205,6 @@ const start = (zcf) => {
         bidDuration,
         timeAuthority,
         bids: [],
-        fake: 'This is fake data',
       });
     }
     return session.getSessionDetails();

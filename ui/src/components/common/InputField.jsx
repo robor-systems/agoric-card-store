@@ -1,7 +1,7 @@
 import React from 'react';
 import RUN from '../../assets/icons/RUN-logo.png';
 
-function Input({ label }) {
+function Input({ label, value, handleChange }) {
   return (
     <div>
       <span className="text-lg leading-none">{label}</span>
@@ -10,6 +10,8 @@ function Input({ label }) {
           type="number"
           className="outline-none focus:outline-none w-56 h-12 rounded ml-4 mr-3"
           placeholder="0.00"
+          value={value}
+          onChange={(e) => handleChange(e.target.value)}
         />
         <div className="w-20 flex items-center">
           <img src={RUN} className="w-5 mr-2 h-5" alt="Run" />
