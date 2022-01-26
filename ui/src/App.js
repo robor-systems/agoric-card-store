@@ -171,11 +171,9 @@ function App() {
     };
     const sellerSeatInvitation = await getSellerSeat(params);
     await getBuyerSeat({
-      tokenPetname,
       cardPurse,
       tokenPurses,
       cardDetail: activeCard,
-      INSTANCE_BOARD_ID,
       sellingPrice: BigInt(price),
       walletP: walletPRef.current,
       sellerSeatInvitation,

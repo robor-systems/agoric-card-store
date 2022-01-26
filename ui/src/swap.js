@@ -6,12 +6,12 @@ import { E } from '@agoric/eventual-send';
  */
 
 const getBuyerSeat = async ({
-  walletP,
-  sellerSeatInvitation,
-  cardDetail,
-  sellingPrice,
   cardPurse,
   tokenPurses,
+  cardDetail,
+  sellingPrice,
+  walletP,
+  sellerSeatInvitation,
 }) => {
   console.log('sellerSeatInvitation', sellerSeatInvitation);
   const zoe = E(walletP).getZoe();
