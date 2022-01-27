@@ -91,9 +91,10 @@ export default async function deployApi(homePromise, { pathResolve }) {
   // give us a `creatorFacet` that will let us make invitations we can
   // send to users.
 
-  const { creatorFacet: baseballCardSellerFacet } = await E(zoe).startInstance(
-    installation,
-  );
+  const {
+    creatorFacet: baseballCardSellerFacet,
+    instance: baseballCardInstance,
+  } = await E(zoe).startInstance(installation);
 
   /**
    * @type {ERef<Issuer>}
@@ -166,6 +167,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     INVITE_BRAND_BOARD_ID,
     SWAP_INSTANCE_BOARD_ID,
     SWAP_WRAPPER_INSTANCE_BOARD_ID,
+    MAIN_CONTRACT_BOARD_INSTANCE_ID,
   ] = await Promise.all([
     E(board).getId(instance),
     E(board).getId(cardBrand),
@@ -176,6 +178,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     E(board).getId(invitationBrand),
     E(board).getId(swapInstallation),
     E(board).getId(swapWrapperInstance),
+    E(board).getId(baseballCardInstance),
   ]);
 
   console.log(`-- Contract Name: ${CONTRACT_NAME}`);
@@ -187,6 +190,9 @@ export default async function deployApi(homePromise, { pathResolve }) {
   console.log(`-- SWAP_INSTANCE_BOARD_ID: ${SWAP_INSTANCE_BOARD_ID}`);
   console.log(
     `-- SWAP_WRAPPER_INSTANCE_BOARD_ID: ${SWAP_WRAPPER_INSTANCE_BOARD_ID}`,
+  );
+  console.log(
+    `-- MAIN_CONTRACT_BOARD_INSTANCE_ID: ${MAIN_CONTRACT_BOARD_INSTANCE_ID}`,
   );
 
   const API_URL = process.env.API_URL || `http://127.0.0.1:${API_PORT || 8000}`;
@@ -212,6 +218,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     minBidPerCard: Number(moneyValue),
     API_URL,
     CONTRACT_NAME,
+    MAIN_CONTRACT_BOARD_INSTANCE_ID,
   };
   const defaultsFile = pathResolve(`../ui/src/conf/defaults.js`);
   console.log('writing', defaultsFile);
