@@ -45,11 +45,15 @@ const start = (zcf) => {
 
   const getAvailableOfferNotifier = () => availableOfferNotifier;
   const getAvailableOffers = () => availableOffers;
-
+  const updateAvailableOffers = (cardAmount) => {
+    availableOffers = AmountMath.subtract(availableOffers, cardAmount);
+    availableOfferUpdater.updateState(availableOffers);
+  };
   const publicFacet = Far('PublicFaucetForSwapInvitation', {
     getSellerSeat,
     getAvailableOfferNotifier,
     getAvailableOffers,
+    updateAvailableOffers,
   });
 
   return harden({ publicFacet });

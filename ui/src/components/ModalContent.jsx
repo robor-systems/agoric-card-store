@@ -23,7 +23,10 @@ function ModalContent({
         return (
           <div className="flex gap-x-10 mt-11 mx-12 mb-12">
             <BaseballCard imageOnly={true} playerName={playerName} />
-            <SellProductForm makeSwapInvitation={makeSwapInvitation} />
+            <SellProductForm
+              makeSwapInvitation={makeSwapInvitation}
+              tokenDisplayInfo={tokenDisplayInfo}
+            />
           </div>
         );
       case 'Edit Product':

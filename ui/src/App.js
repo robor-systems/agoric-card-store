@@ -20,13 +20,13 @@ import { getCardAuctionDetail, makeBidOfferForCard } from './auction.js';
 import dappConstants from './lib/constants.js';
 import ModalWrapper from './components/ModalWrapper';
 import ModalContent from './components/ModalContent';
-import { getSellerSeat } from './swap';
+import { getSellerSeat, makeMatchingInvitation } from './swap';
 
 const {
   INSTANCE_BOARD_ID,
   INSTALLATION_BOARD_ID,
-  SWAP_INSTANCE_BOARD_ID,
-  CARD_MINTER_BOARD_ID,
+  // SWAP_INSTANCE_BOARD_ID,
+  // CARD_MINTER_BOARD_ID,
   SWAP_WRAPPER_INSTANCE_BOARD_ID,
   issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID },
   brandBoardIds: { Money: MONEY_BRAND_BOARD_ID, Card: CARD_BRAND_BOARD_ID },
@@ -103,6 +103,7 @@ function App() {
         console.log('printing card purse:', newCardPurse);
         console.log('printing all cards:', availableCards);
       };
+
       async function watchPurses() {
         const pn = E(walletP).getPursesNotifier();
         for await (const purses of iterateNotifier(pn)) {
@@ -180,35 +181,32 @@ function App() {
     });
     return deactivateWebSocket;
   }, []);
-  console.log(userOffers, 'userOFFER');
 
-  // const getAvailableOffers = async () => {
-  //   // console.log('onconnectRunning agin');
-
-  //   // const offersSwap = await E(publicFacetSwapRef.current).getAvailableOffers();
-  //   // setUserOffers(offersSwap.value);
-  // };
-
-  const GetSwapObject = async () => {
-    const board = E(walletPRef.current).getBoard();
-    const swapInstallation = await E(board).getValue(SWAP_INSTANCE_BOARD_ID);
-    const publicFacet = publicFacetSwapRef.current;
-    return {
-      CARD_MINTER_BOARD_ID,
-      INSTANCE_BOARD_ID,
-      publicFacet,
-      sellingPrice: 4n,
-      swapInstallation,
+  const makeInvitationAndSellerSeat = async ({ price }) => {
+    // const board = E(walletPRef.current).getBoard();
+    // const swapInstallation = await E(board).getValue(SWAP_INSTANCE_BOARD_ID);
+    // const publicFacet = await E(board).getValue(SWAP_PUBLIC_FAUCET_BOARD_ID);
+    const params = {
+      // CARD_MINTER_BOARD_ID,
+      // INSTANCE_BOARD_ID,
+      publicFacet: publicFacetSwapRef.current,
+      sellingPrice: BigInt(price),
+      // swapInstallation,
       walletP: walletPRef.current,
       cardDetail: activeCard,
     };
-  };
-  // const updateMarketPlace =()=>{
-
-  // }
-  const makeInvitationAndSellerSeat = async () => {
-    const obj = await getSellerSeat(await GetSwapObject());
-    console.log('printing output:', obj);
+    const sellerSeatInvitation = await getSellerSeat(params);
+    // here add functionality to store sellerSeatInvitation
+    await makeMatchingInvitation({
+      cardPurse,
+      tokenPurses,
+      cardDetail: activeCard,
+      sellingPrice: BigInt(price),
+      walletP: walletPRef.current,
+      sellerSeatInvitation,
+      publicFacet: publicFacetSwapRef.current,
+    });
+    // console.log('makeInvitationAndSellerSeat() result:', result);
   };
   const handleCardClick = (cardDetail, bool) => {
     console.log('active card:', cardDetail);

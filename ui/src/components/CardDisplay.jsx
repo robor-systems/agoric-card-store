@@ -38,7 +38,7 @@ const CardDisplay = ({ activeTab, cardList, handleClick, type, cardPurse }) => {
     case 1:
       console.log(cardList, 'userOffer');
       cards =
-        cardList.length !== 0 ? (
+        cardList?.length !== 0 ? (
           <div className="grid grid-cols-3 gap-x-8 gap-y-10">
             {cardList.map((playerName) => {
               console.log(playerName, 'inside map ');

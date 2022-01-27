@@ -53,7 +53,7 @@ export default async function deployContract(
     // second time, the original id is just returned.
     board,
   } = home;
-
+  
   // First, we must bundle up our contract code (./src/contract.js)
   // and install it on Zoe. This returns an installationHandle, an
   // opaque, unforgeable identifier for our contract code that we can

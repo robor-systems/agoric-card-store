@@ -4,9 +4,7 @@ import '@agoric/zoe/exported';
 import { makeIssuerKit, AssetKind, AmountMath } from '@agoric/ertp';
 import { Far } from '@agoric/marshal';
 import { E } from '@agoric/eventual-send';
-
 import { FIRST_PRICE } from '@agoric/zoe/src/contracts/auction';
-
 /**
  * This contract mints non-fungible tokens (baseball cards) and creates a contract
  * instance to auction the cards in exchange for some sort of money.

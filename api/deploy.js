@@ -48,12 +48,10 @@ export default async function deployApi(homePromise, { pathResolve }) {
   const {
     // *** ON-CHAIN REFERENCES ***
     chainTimerService,
-
     // Zoe lives on-chain and is shared by everyone who has access to
     // the chain. In this demo, that's just you, but on our testnet,
     // everyone has access to the same Zoe.
     zoe,
-
     // The board is an on-chain object that is used to make private
     // on-chain objects public to everyone else on-chain. These
     // objects get assigned a unique string id. Given the id, other
@@ -185,7 +183,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
   console.log(`-- INSTANCE_BOARD_ID: ${INSTANCE_BOARD_ID}`);
   console.log(`-- CARD_ISSUER_BOARD_ID: ${CARD_ISSUER_BOARD_ID}`);
   console.log(`-- CARD_BRAND_BOARD_ID: ${CARD_BRAND_BOARD_ID}`);
-  console.log(`-- CARD_MINTER_BOARD_ID: ${CARD_MINTER_BOARD_ID}`);
   console.log(`-- CARD_MINTER_BOARD_ID: ${CARD_MINTER_BOARD_ID}`);
   console.log(`-- SWAP_INSTANCE_BOARD_ID: ${SWAP_INSTANCE_BOARD_ID}`);
   console.log(
