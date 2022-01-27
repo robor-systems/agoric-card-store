@@ -5,7 +5,7 @@ import Input from './common/InputField';
 import Select from './common/SelectField';
 import { makeValue } from '../utils/amount';
 
-function SellProductForm({ makeSwapInvitation, tokenDisplayInfo }) {
+function SellProductForm({ makeSwapInvitation, tokenDisplayInfo, onClose }) {
   const [price, setPrice] = useState(0);
   return (
     <div className="form flex flex-col gap-y-6 self">
@@ -16,6 +16,7 @@ function SellProductForm({ makeSwapInvitation, tokenDisplayInfo }) {
         onClick={async () => {
           const amount = makeValue(price, tokenDisplayInfo);
           console.log('amount is:', amount);
+          onClose();
           await makeSwapInvitation({ price: amount });
         }}
         text="Place in Marketplace"

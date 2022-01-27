@@ -9,7 +9,18 @@ const Header = ({ walletConnected, activeTab, setActiveTab, setType }) => {
         onClick={() => {
           setActiveTab(tabIndex);
           console.log(tabIndex);
-          tabIndex === 0 ? setType('Sell Product') : setType('Buy Product');
+          switch (tabIndex) {
+            case 0:
+              setType('Sell Product');
+              break;
+            case 1:
+              setType('Buy Product');
+              break;
+            case 2:
+              setType('Bid Product');
+              break;
+            default:
+          }
         }}
         className={`cursor-pointer flex flex-col justify-center relative h-20 ${width}`}
       >

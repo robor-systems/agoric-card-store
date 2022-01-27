@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import BaseballCard from './BaseballCard';
 import Button from './common/Button';
 import EditProductForm from './EditProductForm';
@@ -9,66 +9,62 @@ function ModalContent({
   makeSwapInvitation,
   onClose,
   type,
-  playerName,
+  cardDetail,
   onGetCardDetail,
   onBidCard,
   tokenPurses,
   tokenPetname,
   tokenDisplayInfo,
+  handleClick,
 }) {
-  const [hidden, setHidden] = useState(true);
+  // const [hidden, setHidden] = useState(true);
   const populateContent = () => {
     switch (type) {
       case 'Sell Product':
         return (
           <div className="flex gap-x-10 mt-11 mx-12 mb-12">
-            <BaseballCard imageOnly={true} playerName={playerName} />
+            <BaseballCard
+              imageOnly={true}
+              cardDetail={cardDetail}
+              handleClick={handleClick}
+            />
             <SellProductForm
               makeSwapInvitation={makeSwapInvitation}
               tokenDisplayInfo={tokenDisplayInfo}
+              onClose={onClose}
             />
           </div>
         );
       case 'Edit Product':
-        setHidden(false);
         return (
           <div className="flex gap-x-10 mt-11 mx-12 mb-12">
-            <BaseballCard imageOnly={true} playerName={playerName} />
+            <BaseballCard imageOnly={true} cardDetail={cardDetail} />
             <EditProductForm />
           </div>
+        );
+      case 'Bid Product':
+        return (
+          <>
+            <h1 className="text-2xl font-semibold text-center">{type}</h1>
+            <CardDetailModal
+              onClose={onClose}
+              onGetCardDetail={onGetCardDetail}
+              onBidCard={onBidCard}
+              cardDetail={cardDetail}
+              tokenPurses={tokenPurses}
+              tokenPetname={tokenPetname}
+              tokenDisplayInfo={tokenDisplayInfo}
+            />
+          </>
         );
       case 'Buy Product':
         return (
           <>
-            {!hidden && (
-              <>
-                <h1 className="text-2xl font-semibold text-center">{type}</h1>
-                <CardDetailModal
-                  onClose={onClose}
-                  onGetCardDetail={onGetCardDetail}
-                  onBidCard={onBidCard}
-                  playerName={playerName}
-                  tokenPurses={tokenPurses}
-                  tokenPetname={tokenPetname}
-                  tokenDisplayInfo={tokenDisplayInfo}
-                />
-              </>
-            )}
-            {hidden && (
-              <>
-                <h1 className="text-2xl font-semibold text-center">{type}</h1>
-                <div className="flex flex-col gap-y-10 mt-11 mx-12 mb-8">
-                  <BaseballCard playerName={playerName} />
-                  <Button
-                    onClick={() => {
-                      setHidden(false);
-                    }}
-                    text="Buy"
-                    style="w-full text-white"
-                  />
-                </div>
-              </>
-            )}
+            <h1 className="text-2xl font-semibold text-center">{type}</h1>
+            <div className="flex flex-col gap-y-10 mt-11 mx-12 mb-8">
+              <BaseballCard cardDetail={cardDetail} handleClick={handleClick} />
+              <Button text="Buy" style="w-full text-white" />
+            </div>
           </>
         );
       default:

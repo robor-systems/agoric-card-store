@@ -18,9 +18,9 @@ const makeMatchingInvitation = async ({
   console.log('sellerSeatInvitation', sellerSeatInvitation);
   const zoe = E(walletP).getZoe();
   const invitationP = await E(sellerSeatInvitation).getOfferResult();
-  const { installation: buyerInstallationId, instance } = await E(
-    zoe,
-  ).getInvitationDetails(invitationP);
+  // const { installation: buyerInstallationId, instance } = await E(
+  //   zoe,
+  // ).getInvitationDetails(invitationP);
   const invitationIssuer = await E(zoe).getInvitationIssuer();
   const BuyerExclusiveInvitation = await E(invitationIssuer).claim(invitationP);
   console.log('myExclusiveInvitation:', BuyerExclusiveInvitation);
@@ -30,9 +30,6 @@ const makeMatchingInvitation = async ({
   console.log('Buyers Invitation Value:', BuyerInvitationValue);
   const offerConfig = {
     id: Date.now(),
-    instancePetname: 'testing',
-    installation: buyerInstallationId,
-    instance,
     invitation: BuyerExclusiveInvitation,
     proposalTemplate: {
       want: {
@@ -47,6 +44,7 @@ const makeMatchingInvitation = async ({
           value: BigInt(sellingPrice),
         },
       },
+      exit: { onDemand: null },
     },
   };
   console.log(offerConfig);
@@ -54,42 +52,20 @@ const makeMatchingInvitation = async ({
   console.log('result from wallet:', result);
   if (result) {
     await E(publicFacet).updateAvailableOffers(
-      AmountMath.make(cardPurse.brand, cardDetail),
+      harden(AmountMath.make(cardPurse.brand, [cardDetail])),
     );
   }
-  // const result2 = await E(sellerSeatInvitation).getOfferResult();
-  // console.log('result:', result2);
-  // const exited = await E(sellerSeatInvitation).hasExited();
-  // console.log('seller seat exited:', exited);
-  // return buyerSeat;
 };
 /*
  * This function should be called when the user puts a card
  * which he own on sale in the secondary marketplace
  */
-const getSellerSeat = async ({
-  cardDetail,
-  sellingPrice,
-  // walletP,
-  // INSTANCE_BOARD_ID,
-  // CARD_MINTER_BOARD_ID,
-  // swapInstallation,
-  publicFacet,
-}) => {
-  // const board = E(walletP).getBoard();
-  // const mainContractInstance = await E(board).getValue(INSTANCE_BOARD_ID);
+const getSellerSeat = async ({ cardDetail, sellingPrice, publicFacet }) => {
   const sellerSeatInvitation = await E(publicFacet).getSellerSeat({
     cardDetail,
-    // swapInstallation,
     sellingPrice,
-    // mainContractInstance,
-    // walletP,
-    // CARD_MINTER_BOARD_ID,
   });
   return sellerSeatInvitation;
 };
 
 export { getSellerSeat, makeMatchingInvitation };
-
-// Unhandled Rejection (Error): The amount could not be subtracted from the allocation because the allocation did not have an amount under the keyword (a string).
-// Unhandled Rejection (Error): The "Money" keyword in proposal.give did not have an associated payment in the paymentKeywordRecord, which had keywords: []

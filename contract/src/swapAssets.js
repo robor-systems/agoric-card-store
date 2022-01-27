@@ -25,6 +25,7 @@ const start = (zcf) => {
     assertProposalShape(SellerSeat, {
       give: { Items: null },
       want: { Money: null },
+      exit: { onDemand: null },
     });
     const { want, give } = SellerSeat.getProposal();
     /** @type {OfferHandler} */

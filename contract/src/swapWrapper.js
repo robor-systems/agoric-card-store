@@ -37,9 +37,16 @@ const start = (zcf) => {
       swapInstallation,
       issuers,
     );
-    availableOffers = AmountMath.add(availableOffers, cardAmount);
-    availableOfferUpdater.updateState(availableOffers);
+
+    const shouldBeInvitationMsg = `The swapAsset instance should return a creatorInvitation`;
+    assert(creatorInvitation, shouldBeInvitationMsg);
+
     const sellerSeat = await E(zoe).offer(creatorInvitation, Proposal, payment);
+
+    const cardOffer = { ...cardDetail, sellingPrice, sellerSeat };
+    const cardOfferAmount = AmountMath.make(brands.Items, harden([cardOffer]));
+    availableOffers = AmountMath.add(availableOffers, cardOfferAmount);
+    availableOfferUpdater.updateState(availableOffers);
     return sellerSeat;
   };
 

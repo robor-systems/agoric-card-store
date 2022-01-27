@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme) => {
       borderRadius: '4px',
       maxWidth: '960px',
       alignItems: 'center',
+      backgroundColor: 'transparent',
     },
     closeBtn: {
       position: 'absolute',
@@ -52,7 +53,7 @@ const useStyles = makeStyles((theme) => {
 
 const CardDetailModal = ({
   onClose,
-  playerName,
+  cardDetail,
   tokenPurses,
   tokenPetname,
   tokenDisplayInfo,
@@ -68,7 +69,7 @@ const CardDetailModal = ({
       isActive = false;
     };
 
-    if (!playerName) {
+    if (!cardDetail) {
       setDetailState({
         details: null,
         error: null,
@@ -76,11 +77,12 @@ const CardDetailModal = ({
       return cancelFn;
     }
 
-    onGetCardDetail(playerName.name)
+    onGetCardDetail(cardDetail.name)
       .then((result) => {
         if (!isActive) {
           return;
         }
+        console.log('Cardsdd:', cardDetail);
         setDetailState({
           details: result,
           error: null,
@@ -94,13 +96,13 @@ const CardDetailModal = ({
       });
 
     return cancelFn;
-  }, [playerName]);
+  }, [cardDetail]);
 
   const submitBidOffer = (...args) => {
     if (!onBidCard) {
       return null;
     }
-    return onBidCard(playerName, ...args).then(onClose);
+    return onBidCard(cardDetail, ...args).then(onClose);
   };
   const { details, error } = state;
 

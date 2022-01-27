@@ -36,7 +36,7 @@ function App() {
   const [walletConnected, setWalletConnected] = useState(false);
   const [dappApproved, setDappApproved] = useState(true);
   const [availableCards, setAvailableCards] = useState([]);
-  const [cardPurse, setCardPurse] = useState(null);
+  const [cardPurse, setCardPurse] = useState([]);
   const [tokenPurses, setTokenPurses] = useState([]);
   const [openEnableAppDialog, setOpenEnableAppDialog] = useState(false);
   const [needToApproveOffer, setNeedToApproveOffer] = useState(false);
@@ -187,29 +187,31 @@ function App() {
     // const swapInstallation = await E(board).getValue(SWAP_INSTANCE_BOARD_ID);
     // const publicFacet = await E(board).getValue(SWAP_PUBLIC_FAUCET_BOARD_ID);
     const params = {
-      // CARD_MINTER_BOARD_ID,
-      // INSTANCE_BOARD_ID,
       publicFacet: publicFacetSwapRef.current,
       sellingPrice: BigInt(price),
-      // swapInstallation,
       walletP: walletPRef.current,
       cardDetail: activeCard,
     };
     const sellerSeatInvitation = await getSellerSeat(params);
+    console.log('Call seller seat function here:', sellerSeatInvitation);
     // here add functionality to store sellerSeatInvitation
-    await makeMatchingInvitation({
-      cardPurse,
-      tokenPurses,
-      cardDetail: activeCard,
-      sellingPrice: BigInt(price),
-      walletP: walletPRef.current,
-      sellerSeatInvitation,
-      publicFacet: publicFacetSwapRef.current,
-    });
+    // setTimeout(
+    //   async () =>
+    //     makeMatchingInvitation({
+    //       cardPurse,
+    //       tokenPurses,
+    //       cardDetail: activeCard,
+    //       sellingPrice: BigInt(price),
+    //       walletP: walletPRef.current,
+    //       sellerSeatInvitation,
+    //       publicFacet: publicFacetSwapRef.current,
+    //     }),
+    //   120000,
+    // );
     // console.log('makeInvitationAndSellerSeat() result:', result);
   };
   const handleCardClick = (cardDetail, bool) => {
-    console.log('active card:', cardDetail);
+    console.log('active card:', bool);
     setActiveCard(cardDetail);
     setOpenExpandModal(bool);
   };
@@ -252,7 +254,7 @@ function App() {
   };
   console.log(availableCards, 'available cards');
   return (
-    <div className="App relative">
+    <div>
       <Header
         walletConnected={walletConnected}
         dappApproved={dappApproved}
@@ -262,10 +264,10 @@ function App() {
       />
       <CardDisplay
         activeTab={activeTab}
-        cardList={activeTab === 1 ? userOffers : availableCards}
-        cardPurse={cardPurse}
+        cardList={availableCards}
+        userOffers={activeTab !== 2 && userOffers ? userOffers : []}
+        userCards={cardPurse?.currentAmount?.value}
         handleClick={handleCardClick}
-        userOffers={userOffers}
         type={type}
       />
       <ModalWrapper
@@ -274,8 +276,10 @@ function App() {
         style="modal"
       >
         <ModalContent
+          handleClick={handleCardClick}
           makeSwapInvitation={makeInvitationAndSellerSeat}
-          playerName={activeCard}
+          makeMatchingInvitation={makeMatchingInvitation}
+          cardDetail={activeCard}
           type={type}
           onOpen={handleCardBidOpen}
           onClose={handleCardModalClose}
