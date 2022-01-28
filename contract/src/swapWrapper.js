@@ -43,7 +43,17 @@ const start = (zcf) => {
 
     const sellerSeat = await E(zoe).offer(creatorInvitation, Proposal, payment);
 
-    const cardOffer = { ...cardDetail, sellingPrice, sellerSeat };
+    const invitationP = await E(sellerSeat).getOfferResult();
+    const invitationIssuer = await E(zoe).getInvitationIssuer();
+    const BuyerExclusiveInvitation = await E(invitationIssuer).claim(
+      invitationP,
+    );
+    const cardOffer = {
+      ...cardDetail,
+      sellingPrice,
+      BuyerExclusiveInvitation,
+      sellerSeat,
+    };
     const cardOfferAmount = AmountMath.make(brands.Items, harden([cardOffer]));
     availableOffers = AmountMath.add(availableOffers, cardOfferAmount);
     availableOfferUpdater.updateState(availableOffers);

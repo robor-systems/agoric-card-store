@@ -7,6 +7,7 @@ import CardDetailModal from './CardDetailModal';
 
 function ModalContent({
   makeSwapInvitation,
+  makeMatchingSeatInvitation,
   onClose,
   type,
   cardDetail,
@@ -63,7 +64,17 @@ function ModalContent({
             <h1 className="text-2xl font-semibold text-center">{type}</h1>
             <div className="flex flex-col gap-y-10 mt-11 mx-12 mb-8">
               <BaseballCard cardDetail={cardDetail} handleClick={handleClick} />
-              <Button text="Buy" style="w-full text-white" />
+              <Button
+                text="Buy"
+                style="w-full text-white"
+                onClick={async () => {
+                  const result = await makeMatchingSeatInvitation({
+                    cardDetail,
+                  });
+                  console.log('result:', result);
+                  onClose();
+                }}
+              />
             </div>
           </>
         );

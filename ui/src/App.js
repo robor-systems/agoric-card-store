@@ -172,8 +172,8 @@ function App() {
     const onMessage = (data) => {
       const obj = JSON.parse(data);
       walletDispatch && walletDispatch(obj);
+      console.log('Response from wallet:', obj);
     };
-
     activateWebSocket({
       onConnect,
       onDisconnect,
@@ -194,6 +194,7 @@ function App() {
     };
     const sellerSeatInvitation = await getSellerSeat(params);
     console.log('Call seller seat function here:', sellerSeatInvitation);
+    return sellerSeatInvitation;
     // here add functionality to store sellerSeatInvitation
     // setTimeout(
     //   async () =>
@@ -209,6 +210,25 @@ function App() {
     //   120000,
     // );
     // console.log('makeInvitationAndSellerSeat() result:', result);
+  };
+  const makeMatchingSeatInvitation = async ({ cardDetail }) => {
+    const Obj = { ...cardDetail };
+    const BuyerExclusiveInvitation = Obj.BuyerExclusiveInvitation;
+    const Price = Obj.sellingPrice;
+    delete Obj.sellerSeat;
+    delete Obj.sellingPrice;
+    delete Obj.BuyerExclusiveInvitation;
+    const result = await makeMatchingInvitation({
+      cardPurse,
+      tokenPurses,
+      cardDetail: harden(Obj),
+      cardOffer: cardDetail,
+      sellingPrice: Price,
+      walletP: walletPRef.current,
+      BuyerExclusiveInvitation,
+      publicFacet: publicFacetSwapRef.current,
+    });
+    return result;
   };
   const handleCardClick = (cardDetail, bool) => {
     console.log('active card:', bool);
@@ -278,7 +298,7 @@ function App() {
         <ModalContent
           handleClick={handleCardClick}
           makeSwapInvitation={makeInvitationAndSellerSeat}
-          makeMatchingInvitation={makeMatchingInvitation}
+          makeMatchingSeatInvitation={makeMatchingSeatInvitation}
           cardDetail={activeCard}
           type={type}
           onOpen={handleCardBidOpen}

@@ -16,8 +16,11 @@ function SellProductForm({ makeSwapInvitation, tokenDisplayInfo, onClose }) {
         onClick={async () => {
           const amount = makeValue(price, tokenDisplayInfo);
           console.log('amount is:', amount);
-          onClose();
-          await makeSwapInvitation({ price: amount });
+
+          const result = await makeSwapInvitation({ price: amount });
+          if (result) {
+            onClose();
+          }
         }}
         text="Place in Marketplace"
         styles="w-full mt-auto"
