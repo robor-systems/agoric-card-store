@@ -8,6 +8,7 @@ import CardDetailModal from './CardDetailModal';
 function ModalContent({
   makeSwapInvitation,
   makeMatchingSeatInvitation,
+  removeCardFromSale,
   onClose,
   type,
   cardDetail,
@@ -23,7 +24,29 @@ function ModalContent({
   const populateContent = () => {
     switch (type) {
       case 'Sell Product':
-        return (
+        return cardDetail.sellingPrice ? (
+          <>
+            <h1 className="text-2xl font-semibold text-center">
+              Remove from Sale
+            </h1>
+            <div className="flex flex-col gap-y-10 mt-11 mx-12 mb-8">
+              <BaseballCard cardDetail={cardDetail} handleClick={handleClick} />
+              <Button
+                text="Remove"
+                style="w-full text-white"
+                onClick={async () => {
+                  setLoading(true);
+                  const result = await removeCardFromSale();
+                  console.log('result:', result);
+                  setLoading(false);
+                  onClose();
+                }}
+                styles="relative"
+                isLoading={isLoading}
+              />
+            </div>
+          </>
+        ) : (
           <div className="flex gap-x-10 mt-11 mx-12 mb-12">
             <BaseballCard
               imageOnly={true}
@@ -37,6 +60,7 @@ function ModalContent({
             />
           </div>
         );
+
       case 'Edit Product':
         return (
           <div className="flex gap-x-10 mt-11 mx-12 mb-12">

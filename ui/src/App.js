@@ -23,13 +23,15 @@ import {
 import dappConstants from './lib/constants.js';
 import ModalWrapper from './components/ModalWrapper';
 import ModalContent from './components/ModalContent';
-import { getSellerSeat, makeMatchingInvitation } from './services/swap';
+import {
+  getSellerSeat,
+  makeMatchingInvitation,
+  removeItemFromSale,
+} from './services/swap';
 
 const {
   INSTANCE_BOARD_ID,
   INSTALLATION_BOARD_ID,
-  // SWAP_INSTANCE_BOARD_ID,
-  // CARD_MINTER_BOARD_ID,
   SWAP_WRAPPER_INSTANCE_BOARD_ID,
   issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID },
   brandBoardIds: { Money: MONEY_BRAND_BOARD_ID, Card: CARD_BRAND_BOARD_ID },
@@ -58,7 +60,7 @@ function App() {
   const walletPRef = useRef(undefined);
   const publicFacetRef = useRef(undefined);
   const publicFacetSwapRef = useRef(undefined);
-  // const availableOfferNotifierRef = useRef(undefined);
+
   useEffect(() => {
     // Receive callbacks from the wallet connection.
     const otherSide = Far('otherSide', {
@@ -184,11 +186,14 @@ function App() {
     });
     return deactivateWebSocket;
   }, []);
-
+  const removeCardFromSale = async () => {
+    await removeItemFromSale({
+      cardDetail: activeCard,
+      cardPurse,
+      publicFacet: publicFacetSwapRef.current,
+    });
+  };
   const makeInvitationAndSellerSeat = async ({ price }) => {
-    // const board = E(walletPRef.current).getBoard();
-    // const swapInstallation = await E(board).getValue(SWAP_INSTANCE_BOARD_ID);
-    // const publicFacet = await E(board).getValue(SWAP_PUBLIC_FAUCET_BOARD_ID);
     const params = {
       publicFacet: publicFacetSwapRef.current,
       sellingPrice: BigInt(price),
@@ -196,23 +201,7 @@ function App() {
       cardDetail: activeCard,
     };
     const sellerSeatInvitation = await getSellerSeat(params);
-    console.log('Call seller seat function here:', sellerSeatInvitation);
     return sellerSeatInvitation;
-    // here add functionality to store sellerSeatInvitation
-    // setTimeout(
-    //   async () =>
-    //     makeMatchingInvitation({
-    //       cardPurse,
-    //       tokenPurses,
-    //       cardDetail: activeCard,
-    //       sellingPrice: BigInt(price),
-    //       walletP: walletPRef.current,
-    //       sellerSeatInvitation,
-    //       publicFacet: publicFacetSwapRef.current,
-    //     }),
-    //   120000,
-    // );
-    // console.log('makeInvitationAndSellerSeat() result:', result);
   };
   const makeMatchingSeatInvitation = async ({ cardDetail }) => {
     const Obj = { ...cardDetail };
@@ -302,6 +291,7 @@ function App() {
           handleClick={handleCardClick}
           makeSwapInvitation={makeInvitationAndSellerSeat}
           makeMatchingSeatInvitation={makeMatchingSeatInvitation}
+          removeCardFromSale={removeCardFromSale}
           cardDetail={activeCard}
           type={type}
           onOpen={handleCardBidOpen}

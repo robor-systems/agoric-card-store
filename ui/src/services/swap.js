@@ -79,5 +79,10 @@ const getSellerSeat = async ({ cardDetail, sellingPrice, publicFacet }) => {
   });
   return sellerSeatInvitation;
 };
+const removeItemFromSale = async ({ cardDetail, cardPurse, publicFacet }) => {
+  await E(cardDetail.sellerSeat).tryExit();
+  const amount = AmountMath.make(cardPurse.brand, harden([cardDetail]));
+  await E(publicFacet).updateAvailableOffers(amount);
+};
 
-export { getSellerSeat, makeMatchingInvitation };
+export { getSellerSeat, makeMatchingInvitation, removeItemFromSale };
