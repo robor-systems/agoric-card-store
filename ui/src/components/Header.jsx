@@ -1,6 +1,12 @@
 import React from 'react';
 
-const Header = ({ walletConnected, activeTab, setActiveTab, setType }) => {
+const Header = ({
+  walletConnected,
+  activeTab,
+  setActiveTab,
+  setType,
+  handleAddNFTForm,
+}) => {
   const walletStatus = walletConnected ? 'Connected' : 'Not connected';
   console.log(activeTab);
   const TabButton = ({ tabIndex, text, width }) => {
@@ -29,6 +35,12 @@ const Header = ({ walletConnected, activeTab, setActiveTab, setType }) => {
         <TabButton tabIndex={0} text="My Cards" width="w-32" />
         <TabButton tabIndex={1} text="Marketplace" width="w-36" />
         <TabButton tabIndex={2} text="Primary Sales" width="w-40" />
+        <span
+          onClick={() => handleAddNFTForm()}
+          className="self-center font-bold cursor-pointer"
+        >
+          Add NFT
+        </span>
       </div>
       <div>
         Agoric Wallet: {walletStatus}

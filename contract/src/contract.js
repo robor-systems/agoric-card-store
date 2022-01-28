@@ -20,13 +20,6 @@ const start = (zcf) => {
 
   const zoeService = zcf.getZoeService();
 
-  const mintUserCard = async (cardDetails) => {
-    const newUserCardAmount = AmountMath.make(brand, cardDetails);
-    const newUserCardPayment = mint.mintPayment(newUserCardAmount);
-
-    return harden(newUserCardPayment);
-  };
-
   const auctionCards = async (
     newCardNames,
     moneyIssuer,
@@ -81,6 +74,12 @@ const start = (zcf) => {
       auctionItemsInstance: instance,
       auctionItemsPublicFacet: publicFacet,
     });
+  };
+
+  const mintUserCard = async (cardDetails) => {
+    const newUserCardAmount = AmountMath.make(brand, harden([cardDetails]));
+    const newUserCardPayment = mint.mintPayment(harden(newUserCardAmount));
+    return harden(newUserCardPayment);
   };
 
   const publicFacet = Far('PublicFacet for card store', {

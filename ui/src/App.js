@@ -20,7 +20,10 @@ import { getCardAuctionDetail, makeBidOfferForCard } from './auction.js';
 import dappConstants from './lib/constants.js';
 import ModalWrapper from './components/ModalWrapper';
 import ModalContent from './components/ModalContent';
+import AddNewNFTForm from './components/AddNewNFTForm';
+
 import { getSellerSeat, makeMatchingInvitation } from './swap';
+import { mintNFT } from './mintNFT';
 
 const {
   INSTANCE_BOARD_ID,
@@ -28,6 +31,7 @@ const {
   // SWAP_INSTANCE_BOARD_ID,
   // CARD_MINTER_BOARD_ID,
   SWAP_WRAPPER_INSTANCE_BOARD_ID,
+  MAIN_CONTRACT_BOARD_INSTANCE_ID,
   issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID },
   brandBoardIds: { Money: MONEY_BRAND_BOARD_ID, Card: CARD_BRAND_BOARD_ID },
 } = dappConstants;
@@ -47,10 +51,12 @@ function App() {
   const [tokenPetname, setTokenPetname] = useState(null);
   const [openExpandModal, setOpenExpandModal] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
+  const [addNFTForm, setAddNFTForm] = useState(false);
   const [type, setType] = useState('Sell Product');
   const [userOffers, setUserOffers] = useState([]);
   const handleTabChange = (index) => setActiveTab(index);
   const handleDialogClose = () => setOpenEnableAppDialog(false);
+  const handleAddNFTForm = () => setAddNFTForm(!addNFTForm);
 
   const walletPRef = useRef(undefined);
   const publicFacetRef = useRef(undefined);
@@ -170,6 +176,7 @@ function App() {
     };
 
     const onMessage = (data) => {
+      console.log(data);
       const obj = JSON.parse(data);
       walletDispatch && walletDispatch(obj);
     };
@@ -181,6 +188,16 @@ function App() {
     });
     return deactivateWebSocket;
   }, []);
+
+  const handleNFTMint = ({ cardDetails }) => {
+    mintNFT({
+      cardDetails,
+      MAIN_CONTRACT_BOARD_INSTANCE_ID,
+      walletP: walletPRef.current,
+      CARD_BRAND_BOARD_ID,
+      cardPurse,
+    });
+  };
 
   const makeInvitationAndSellerSeat = async ({ price }) => {
     // const board = E(walletPRef.current).getBoard();
@@ -259,6 +276,7 @@ function App() {
         activeTab={activeTab}
         setActiveTab={handleTabChange}
         setType={setType}
+        handleAddNFTForm={handleAddNFTForm}
       />
       <CardDisplay
         activeTab={activeTab}
@@ -271,7 +289,6 @@ function App() {
       <ModalWrapper
         open={activeCard && !openExpandModal}
         onClose={handleCardModalClose}
-        style="modal"
       >
         <ModalContent
           makeSwapInvitation={makeInvitationAndSellerSeat}
@@ -295,6 +312,16 @@ function App() {
           <img
             src={`https://gateway.pinata.cloud/ipfs/${activeCard?.image}`}
             alt="Card Media"
+          />
+        </div>
+      </ModalWrapper>
+
+      <ModalWrapper open={addNFTForm} onClose={handleAddNFTForm}>
+        <h1 className="text-2xl font-semibold text-center">Add NFT</h1>
+        <div className="flex flex-col gap-x-10 mt-11 mx-12 mb-12">
+          <AddNewNFTForm
+            tokenDisplayInfo={tokenDisplayInfo}
+            handleNFTMint={handleNFTMint}
           />
         </div>
       </ModalWrapper>
