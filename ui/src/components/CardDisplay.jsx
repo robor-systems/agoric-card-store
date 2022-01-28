@@ -11,7 +11,14 @@ import FilterIcon from '../assets/icons/filter.png';
 import BaseballCard from './BaseballCard.jsx';
 import Loader from './common/Loader.jsx';
 
-const CardDisplay = ({ activeTab, cardList, handleClick, type, cardPurse }) => {
+const CardDisplay = ({
+  activeTab,
+  cardList,
+  handleClick,
+  type,
+  cardPurse,
+  userOffers,
+}) => {
   const isReady = cardList && cardList.length > 0;
 
   let cards;
@@ -36,11 +43,11 @@ const CardDisplay = ({ activeTab, cardList, handleClick, type, cardPurse }) => {
         );
       break;
     case 1:
-      console.log(cardList, 'userOffer');
+      console.log(userOffers, 'userOffer');
       cards =
-        cardList?.length !== 0 ? (
+        userOffers?.length !== 0 ? (
           <div className="grid grid-cols-3 gap-x-8 gap-y-10">
-            {cardList.map((playerName) => {
+            {userOffers?.map((playerName) => {
               console.log(playerName, 'inside map ');
               return (
                 <div key={playerName.id}>
@@ -53,14 +60,6 @@ const CardDisplay = ({ activeTab, cardList, handleClick, type, cardPurse }) => {
                 </div>
               );
             })}
-            {/* <div key={cardList[0].id}>
-              <BaseballCard
-                playerName={cardList[0]}
-                key={cardList[0].name}
-                handleClick={handleClick}
-                type={type}
-              />
-            </div> */}
           </div>
         ) : (
           <h1>No nfts for sale currently</h1>

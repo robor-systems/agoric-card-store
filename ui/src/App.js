@@ -144,7 +144,7 @@ function App() {
           availableOfferNotifier,
         )) {
           console.log('available offers from swap:', availableOffers);
-          setUserOffers(availableOffers.value);
+          setUserOffers(availableOffers.value || []);
         }
       }
       watchOffers().catch((err) => console.log('got watchOffer errs', err));
@@ -280,7 +280,7 @@ function App() {
       />
       <CardDisplay
         activeTab={activeTab}
-        cardList={activeTab === 1 ? userOffers : availableCards}
+        cardList={availableCards}
         cardPurse={cardPurse}
         handleClick={handleCardClick}
         userOffers={userOffers}
@@ -308,8 +308,9 @@ function App() {
         onClose={handleCardModalClose}
         style="modal-img"
       >
-        <div className="pb-12 w-full h-full object-cover flex justify-center items-center">
+        <div className="pb-12 object-contain flex justify-center items-center">
           <img
+            style={{ maxWidth: '30%' }}
             src={`https://gateway.pinata.cloud/ipfs/${activeCard?.image}`}
             alt="Card Media"
           />

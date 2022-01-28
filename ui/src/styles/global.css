@@ -75,13 +75,15 @@ body,
   .btn-shadow:hover {
     box-shadow: 0px 3px 6px #00000029;
   }
-/* 
+  /* 
   .modal {
     max-height: 640px !important;
   } */
 
   .modal-img {
     width: 1269px;
+    max-width: 1269px;
+    max-height: 85%;
   }
 
   .modal::-webkit-scrollbar {
