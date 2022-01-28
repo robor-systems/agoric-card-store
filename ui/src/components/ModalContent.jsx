@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import BaseballCard from './BaseballCard';
 import Button from './common/Button';
 import EditProductForm from './EditProductForm';
@@ -18,7 +18,8 @@ function ModalContent({
   tokenDisplayInfo,
   handleClick,
 }) {
-  // const [hidden, setHidden] = useState(true);
+  const [isLoading, setLoading] = useState(false);
+  console.log(isLoading);
   const populateContent = () => {
     switch (type) {
       case 'Sell Product':
@@ -68,12 +69,16 @@ function ModalContent({
                 text="Buy"
                 style="w-full text-white"
                 onClick={async () => {
+                  setLoading(true);
                   const result = await makeMatchingSeatInvitation({
                     cardDetail,
                   });
                   console.log('result:', result);
+                  setLoading(false);
                   onClose();
                 }}
+                styles="relative"
+                isLoading={isLoading}
               />
             </div>
           </>

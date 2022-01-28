@@ -62,7 +62,7 @@ export default async function deployContract(
   const installation = await E(zoe).install(bundle);
 
   const swapbundleUrl = await importMetaResolve(
-    './src/swapAssets.js',
+    './src/secondaryStore.js',
     import.meta.url,
   );
   const swapbundlePath = new URL(swapbundleUrl).pathname;
@@ -70,7 +70,7 @@ export default async function deployContract(
   const swapInstallation = await E(zoe).install(swapBundle);
 
   const swapWrapperBundleUrl = await importMetaResolve(
-    './src/swapWrapper.js',
+    './src/secondaryStoreWrapper.js',
     import.meta.url,
   );
   const swapWrapperBundlePath = new URL(swapWrapperBundleUrl).pathname;

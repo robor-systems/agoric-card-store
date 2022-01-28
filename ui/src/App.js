@@ -16,11 +16,14 @@ import ApproveOfferSnackbar from './components/ApproveOfferSnackbar.jsx';
 import BoughtCardSnackbar from './components/BoughtCardSnackbar.jsx';
 import EnableAppDialog from './components/EnableAppDialog.jsx';
 
-import { getCardAuctionDetail, makeBidOfferForCard } from './auction.js';
+import {
+  getCardAuctionDetail,
+  makeBidOfferForCard,
+} from './services/auction.js';
 import dappConstants from './lib/constants.js';
 import ModalWrapper from './components/ModalWrapper';
 import ModalContent from './components/ModalContent';
-import { getSellerSeat, makeMatchingInvitation } from './swap';
+import { getSellerSeat, makeMatchingInvitation } from './services/swap';
 
 const {
   INSTANCE_BOARD_ID,
