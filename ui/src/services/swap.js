@@ -50,6 +50,8 @@ const makeMatchingInvitation = async ({
   console.log('offerconfig:', offerConfig);
   const offerId = await E(walletP).addOffer(offerConfig);
   console.log('result from wallet:', offerId);
+  console.log('cardOffer:', cardOffer);
+  console.log('cardDetail:', cardDetail);
   const amount = AmountMath.make(cardPurse.brand, harden([cardOffer]));
   const amount2 = AmountMath.make(
     cardPurse.brand,
@@ -66,7 +68,7 @@ const makeMatchingInvitation = async ({
   for await (const walletOffers of iterateNotifier(notifier)) {
     console.log(' walletOffer:', walletOffers);
     for (const { id, status } of walletOffers) {
-      if (id === offerId && status === 'complete') {
+      if (id === offerId && (status === 'complete' || status === 'accept')) {
         E(publicFacet).removeUserOwnedNfts(amount2);
         E(publicFacet).addUserOwnedNfts(amount3);
         E(publicFacetSwap).updateAvailableOffers(amount);
