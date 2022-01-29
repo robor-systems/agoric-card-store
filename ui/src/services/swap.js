@@ -12,19 +12,16 @@ const makeMatchingInvitation = async ({
   tokenPurses,
   cardDetail,
   sellingPrice,
+  boughtFor,
   walletP,
   BuyerExclusiveInvitation,
   publicFacet,
+  publicFacetSwap,
   cardOffer,
+  setLoading,
+  onClose,
 }) => {
-  // console.log('sellerSeatInvitation', sellerSeatInvitation);
   const zoe = E(walletP).getZoe();
-  // const invitationP = await E(sellerSeatInvitation).getOfferResult();
-  // // const { installation: buyerInstallationId, instance } = await E(
-  // //   zoe,
-  // // ).getInvitationDetails(invitationP);
-  // const invitationIssuer = await E(zoe).getInvitationIssuer();
-  // const BuyerExclusiveInvitation = await E(invitationIssuer).claim(invitationP);
   console.log('myExclusiveInvitation:', BuyerExclusiveInvitation);
   const BuyerInvitationValue = await E(zoe).getInvitationDetails(
     BuyerExclusiveInvitation,
@@ -54,14 +51,25 @@ const makeMatchingInvitation = async ({
   const offerId = await E(walletP).addOffer(offerConfig);
   console.log('result from wallet:', offerId);
   const amount = AmountMath.make(cardPurse.brand, harden([cardOffer]));
+  const amount2 = AmountMath.make(
+    cardPurse.brand,
+    harden([{ ...cardDetail, boughtFor }]),
+  );
+  const amount3 = AmountMath.make(
+    cardPurse.brand,
+    harden([{ ...cardDetail, boughtFor: sellingPrice }]),
+  );
   console.log('amount:', amount);
+  setLoading(false);
+  onClose();
   const notifier = await E(walletP).getOffersNotifier();
   for await (const walletOffers of iterateNotifier(notifier)) {
-    // if (walletOffers.id === offerId) {
     console.log(' walletOffer:', walletOffers);
     for (const { id, status } of walletOffers) {
       if (id === offerId && status === 'complete') {
-        E(publicFacet).updateAvailableOffers(amount);
+        E(publicFacet).removeUserOwnedNfts(amount2);
+        E(publicFacet).addUserOwnedNfts(amount3);
+        E(publicFacetSwap).updateAvailableOffers(amount);
         return true;
       }
     }
@@ -79,6 +87,7 @@ const getSellerSeat = async ({ cardDetail, sellingPrice, publicFacet }) => {
   });
   return sellerSeatInvitation;
 };
+
 const removeItemFromSale = async ({ cardDetail, cardPurse, publicFacet }) => {
   await E(cardDetail.sellerSeat).tryExit();
   const amount = AmountMath.make(cardPurse.brand, harden([cardDetail]));

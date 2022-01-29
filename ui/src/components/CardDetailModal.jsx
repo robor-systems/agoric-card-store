@@ -102,7 +102,7 @@ const CardDetailModal = ({
     if (!onBidCard) {
       return null;
     }
-    return onBidCard(cardDetail, ...args).then(onClose);
+    return onBidCard(cardDetail, ...args, onClose);
   };
   const { details, error } = state;
 

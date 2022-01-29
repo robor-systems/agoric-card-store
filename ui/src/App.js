@@ -54,6 +54,7 @@ function App() {
   const [activeTab, setActiveTab] = useState(0);
   const [type, setType] = useState('Sell Product');
   const [userOffers, setUserOffers] = useState([]);
+  const [userNfts, setUserNfts] = useState([]);
   const handleTabChange = (index) => setActiveTab(index);
   const handleDialogClose = () => setOpenEnableAppDialog(false);
 
@@ -135,6 +136,7 @@ function App() {
       publicFacetSwapRef.current = publicFacetSwap;
 
       async function watchOffers() {
+        console.log('watch offer');
         const availableOfferNotifier = await E(
           publicFacetSwapRef.current,
         ).getAvailableOfferNotifier();
@@ -145,8 +147,37 @@ function App() {
           console.log('available offers from swap:', availableOffers);
           setUserOffers(availableOffers.value);
         }
+
+        const userOwnedNftsNotifier = await E(
+          publicFacetRef.current,
+        ).getUserOwnedNftNotifier();
+
+        console.log('userOwnedNftsNotifier:', userOwnedNftsNotifier);
+        for await (const userOwnedNfts of iterateNotifier(
+          userOwnedNftsNotifier,
+        )) {
+          console.log('userNfts:', userOwnedNfts);
+          setUserNfts(userOwnedNfts.value);
+        }
       }
       watchOffers().catch((err) => console.log('got watchOffer errs', err));
+
+      async function watchSale() {
+        console.log('watch offer');
+        const userOwnedNftsNotifier = await E(
+          publicFacetRef.current,
+        ).getUserOwnedNftNotifier();
+
+        console.log('userOwnedNftsNotifier:', userOwnedNftsNotifier);
+        for await (const userOwnedNfts of iterateNotifier(
+          userOwnedNftsNotifier,
+        )) {
+          console.log('userNfts:', userOwnedNfts);
+          setUserNfts(userOwnedNfts.value);
+        }
+      }
+      watchSale().catch((err) => console.log('got watchSale errs', err));
+
       /*
        *get the current items for sale in the proposal
        *Currenly these will me primary marketplace cards
@@ -155,11 +186,6 @@ function App() {
         publicFacetRef.current,
       ).getAvailableItemsNotifier();
 
-      // const offersSwap = await E(
-      //   publicFacetSwapRef.current,
-      // ).getAvailableOffers();
-      // setUserOffers(offersSwap.value);
-      // console.log(offersSwap, 'offers diresctly');
       /* Using the public faucet we get all the current Nfts offered for sale */
       for await (const cardsAvailableAmount of iterateNotifier(
         availableItemsNotifier,
@@ -203,12 +229,19 @@ function App() {
     const sellerSeatInvitation = await getSellerSeat(params);
     return sellerSeatInvitation;
   };
-  const makeMatchingSeatInvitation = async ({ cardDetail }) => {
+  const makeMatchingSeatInvitation = async ({
+    cardDetail,
+    setLoading,
+    onClose,
+  }) => {
+    console.log('cardDetail:', cardDetail);
     const Obj = { ...cardDetail };
     const BuyerExclusiveInvitation = Obj.BuyerExclusiveInvitation;
     const Price = Obj.sellingPrice;
+    const boughtPrice = Obj.boughtFor;
     delete Obj.sellerSeat;
     delete Obj.sellingPrice;
+    delete Obj.boughtFor;
     delete Obj.BuyerExclusiveInvitation;
     const result = await makeMatchingInvitation({
       cardPurse,
@@ -216,9 +249,13 @@ function App() {
       cardDetail: harden(Obj),
       cardOffer: cardDetail,
       sellingPrice: Price,
+      boughtFor: boughtPrice,
       walletP: walletPRef.current,
       BuyerExclusiveInvitation,
-      publicFacet: publicFacetSwapRef.current,
+      publicFacetSwap: publicFacetSwapRef.current,
+      publicFacet: publicFacetRef.current,
+      setLoading,
+      onClose,
     });
     return result;
   };
@@ -245,16 +282,24 @@ function App() {
     });
   };
 
-  const submitCardOffer = (name, price, selectedPurse) => {
+  const submitCardOffer = (
+    name,
+    price,
+    selectedPurse,
+    setFormState,
+    onClose,
+  ) => {
     return makeBidOfferForCard({
       walletP: walletPRef.current,
       publicFacet: publicFacetRef.current,
       card: name,
+      cardOffer: { ...name, boughtFor: price },
       cardPurse,
       tokenPurse: selectedPurse || tokenPurses[0],
       price: BigInt(price),
+      onClose,
+      setFormState,
     }).then((result) => {
-      // getSellerSession({ publicFacet: publicFacetRef.current });
       console.log('Your offer id for this current offer:', result);
       setNeedToApproveOffer(true);
     });
@@ -279,6 +324,7 @@ function App() {
         cardList={availableCards}
         userOffers={activeTab !== 2 && userOffers ? userOffers : []}
         userCards={cardPurse?.currentAmount?.value}
+        userNfts={userNfts}
         handleClick={handleCardClick}
         type={type}
       />

@@ -30,7 +30,14 @@ function ModalContent({
               Remove from Sale
             </h1>
             <div className="flex flex-col gap-y-10 mt-11 mx-12 mb-8">
-              <BaseballCard cardDetail={cardDetail} handleClick={handleClick} />
+              <BaseballCard
+                cardDetail={cardDetail}
+                handleClick={handleClick}
+                // imageOnly={true}
+                type={type}
+                onSale={cardDetail.sellingPrice}
+                noButton={true}
+              />
               <Button
                 text="Remove"
                 style="w-full text-white"
@@ -52,6 +59,8 @@ function ModalContent({
               imageOnly={true}
               cardDetail={cardDetail}
               handleClick={handleClick}
+              noButton={true}
+              type={type}
             />
             <SellProductForm
               makeSwapInvitation={makeSwapInvitation}
@@ -64,7 +73,11 @@ function ModalContent({
       case 'Edit Product':
         return (
           <div className="flex gap-x-10 mt-11 mx-12 mb-12">
-            <BaseballCard imageOnly={true} cardDetail={cardDetail} />
+            <BaseballCard
+              imageOnly={true}
+              cardDetail={cardDetail}
+              noButton={true}
+            />
             <EditProductForm />
           </div>
         );
@@ -88,7 +101,12 @@ function ModalContent({
           <>
             <h1 className="text-2xl font-semibold text-center">{type}</h1>
             <div className="flex flex-col gap-y-10 mt-11 mx-12 mb-8">
-              <BaseballCard cardDetail={cardDetail} handleClick={handleClick} />
+              <BaseballCard
+                cardDetail={cardDetail}
+                handleClick={handleClick}
+                type={type}
+                noButton={true}
+              />
               <Button
                 text="Buy"
                 style="w-full text-white"
@@ -96,6 +114,8 @@ function ModalContent({
                   setLoading(true);
                   const result = await makeMatchingSeatInvitation({
                     cardDetail,
+                    setLoading,
+                    onClose,
                   });
                   console.log('result:', result);
                   setLoading(false);

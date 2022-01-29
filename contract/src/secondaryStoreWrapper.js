@@ -15,16 +15,16 @@ const start = (zcf) => {
   const { brands, issuers, swapInstallation, cardMinter } = zcf.getTerms();
   const zoe = zcf.getZoeService();
   let availableOffers = AmountMath.make(brands.Items, harden([]));
+  let userOwnedNfts = AmountMath.make(brands.Items, harden([]));
   const {
     notifier: availableOfferNotifier,
     updater: availableOfferUpdater,
   } = makeNotifierKit();
-  availableOfferUpdater.updateState('its working i think plz confirm');
+  const {
+    notifier: userOwnedNftsNotifier,
+    updater: userOwnedNftsUpdater,
+  } = makeNotifierKit();
   const getSellerSeat = async ({ cardDetail, sellingPrice }) => {
-    // const board = E(walletP).getBoard();
-    // const brandKeywordRecord = await E(zoe).getBrands(mainContractInstance);
-    // const issuerKeywordRecord = await E(zoe).getIssuers(mainContractInstance);
-    // const cardMinter = await E(board).getValue(CARD_MINTER_BOARD_ID);
     const cardAmount = AmountMath.make(brands.Items, harden([cardDetail]));
     const saleAmount = AmountMath.make(brands.Money, sellingPrice);
     const Proposal = harden({
@@ -61,16 +61,30 @@ const start = (zcf) => {
   };
 
   const getAvailableOfferNotifier = () => availableOfferNotifier;
+  const getUserOwnedNftNotifier = () => userOwnedNftsNotifier;
   const getAvailableOffers = () => availableOffers;
+  const getUserOwnedNfts = () => userOwnedNfts;
   const updateAvailableOffers = (cardAmount) => {
     availableOffers = AmountMath.subtract(availableOffers, cardAmount);
     availableOfferUpdater.updateState(availableOffers);
   };
+  const addUserOwnedNfts = (cardAmount) => {
+    userOwnedNfts = AmountMath.add(userOwnedNfts, cardAmount);
+    userOwnedNftsUpdater.updateState(userOwnedNfts);
+  };
+  const removeUserOwnedNfts = (cardAmount) => {
+    userOwnedNfts = AmountMath.subtract(userOwnedNfts, cardAmount);
+    userOwnedNftsUpdater.updateState(userOwnedNfts);
+  };
   const publicFacet = Far('PublicFaucetForSwapInvitation', {
     getSellerSeat,
     getAvailableOfferNotifier,
+    getUserOwnedNftNotifier,
     getAvailableOffers,
+    getUserOwnedNfts,
     updateAvailableOffers,
+    addUserOwnedNfts,
+    removeUserOwnedNfts,
   });
 
   return harden({ publicFacet });

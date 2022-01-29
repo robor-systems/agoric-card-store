@@ -39,7 +39,7 @@ const CardAuctionForm = ({ tokenPurses, tokenDisplayInfo, onSubmit }) => {
       isSubmitting: true,
     });
     const price = makeValue(amount, tokenDisplayInfo);
-    return onSubmit(price, selectedPurse)
+    return onSubmit(price, selectedPurse, setFormState)
       .then(() => {
         console.log('Done with bid');
         setFormState({

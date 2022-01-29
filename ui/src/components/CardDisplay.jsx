@@ -18,35 +18,57 @@ const CardDisplay = ({
   type,
   userOffers,
   userCards,
+  userNfts,
 }) => {
   // const isReady1 = cardPurse && cardPurse?.currentAmount?.value?.length > 0;
   // const isReady2 = userCards && userCards.length > 0;
   const isReady = cardList && cardList.length > 0;
   let cards;
+  const [secondaryLoader, setSecondaryLoader] = useState(true);
+  const [myCardLoader, setMyCardLoader] = useState(true);
   const [myCards, setMyCards] = useState([]);
+  const [secondaryCards, setSecondaryCards] = useState([]);
   const getUserCards = (params) => {
-    const result = params.userCards.reduce(function (map, obj) {
+    console.log('params:', params);
+    const userOffersMap = params?.userOffers.reduce(function (map, obj) {
       map[obj.id] = { ...obj };
       return map;
     }, {});
-    params.userOffers.forEach((offer, i) => {
-      if (result[offer.id]) {
-        result[offer.id] = params.userOffers[i];
-      }
+    console.log('userOfferMap:', userOffersMap);
+    const userNftsMap = params?.userNfts.reduce(function (map, obj) {
+      map[obj.id] = { ...obj };
+      return map;
+    }, {});
+    console.log('userNftsMap:', userNftsMap);
+    const arr = params?.userCards.map((offer) => {
+      let obj = {};
+      if (userOffersMap[offer.id]) obj = { ...userOffersMap[offer.id] };
+      if (userNftsMap[offer.id]) obj = { ...obj, ...userNftsMap[offer.id] };
+      return obj;
     });
-    const arr = [];
-    for (const [key, value] of Object.entries(result)) {
-      console.log(key);
-      arr.push(value);
-    }
     console.log('array:', arr);
+    setMyCardLoader(false);
     return arr;
   };
+  const getSecondaryCards = (params) => {
+    const ids = params?.userCards?.map((card) => card.id);
+    // change !== to === to filter user owned cards from secondaryMarketplace
+    const arr = params?.userOffers?.filter(
+      (card) => ids.indexOf(card.id) !== -1,
+    );
+    setSecondaryLoader(false);
+    return arr;
+  };
+
   useEffect(() => {
     console.log('userOffers:', userOffers);
     userCards?.length > 0 &&
-      setMyCards(getUserCards({ userCards, userOffers }));
-  }, [userOffers, userCards]);
+      userNfts?.length > 0 &&
+      setMyCards(getUserCards({ userCards, userOffers, userNfts }));
+    userCards?.length === 0 && userNfts?.length === 0 && setMyCardLoader(false);
+
+    setSecondaryCards(getSecondaryCards({ userCards, userOffers }));
+  }, [userOffers, userCards, userNfts]);
   switch (activeTab) {
     case 0:
       cards =
@@ -71,9 +93,9 @@ const CardDisplay = ({
     case 1:
       console.log(userOffers, 'userCards');
       cards =
-        userOffers?.length !== 0 ? (
+        secondaryCards?.length !== 0 ? (
           <div className="grid grid-cols-3 gap-x-8 gap-y-10">
-            {userOffers?.map((cardDetail) => {
+            {secondaryCards?.map((cardDetail) => {
               console.log(cardDetail, 'inside map ');
               return (
                 <div key={cardDetail.id}>
@@ -150,10 +172,16 @@ const CardDisplay = ({
         </div>
       )}
       <div className="flex flex-col items-center">
-        {!isReady && <Loader />}
-        {!isReady && 'Fetching card list...'}
+        {!isReady && type === 'Bid Product' && <Loader />}
+        {!isReady && type === 'Bid Product' && 'Fetching card list...'}
+        {secondaryLoader && type === 'Buy Product' && <Loader />}
+        {secondaryLoader && type === 'Buy Product' && 'Fetching card list...'}
+        {myCardLoader && type === 'Sell Product' && <Loader />}
+        {myCardLoader && type === 'Sell Product' && 'Fetching card list...'}
       </div>
-      {isReady && <>{cards}</>}
+      {isReady && type === 'Bid Product' && <>{cards}</>}
+      {!secondaryLoader && type === 'Buy Product' && <>{cards}</>}
+      {!myCardLoader && type === 'Sell Product' && <>{cards}</>}
     </div>
   );
 };

@@ -13,6 +13,7 @@ const BaseballCard = ({
   type,
   onSale,
   onAuction,
+  noButton,
 }) => {
   console.log(cardDetail?.image, 'image from baseball card component');
   // console.log(type, 'baseballcard type btn');
@@ -32,7 +33,7 @@ const BaseballCard = ({
           src={`https://gateway.pinata.cloud/ipfs/${cardDetail?.image}`}
           alt={cardDetail?.name}
         />
-        {!imageOnly && (
+        {!imageOnly && !noButton && (
           <>
             <div className="overlay rounded-md absolute top-0 left-0 w-full h-full bg-primary opacity-50 items-center"></div>
             {type === 'Sell Product' && !onSale && (
@@ -88,11 +89,13 @@ const BaseballCard = ({
                   : 'Sale Price'}
               </p>
               <p className="text-lg">
-                {cardDetail?.sellingPrice
+                {type === 'Buy Product' || onSale
                   ? stringifyValue2(cardDetail.sellingPrice, {
                       decimalPlaces: 6,
                     })
-                  : '9 RUN'}
+                  : stringifyValue2(cardDetail.boughtFor, {
+                      decimalPlaces: 6,
+                    })}
               </p>
             </div>
             {type !== 'Sell Product' ? (
