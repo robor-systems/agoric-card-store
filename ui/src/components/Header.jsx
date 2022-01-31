@@ -1,12 +1,6 @@
 import React from 'react';
 
-const Header = ({
-  walletConnected,
-  activeTab,
-  setActiveTab,
-  setType,
-  handleAddNFTForm,
-}) => {
+const Header = ({ walletConnected, activeTab, setActiveTab, setType }) => {
   const walletStatus = walletConnected ? 'Connected' : 'Not connected';
   console.log(activeTab);
   const TabButton = ({ tabIndex, text, width }) => {
@@ -14,14 +8,13 @@ const Header = ({
       <div
         onClick={() => {
           setActiveTab(tabIndex);
-          console.log(tabIndex);
           tabIndex === 0 ? setType('Sell Product') : setType('Buy Product');
         }}
         className={`cursor-pointer flex flex-col justify-center relative h-20 ${width}`}
       >
         <span>{text}</span>
         <div
-          className={`w-full h-1 bg-secondary rounded-md absolute bottom-0 ${
+          className={`w-full h-1 bg-secondary rounded-t-md absolute bottom-0 ${
             tabIndex === activeTab ? 'block' : 'hidden'
           }`}
         ></div>
@@ -35,12 +28,13 @@ const Header = ({
         <TabButton tabIndex={0} text="My Cards" width="w-32" />
         <TabButton tabIndex={1} text="Marketplace" width="w-36" />
         <TabButton tabIndex={2} text="Primary Sales" width="w-40" />
-        <span
+        <TabButton tabIndex={3} text="Create" width="w-24" />
+        {/* <span
           onClick={() => handleAddNFTForm()}
           className="self-center font-bold cursor-pointer"
         >
           Add NFT
-        </span>
+        </span> */}
       </div>
       <div>
         Agoric Wallet: {walletStatus}

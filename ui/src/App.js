@@ -20,7 +20,6 @@ import { getCardAuctionDetail, makeBidOfferForCard } from './auction.js';
 import dappConstants from './lib/constants.js';
 import ModalWrapper from './components/ModalWrapper';
 import ModalContent from './components/ModalContent';
-import AddNewNFTForm from './components/AddNewNFTForm';
 
 import { getSellerSeat, makeMatchingInvitation } from './swap';
 import { mintNFT } from './mintNFT';
@@ -285,6 +284,8 @@ function App() {
         handleClick={handleCardClick}
         userOffers={userOffers}
         type={type}
+        handleNFTMint={handleNFTMint}
+        tokenDisplayInfo={tokenDisplayInfo}
       />
       <ModalWrapper
         open={activeCard && !openExpandModal}
@@ -306,7 +307,7 @@ function App() {
       <ModalWrapper
         open={openExpandModal && activeCard}
         onClose={handleCardModalClose}
-        style="modal-img"
+        style="modal-img w-full mx-6"
       >
         <div className="pb-12 object-contain flex justify-center items-center">
           <img
@@ -317,15 +318,6 @@ function App() {
         </div>
       </ModalWrapper>
 
-      <ModalWrapper open={addNFTForm} onClose={handleAddNFTForm}>
-        <h1 className="text-2xl font-semibold text-center">Add NFT</h1>
-        <div className="flex flex-col gap-x-10 mt-11 mx-12 mb-12">
-          <AddNewNFTForm
-            tokenDisplayInfo={tokenDisplayInfo}
-            handleNFTMint={handleNFTMint}
-          />
-        </div>
-      </ModalWrapper>
       <EnableAppDialog
         open={openEnableAppDialog}
         handleClose={handleDialogClose}

@@ -81,7 +81,7 @@ body,
   } */
 
   .modal-img {
-    width: 1269px;
+    /* min-width: 100%; */
     max-width: 1269px;
     max-height: 85%;
   }
@@ -130,7 +130,7 @@ body,
     margin: 72px auto;
   }
 
-  .form {
+  /* .form {
     width: 336px;
-  }
+  } */
 }
