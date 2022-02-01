@@ -45,6 +45,12 @@ const start = (zcf) => {
 
   assertNatAssetKind(zcf, moneyBrand);
 
+  let userSaleHistory = AmountMath.make(brands.Items, harden([]));
+  const {
+    notifier: userSaleHistoryNotifier,
+    updater: userSaleHistoryUpdater,
+  } = makeNotifierKit();
+
   /** @type Record<string, AuctionSession> */
   const sellerSessions = {};
   let availableItems = AmountMath.make(itemBrand, harden([]));
@@ -91,7 +97,7 @@ const start = (zcf) => {
 
   const getAvailableItemsNotifier = () => availableItemsNotifier;
 
-  const startAuctioningItem = async (itemKey) => {
+  const startAuctioningItem = async (itemKey, cardOffer) => {
     const itemAmount = AmountMath.make(itemBrand, harden([itemKey]));
     const availableAmount = sellerSeat.getAmountAllocated('Items', itemBrand);
 
@@ -148,6 +154,8 @@ const start = (zcf) => {
         // item was sold, update available items by substracting sold amount
         // XXX we can not get the allocated amount, because it is prone to
         // race-condition when multiple auctions are completed consecutively
+        const amount = AmountMath.make(itemBrand, harden([cardOffer]));
+        addUserOwnedNfts(amount);
         availableItems = AmountMath.subtract(availableItems, itemAmount);
         availableItemsUpdater.updateState(availableItems);
       }
@@ -167,18 +175,18 @@ const start = (zcf) => {
     };
   };
 
-  const getOrCreateAuctionSession = async (itemKey) => {
+  const getOrCreateAuctionSession = async (itemKey, cardOffer) => {
     // assert.typeof(itemKey, 'string');
 
     if (!sellerSessions[itemKey]) {
-      sellerSessions[itemKey] = await startAuctioningItem(itemKey);
+      sellerSessions[itemKey] = await startAuctioningItem(itemKey, cardOffer);
     }
 
     return sellerSessions[itemKey];
   };
 
-  const makeBidInvitationForKey = async (itemKey) => {
-    const session = await getOrCreateAuctionSession(itemKey);
+  const makeBidInvitationForKey = async (itemKey, cardOffer) => {
+    const session = await getOrCreateAuctionSession(itemKey, cardOffer);
     return session.makeBidInvitation();
   };
 
@@ -219,6 +227,27 @@ const start = (zcf) => {
     return zcf.makeInvitation(withdraw, 'withdraw');
   };
 
+  const getUserOwnedNftNotifier = () => userSaleHistoryNotifier;
+  const getUserOwnedNfts = () => userSaleHistory;
+  const addUserOwnedNfts = (cardAmount) => {
+    try {
+      const validatedAmount = AmountMath.coerce(brands.Items, cardAmount);
+      userSaleHistory = AmountMath.add(userSaleHistory, validatedAmount);
+      userSaleHistoryUpdater.updateState(userSaleHistory);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const removeUserOwnedNfts = (cardAmount) => {
+    try {
+      const validatedAmount = AmountMath.coerce(brands.Items, cardAmount);
+      userSaleHistory = AmountMath.subtract(userSaleHistory, validatedAmount);
+      userSaleHistoryUpdater.updateState(userSaleHistory);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const publicFacet = Far('AuctionItemsPublicFacet', {
     getAvailableItems,
     getAvailableItemsNotifier,
@@ -227,6 +256,10 @@ const start = (zcf) => {
     getSellerSession,
     getCompletedPromiseForKey,
     getSessionDetailsForKey,
+    getUserOwnedNftNotifier,
+    getUserOwnedNfts,
+    addUserOwnedNfts,
+    removeUserOwnedNfts,
   });
 
   const creatorFacet = Far('AuctionItemsCreatorFacet', {

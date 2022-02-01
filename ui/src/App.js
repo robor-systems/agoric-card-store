@@ -16,22 +16,24 @@ import ApproveOfferSnackbar from './components/ApproveOfferSnackbar.jsx';
 import BoughtCardSnackbar from './components/BoughtCardSnackbar.jsx';
 import EnableAppDialog from './components/EnableAppDialog.jsx';
 
-import { getCardAuctionDetail, makeBidOfferForCard } from './auction.js';
+import {
+  getCardAuctionDetail,
+  makeBidOfferForCard,
+} from './services/auction.js';
 import dappConstants from './lib/constants.js';
 import ModalWrapper from './components/ModalWrapper';
 import ModalContent from './components/ModalContent';
-import AddNewNFTForm from './components/AddNewNFTForm';
-
-import { getSellerSeat, makeMatchingInvitation } from './swap';
-import { mintNFT } from './mintNFT';
+import {
+  getSellerSeat,
+  makeMatchingInvitation,
+  removeItemFromSale,
+} from './services/swap';
 
 const {
   INSTANCE_BOARD_ID,
   INSTALLATION_BOARD_ID,
-  // SWAP_INSTANCE_BOARD_ID,
-  // CARD_MINTER_BOARD_ID,
   SWAP_WRAPPER_INSTANCE_BOARD_ID,
-  MAIN_CONTRACT_BOARD_INSTANCE_ID,
+  // MAIN_CONTRACT_BOARD_INSTANCE_ID,
   issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID },
   brandBoardIds: { Money: MONEY_BRAND_BOARD_ID, Card: CARD_BRAND_BOARD_ID },
 } = dappConstants;
@@ -40,7 +42,7 @@ function App() {
   const [walletConnected, setWalletConnected] = useState(false);
   const [dappApproved, setDappApproved] = useState(true);
   const [availableCards, setAvailableCards] = useState([]);
-  const [cardPurse, setCardPurse] = useState(null);
+  const [cardPurse, setCardPurse] = useState([]);
   const [tokenPurses, setTokenPurses] = useState([]);
   const [openEnableAppDialog, setOpenEnableAppDialog] = useState(false);
   const [needToApproveOffer, setNeedToApproveOffer] = useState(false);
@@ -54,6 +56,7 @@ function App() {
   const [addNFTForm, setAddNFTForm] = useState(false);
   const [type, setType] = useState('Sell Product');
   const [userOffers, setUserOffers] = useState([]);
+  const [userNfts, setUserNfts] = useState([]);
   const handleTabChange = (index) => setActiveTab(index);
   const handleDialogClose = () => setOpenEnableAppDialog(false);
   const handleAddNFTForm = () => setAddNFTForm(!addNFTForm);
@@ -61,7 +64,7 @@ function App() {
   const walletPRef = useRef(undefined);
   const publicFacetRef = useRef(undefined);
   const publicFacetSwapRef = useRef(undefined);
-  // const availableOfferNotifierRef = useRef(undefined);
+
   useEffect(() => {
     // Receive callbacks from the wallet connection.
     const otherSide = Far('otherSide', {
@@ -136,6 +139,7 @@ function App() {
       publicFacetSwapRef.current = publicFacetSwap;
 
       async function watchOffers() {
+        console.log('watch offer');
         const availableOfferNotifier = await E(
           publicFacetSwapRef.current,
         ).getAvailableOfferNotifier();
@@ -146,8 +150,37 @@ function App() {
           console.log('available offers from swap:', availableOffers);
           setUserOffers(availableOffers.value);
         }
+
+        const userOwnedNftsNotifier = await E(
+          publicFacetRef.current,
+        ).getUserOwnedNftNotifier();
+
+        console.log('userOwnedNftsNotifier:', userOwnedNftsNotifier);
+        for await (const userOwnedNfts of iterateNotifier(
+          userOwnedNftsNotifier,
+        )) {
+          console.log('userNfts:', userOwnedNfts);
+          setUserNfts(userOwnedNfts.value);
+        }
       }
       watchOffers().catch((err) => console.log('got watchOffer errs', err));
+
+      async function watchSale() {
+        console.log('watch offer');
+        const userOwnedNftsNotifier = await E(
+          publicFacetRef.current,
+        ).getUserOwnedNftNotifier();
+
+        console.log('userOwnedNftsNotifier:', userOwnedNftsNotifier);
+        for await (const userOwnedNfts of iterateNotifier(
+          userOwnedNftsNotifier,
+        )) {
+          console.log('userNfts:', userOwnedNfts);
+          setUserNfts(userOwnedNfts.value);
+        }
+      }
+      watchSale().catch((err) => console.log('got watchSale errs', err));
+
       /*
        *get the current items for sale in the proposal
        *Currenly these will me primary marketplace cards
@@ -156,11 +189,6 @@ function App() {
         publicFacetRef.current,
       ).getAvailableItemsNotifier();
 
-      // const offersSwap = await E(
-      //   publicFacetSwapRef.current,
-      // ).getAvailableOffers();
-      // setUserOffers(offersSwap.value);
-      // console.log(offersSwap, 'offers diresctly');
       /* Using the public faucet we get all the current Nfts offered for sale */
       for await (const cardsAvailableAmount of iterateNotifier(
         availableItemsNotifier,
@@ -179,8 +207,8 @@ function App() {
       console.log(data);
       const obj = JSON.parse(data);
       walletDispatch && walletDispatch(obj);
+      console.log('Response from wallet:', obj);
     };
-
     activateWebSocket({
       onConnect,
       onDisconnect,
@@ -188,45 +216,53 @@ function App() {
     });
     return deactivateWebSocket;
   }, []);
-
-  const handleNFTMint = ({ cardDetails }) => {
-    mintNFT({
-      cardDetails,
-      MAIN_CONTRACT_BOARD_INSTANCE_ID,
-      walletP: walletPRef.current,
-      CARD_BRAND_BOARD_ID,
+  const removeCardFromSale = async () => {
+    await removeItemFromSale({
+      cardDetail: activeCard,
       cardPurse,
+      publicFacet: publicFacetSwapRef.current,
     });
   };
-
   const makeInvitationAndSellerSeat = async ({ price }) => {
-    // const board = E(walletPRef.current).getBoard();
-    // const swapInstallation = await E(board).getValue(SWAP_INSTANCE_BOARD_ID);
-    // const publicFacet = await E(board).getValue(SWAP_PUBLIC_FAUCET_BOARD_ID);
     const params = {
-      // CARD_MINTER_BOARD_ID,
-      // INSTANCE_BOARD_ID,
       publicFacet: publicFacetSwapRef.current,
       sellingPrice: BigInt(price),
-      // swapInstallation,
       walletP: walletPRef.current,
       cardDetail: activeCard,
     };
     const sellerSeatInvitation = await getSellerSeat(params);
-    // here add functionality to store sellerSeatInvitation
-    await makeMatchingInvitation({
+    return sellerSeatInvitation;
+  };
+  const makeMatchingSeatInvitation = async ({
+    cardDetail,
+    setLoading,
+    onClose,
+  }) => {
+    console.log('cardDetail:', cardDetail);
+    const Obj = { ...cardDetail };
+    const { BuyerExclusiveInvitation, sellingPrice, boughtFor } = Obj;
+    delete Obj.sellerSeat;
+    delete Obj.sellingPrice;
+    delete Obj.boughtFor;
+    delete Obj.BuyerExclusiveInvitation;
+    const result = await makeMatchingInvitation({
       cardPurse,
       tokenPurses,
-      cardDetail: activeCard,
-      sellingPrice: BigInt(price),
+      cardDetail: harden(Obj),
+      cardOffer: cardDetail,
+      sellingPrice,
+      boughtFor,
       walletP: walletPRef.current,
-      sellerSeatInvitation,
-      publicFacet: publicFacetSwapRef.current,
+      BuyerExclusiveInvitation,
+      publicFacetSwap: publicFacetSwapRef.current,
+      publicFacet: publicFacetRef.current,
+      setLoading,
+      onClose,
     });
-    // console.log('makeInvitationAndSellerSeat() result:', result);
+    return result;
   };
   const handleCardClick = (cardDetail, bool) => {
-    console.log('active card:', cardDetail);
+    console.log('active card:', bool);
     setActiveCard(cardDetail);
     setOpenExpandModal(bool);
   };
@@ -248,16 +284,24 @@ function App() {
     });
   };
 
-  const submitCardOffer = (name, price, selectedPurse) => {
+  const submitCardOffer = (
+    name,
+    price,
+    selectedPurse,
+    setFormState,
+    onClose,
+  ) => {
     return makeBidOfferForCard({
       walletP: walletPRef.current,
       publicFacet: publicFacetRef.current,
       card: name,
+      cardOffer: { ...name, boughtFor: price },
       cardPurse,
       tokenPurse: selectedPurse || tokenPurses[0],
       price: BigInt(price),
+      onClose,
+      setFormState,
     }).then((result) => {
-      // getSellerSession({ publicFacet: publicFacetRef.current });
       console.log('Your offer id for this current offer:', result);
       setNeedToApproveOffer(true);
     });
@@ -269,7 +313,7 @@ function App() {
   };
   console.log(availableCards, 'available cards');
   return (
-    <div className="App relative">
+    <div>
       <Header
         walletConnected={walletConnected}
         dappApproved={dappApproved}
@@ -280,10 +324,11 @@ function App() {
       />
       <CardDisplay
         activeTab={activeTab}
-        cardList={activeTab === 1 ? userOffers : availableCards}
-        cardPurse={cardPurse}
+        cardList={availableCards}
+        userOffers={activeTab !== 2 && userOffers ? userOffers : []}
+        userCards={cardPurse?.currentAmount?.value}
+        userNfts={userNfts}
         handleClick={handleCardClick}
-        userOffers={userOffers}
         type={type}
       />
       <ModalWrapper
@@ -291,8 +336,11 @@ function App() {
         onClose={handleCardModalClose}
       >
         <ModalContent
+          handleClick={handleCardClick}
           makeSwapInvitation={makeInvitationAndSellerSeat}
-          playerName={activeCard}
+          makeMatchingSeatInvitation={makeMatchingSeatInvitation}
+          removeCardFromSale={removeCardFromSale}
+          cardDetail={activeCard}
           type={type}
           onOpen={handleCardBidOpen}
           onClose={handleCardModalClose}
@@ -316,7 +364,7 @@ function App() {
         </div>
       </ModalWrapper>
 
-      <ModalWrapper open={addNFTForm} onClose={handleAddNFTForm}>
+      {/* <ModalWrapper open={addNFTForm} onClose={handleAddNFTForm}>
         <h1 className="text-2xl font-semibold text-center">Add NFT</h1>
         <div className="flex flex-col gap-x-10 mt-11 mx-12 mb-12">
           <AddNewNFTForm
@@ -324,7 +372,7 @@ function App() {
             handleNFTMint={handleNFTMint}
           />
         </div>
-      </ModalWrapper>
+      </ModalWrapper> */}
       <EnableAppDialog
         open={openEnableAppDialog}
         handleClose={handleDialogClose}

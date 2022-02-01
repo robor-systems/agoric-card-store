@@ -8,7 +8,6 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from './common/Button';
-
 import { makeValue, stringifyValue } from '../utils/amount';
 
 const useStyles = makeStyles((theme) => {
@@ -40,8 +39,9 @@ const CardAuctionForm = ({ tokenPurses, tokenDisplayInfo, onSubmit }) => {
       isSubmitting: true,
     });
     const price = makeValue(amount, tokenDisplayInfo);
-    return onSubmit(price, selectedPurse)
+    return onSubmit(price, selectedPurse, setFormState)
       .then(() => {
+        console.log('Done with bid');
         setFormState({
           error: null,
         });
@@ -94,6 +94,7 @@ const CardAuctionForm = ({ tokenPurses, tokenDisplayInfo, onSubmit }) => {
           variant="contained"
           color="primary"
           text={isSubmitting ? 'Submitting' : 'Bid'}
+          isLoading={isSubmitting}
         />
       </FormControl>
     </Box>

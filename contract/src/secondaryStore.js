@@ -1,3 +1,8 @@
+/**
+ * @file Safely swaps the digital assets between two parties.
+ * @author Robor <info@robor.tech>
+ */
+
 // @ts-check
 // Eventually will be importable from '@agoric/zoe-contract-support'
 import {
@@ -15,6 +20,16 @@ import {
  * amount no greater than the original's give, and a give amount at least as
  * large as the original's want.
  *
+ * The secondary store wrapper exists to provide an abstraction over the secondary store contract.
+ * This abstraction is used to interact with the secondary store contract and create matching seats for both
+ * the seller and buyer. It also helps in accounting how many instances are created of the contract and it also
+ * accounts for the details of each offer belonging to a particular instance.
+ *
+ * For each sale a new instance of the secondary store contract is created because a single instance creates a
+ * single offer that returns single seller seat and a single buyer seat and we cannot accommodate multiple offers
+ * in a single instance. There for, after the offer resolves, the instance shuts down and for another sale a new instance
+ * must be created.
+ *
  * @param zcf
  */
 
@@ -25,6 +40,7 @@ const start = (zcf) => {
     assertProposalShape(SellerSeat, {
       give: { Items: null },
       want: { Money: null },
+      exit: { onDemand: null },
     });
     const { want, give } = SellerSeat.getProposal();
     /** @type {OfferHandler} */

@@ -30,3 +30,9 @@ export function stringifyValue(value, displayInfo) {
   const { assetKind = AssetKind.NAT, decimalPlaces = 0 } = displayInfo || {};
   return formatValue(value, assetKind, decimalPlaces, decimalPlaces);
 }
+
+export function stringifyValueRUN(value, displayInfo) {
+  const { assetKind = AssetKind.NAT } = displayInfo || {};
+  const val = formatValue(value, assetKind, 6, 0);
+  return val.toString().concat(' RUN');
+}

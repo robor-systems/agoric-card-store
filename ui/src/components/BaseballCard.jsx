@@ -4,14 +4,23 @@ import User from '../assets/icons/user.png';
 import Expand from '../assets/icons/expand.png';
 // import { images } from '../images';
 import Button from './common/Button';
+import { stringifyValueRUN } from '../utils/amount';
 
-const BaseballCard = ({ imageOnly, playerName, handleClick, type }) => {
-  console.log(playerName, 'image from baseball card component');
+const BaseballCard = ({
+  imageOnly,
+  cardDetail,
+  handleClick,
+  type,
+  onSale,
+  onAuction,
+  noButton,
+}) => {
+  console.log(cardDetail?.image, 'image from baseball card component');
   // console.log(type, 'baseballcard type btn');
   return (
     <div
       className={`transition-all duration-300 flex flex-col py-3 border border-alternativeLight card card-shadow rounded-md ${
-        imageOnly && 'card-image-only py-2.5'
+        (imageOnly && 'card-image-only py-2.5') || (onAuction && 'py-10')
       }`}
     >
       <div
@@ -21,28 +30,35 @@ const BaseballCard = ({ imageOnly, playerName, handleClick, type }) => {
       >
         <img
           className="h-full w-full rounded-md"
-          src={`https://gateway.pinata.cloud/ipfs/${playerName.image}`}
-          alt={playerName}
+          src={`https://gateway.pinata.cloud/ipfs/${cardDetail?.image}`}
+          alt={cardDetail?.name}
         />
-        {!imageOnly && (
+        {!imageOnly && !noButton && (
           <>
-            <div className="overlay rounded-md absolute top-0 left-0 w-full h-full bg-primary opacity-50"></div>
-            {type === 'Sell Product' && (
+            <div className="overlay rounded-md absolute top-0 left-0 w-full h-full bg-primary opacity-50 items-center"></div>
+            {type === 'Sell Product' && !onSale && (
               <Button
                 styles="media-action absolute bottom-6 w-52 left-16"
-                onClick={() => handleClick(playerName, false)}
+                onClick={() => handleClick(cardDetail, false)}
                 text="Sell"
               />
             )}
-            {type === 'Buy Product' && (
+            {type === 'Sell Product' && onSale && (
               <Button
                 styles="media-action absolute bottom-6 w-52 left-16"
-                onClick={() => handleClick(playerName, false)}
+                onClick={() => handleClick(cardDetail, false)}
+                text="Remove from sale"
+              />
+            )}
+            {(type === 'Buy Product' || type === 'Bid Product') && (
+              <Button
+                styles="media-action absolute bottom-6 w-52 left-16"
+                onClick={() => handleClick(cardDetail, false)}
                 text="Buy"
               />
             )}
             <img
-              onClick={() => handleClick(playerName, true)}
+              onClick={() => handleClick(cardDetail, true)}
               src={Expand}
               className="media-action-expand cursor-pointer w-12 h-12 absolute top-2 right-2"
               alt="expand"
@@ -53,8 +69,8 @@ const BaseballCard = ({ imageOnly, playerName, handleClick, type }) => {
       <div>
         <div className="px-3">
           <div className="flex justify-between items-center">
-            <p className="text-lg mb-1">{playerName.name}</p>
-            <img className="w-6 h-6" src={Tag} alt="sale-tag" />
+            <p className="text-lg mb-1">{cardDetail?.name}</p>
+            {onSale && <img className="w-6 h-6" src={Tag} alt="sale-tag" />}
           </div>
           <div className="flex items-center">
             <img className="w-6 h-6 mr-2" src={User} alt="user-icon" />
@@ -62,20 +78,34 @@ const BaseballCard = ({ imageOnly, playerName, handleClick, type }) => {
           </div>
         </div>
       </div>
-      {!imageOnly && (
+      {!imageOnly && !onAuction && (
         <>
           <hr className="mt-2.5 mb-1 bg-alternativeLight" />
           <div className="flex items-center justify-between px-3">
             <div>
               <p className="text-base text-primaryLight">
-                {type === 'Sell Product' ? 'Bought For' : 'Sale Price'}
+                {type === 'Sell Product' && !onSale
+                  ? 'Bought For'
+                  : 'Sale Price'}
               </p>
-              <p className="text-lg">99 RUN</p>
+              <p className="text-lg">
+                {type === 'Buy Product' || onSale
+                  ? stringifyValueRUN(cardDetail.sellingPrice, {
+                      decimalPlaces: 6,
+                    })
+                  : stringifyValueRUN(cardDetail.boughtFor, {
+                      decimalPlaces: 6,
+                    })}
+              </p>
             </div>
-            <div>
-              <p className="text-base text-primaryLight">Sale Ending In</p>
-              <p className="text-lg">8 hours</p>
-            </div>
+            {type !== 'Sell Product' ? (
+              <div>
+                <p className="text-base text-primaryLight">Sale Ending In</p>
+                <p className="text-lg">8 hours</p>
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
         </>
       )}

@@ -36,6 +36,7 @@ const start = (zcf) => {
     // https://github.com/Agoric/agoric-sdk/issues/855
     const proposal = harden({
       give: { Items: newCardsForSaleAmount },
+      exit: { onDemand: null },
     });
     const paymentKeywordRecord = harden({ Items: allCardsForSalePayment });
 

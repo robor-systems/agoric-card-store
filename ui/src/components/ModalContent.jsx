@@ -7,68 +7,124 @@ import CardDetailModal from './CardDetailModal';
 
 function ModalContent({
   makeSwapInvitation,
+  makeMatchingSeatInvitation,
+  removeCardFromSale,
   onClose,
   type,
-  playerName,
+  cardDetail,
   onGetCardDetail,
   onBidCard,
   tokenPurses,
   tokenPetname,
   tokenDisplayInfo,
+  handleClick,
 }) {
-  const [hidden, setHidden] = useState(true);
+  const [isLoading, setLoading] = useState(false);
+  console.log(isLoading);
   const populateContent = () => {
     switch (type) {
       case 'Sell Product':
-        return (
+        return cardDetail.sellingPrice ? (
+          <>
+            <h1 className="text-2xl font-semibold text-center">
+              Remove from Sale
+            </h1>
+            <div className="flex flex-col gap-y-10 mt-11 mx-12 mb-8">
+              <BaseballCard
+                cardDetail={cardDetail}
+                handleClick={handleClick}
+                // imageOnly={true}
+                type={type}
+                onSale={cardDetail.sellingPrice}
+                noButton={true}
+              />
+              <Button
+                text="Remove"
+                style="w-full text-white"
+                onClick={async () => {
+                  setLoading(true);
+                  const result = await removeCardFromSale();
+                  console.log('result:', result);
+                  setLoading(false);
+                  onClose();
+                }}
+                styles="relative"
+                isLoading={isLoading}
+              />
+            </div>
+          </>
+        ) : (
           <div className="flex gap-x-10 mt-11 mx-12 mb-12">
-            <BaseballCard imageOnly={true} playerName={playerName} />
+            <BaseballCard
+              imageOnly={true}
+              cardDetail={cardDetail}
+              handleClick={handleClick}
+              noButton={true}
+              type={type}
+            />
             <SellProductForm
               makeSwapInvitation={makeSwapInvitation}
               tokenDisplayInfo={tokenDisplayInfo}
+              onClose={onClose}
             />
           </div>
         );
+
       case 'Edit Product':
-        setHidden(false);
         return (
           <div className="flex gap-x-10 mt-11 mx-12 mb-12">
-            <BaseballCard imageOnly={true} playerName={playerName} />
+            <BaseballCard
+              imageOnly={true}
+              cardDetail={cardDetail}
+              noButton={true}
+            />
             <EditProductForm />
           </div>
+        );
+      case 'Bid Product':
+        return (
+          <>
+            <h1 className="text-2xl font-semibold text-center">{type}</h1>
+            <CardDetailModal
+              onClose={onClose}
+              onGetCardDetail={onGetCardDetail}
+              onBidCard={onBidCard}
+              cardDetail={cardDetail}
+              tokenPurses={tokenPurses}
+              tokenPetname={tokenPetname}
+              tokenDisplayInfo={tokenDisplayInfo}
+            />
+          </>
         );
       case 'Buy Product':
         return (
           <>
-            {!hidden && (
-              <>
-                <h1 className="text-2xl font-semibold text-center">{type}</h1>
-                <CardDetailModal
-                  onClose={onClose}
-                  onGetCardDetail={onGetCardDetail}
-                  onBidCard={onBidCard}
-                  playerName={playerName}
-                  tokenPurses={tokenPurses}
-                  tokenPetname={tokenPetname}
-                  tokenDisplayInfo={tokenDisplayInfo}
-                />
-              </>
-            )}
-            {hidden && (
-              <>
-                <h1 className="text-2xl font-semibold text-center">{type}</h1>
-                <div className="flex flex-col gap-y-10 mt-11 mx-12 mb-8">
-                  <BaseballCard playerName={playerName} />
-                  <Button
-                    onClick={() => {
-                      setHidden(false);
-                    }}
-                    text="Buy"
-                    style="w-full text-white"
-                  />
-                </div>
-              </>
-            )}
+            <h1 className="text-2xl font-semibold text-center">{type}</h1>
+            <div className="flex flex-col gap-y-10 mt-11 mx-12 mb-8">
+              <BaseballCard
+                cardDetail={cardDetail}
+                handleClick={handleClick}
+                type={type}
+                noButton={true}
+              />
+              <Button
+                text="Buy"
+                style="w-full text-white"
+                onClick={async () => {
+                  setLoading(true);
+                  const result = await makeMatchingSeatInvitation({
+                    cardDetail,
+                    setLoading,
+                    onClose,
+                  });
+                  console.log('result:', result);
+                  setLoading(false);
+                  onClose();
+                }}
+                styles="relative"
+                isLoading={isLoading}
+              />
+            </div>
           </>
         );
       default:
