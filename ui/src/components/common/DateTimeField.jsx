@@ -1,20 +1,22 @@
 import React from 'react';
 import CalenderIcon from '../../assets/icons/date-icon.png';
 
-function DateTimeField() {
+function DateTimeField({ noLabels = false }) {
   return (
     <div>
-      <span className="text-lg leading-none">
-        Sale End Date & Time{' '}
-        <span className="text-primaryLight">(optional)</span>
-      </span>
-      <div className="flex justify-between pr-4 border border-alternativeLight rounded items-center">
+      {!noLabels && (
+        <span className="text-lg leading-none">
+          Sale End Date & Time{' '}
+          <span className="text-primaryLight">(optional)</span>
+        </span>
+      )}
+      <div className="flex relative justify-between  border border-alternativeLight rounded items-center">
         <input
           type="date"
-          className="w-full h-12 ml-4 outline-none focus:outline-none text-primaryLight"
+          className="w-full h-12 pl-4 outline-none pr-4 focus:outline-none text-primaryLight"
         />
-        <div className="">
-          <img src={CalenderIcon} className="w-5 mr-2 h-5" alt="Run" />
+        <div className="absolute right-4 z-0">
+          <img src={CalenderIcon} className="w-5 h-5" alt="Run" />
         </div>
       </div>
     </div>
