@@ -105,7 +105,8 @@
     "ses": "^0.12.6",
     "is-ipfs": "6.0.2",
     "axios": "0.25.0",
-    "nanoid": "^3.2.0"
+    "nanoid": "^3.2.0",
+    "autodux": "^5.0.3"
   },
   "devDependencies": {
     "@babel/eslint-plugin": "^7.12.1",

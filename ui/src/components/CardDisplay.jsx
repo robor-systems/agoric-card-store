@@ -1,28 +1,23 @@
 import React, { useEffect, useState } from 'react';
-// import Grid from '@material-ui/core/Grid';
-// import Typography from '@material-ui/core/Typography';
-// import Paper from '@material-ui/core/Paper';
-// import Container from '@material-ui/core/Container';
-// import CircularProgress from '@material-ui/core/CircularProgress';
 import SearchIcon from '../assets/icons/search.png';
 import FilterIcon from '../assets/icons/filter.png';
-// import { makeStyles } from '@material-ui/core/styles';
 
 import AddNewNFTForm from './AddNewNFTForm';
 import BaseballCard from './BaseballCard.jsx';
 import Loader from './common/Loader.jsx';
+import { useApplicationContext } from '../context/Application';
 
-const CardDisplay = ({
-  activeTab,
-  cardList,
-  handleClick,
-  type,
-  userOffers,
-  userCards,
-  userNfts,
-  tokenDisplayInfo,
-  handleNFTMint,
-}) => {
+const CardDisplay = ({ handleClick, handleNFTMint }) => {
+  const { state } = useApplicationContext();
+  const {
+    activeTab,
+    availableCards: cardList,
+    type,
+    userOffers,
+    userCards,
+    userNfts,
+    tokenDisplayInfo,
+  } = state;
   // const isReady1 = cardPurse && cardPurse?.currentAmount?.value?.length > 0;
   // const isReady2 = userCards && userCards.length > 0;
   const isReady = cardList && cardList.length > 0;

@@ -2,7 +2,6 @@ import React from 'react';
 import Tag from '../assets/icons/tag.png';
 import User from '../assets/icons/user.png';
 import Expand from '../assets/icons/expand.png';
-// import { images } from '../images';
 import Button from './common/Button';
 import { stringifyValueRUN } from '../utils/amount';
 

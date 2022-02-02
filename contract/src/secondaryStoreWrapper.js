@@ -21,10 +21,6 @@ const start = (zcf) => {
   } = makeNotifierKit();
   availableOfferUpdater.updateState('its working i think plz confirm');
   const getSellerSeat = async ({ cardDetail, sellingPrice }) => {
-    // const board = E(walletP).getBoard();
-    // const brandKeywordRecord = await E(zoe).getBrands(mainContractInstance);
-    // const issuerKeywordRecord = await E(zoe).getIssuers(mainContractInstance);
-    // const cardMinter = await E(board).getValue(CARD_MINTER_BOARD_ID);
     const cardAmount = AmountMath.make(brands.Items, harden([cardDetail]));
     const saleAmount = AmountMath.make(brands.Money, sellingPrice);
     const Proposal = harden({
@@ -37,11 +33,30 @@ const start = (zcf) => {
       swapInstallation,
       issuers,
     );
-    availableOffers = AmountMath.add(availableOffers, cardAmount);
-    availableOfferUpdater.updateState(availableOffers);
+
+    const shouldBeInvitationMsg = `The swapAsset instance should return a creatorInvitation`;
+    assert(creatorInvitation, shouldBeInvitationMsg);
+
     const sellerSeat = await E(zoe).offer(creatorInvitation, Proposal, payment);
+
+    const invitationP = await E(sellerSeat).getOfferResult();
+    const invitationIssuer = await E(zoe).getInvitationIssuer();
+    const BuyerExclusiveInvitation = await E(invitationIssuer).claim(
+      invitationP,
+    );
+    const cardOffer = {
+      ...cardDetail,
+      sellingPrice,
+      BuyerExclusiveInvitation,
+      sellerSeat,
+    };
+    const cardOfferAmount = AmountMath.make(brands.Items, harden([cardOffer]));
+    availableOffers = AmountMath.add(availableOffers, cardOfferAmount);
+    availableOfferUpdater.updateState(availableOffers);
     return sellerSeat;
   };
+
+  
 
   const getAvailableOfferNotifier = () => availableOfferNotifier;
   const getAvailableOffers = () => availableOffers;

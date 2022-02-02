@@ -5,7 +5,7 @@ export const mintNFT = async ({
   cardDetails,
   MAIN_CONTRACT_BOARD_INSTANCE_ID,
   walletP,
-  publicFacetAuction,
+  publicFacet,
   CARD_BRAND_BOARD_ID,
   cardPurse,
 }) => {
@@ -16,13 +16,13 @@ export const mintNFT = async ({
     CARD_BRAND_BOARD_ID,
   );
   const depositFacet = await E(board).getValue(depositFacetId);
-  const publicFacet = await E(zoe).getPublicFacet(instance);
-  const mintedCardPayment = await E(publicFacet).mintUserCard(cardDetails);
+  const publicFacetMain = await E(zoe).getPublicFacet(instance);
+  const mintedCardPayment = await E(publicFacetMain).mintUserCard(cardDetails);
   console.log(mintedCardPayment);
   await E(depositFacet).receive(mintedCardPayment);
   const AmountForAddition = AmountMath.make(
     cardPurse.brand,
     harden([cardDetails]),
   );
-  await E(publicFacetAuction).addUserOwnedNfts(AmountForAddition);
+  await E(publicFacet).addToUserSaleHistory(AmountForAddition);
 };

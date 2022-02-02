@@ -1,23 +1,29 @@
 import React from 'react';
+import { useApplicationContext } from '../context/Application';
+import { setActiveTab, setType } from '../store/store';
 
-const Header = ({ walletConnected, activeTab, setActiveTab, setType }) => {
+const Header = () => {
+  const { state, dispatch } = useApplicationContext();
+  const { connected: walletConnected, activeTab } = state;
+
   const walletStatus = walletConnected ? 'Connected' : 'Not connected';
   console.log(activeTab);
+
   const TabButton = ({ tabIndex, text, width }) => {
     return (
       <div
         onClick={() => {
-          setActiveTab(tabIndex);
+          dispatch(setActiveTab(tabIndex));
           console.log(tabIndex);
           switch (tabIndex) {
             case 0:
-              setType('Sell Product');
+              dispatch(setType('Sell Product'));
               break;
             case 1:
-              setType('Buy Product');
+              dispatch(setType('Buy Product'));
               break;
             case 2:
-              setType('Bid Product');
+              dispatch(setType('Bid Product'));
               break;
             default:
           }

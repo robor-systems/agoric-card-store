@@ -155,7 +155,7 @@ const start = (zcf) => {
         // XXX we can not get the allocated amount, because it is prone to
         // race-condition when multiple auctions are completed consecutively
         const amount = AmountMath.make(itemBrand, harden([cardOffer]));
-        addUserOwnedNfts(amount);
+        addToUserSaleHistory(amount);
         availableItems = AmountMath.subtract(availableItems, itemAmount);
         availableItemsUpdater.updateState(availableItems);
       }
@@ -227,9 +227,9 @@ const start = (zcf) => {
     return zcf.makeInvitation(withdraw, 'withdraw');
   };
 
-  const getUserOwnedNftNotifier = () => userSaleHistoryNotifier;
-  const getUserOwnedNfts = () => userSaleHistory;
-  const addUserOwnedNfts = (cardAmount) => {
+  const getUserSaleHistoryNotifier = () => userSaleHistoryNotifier;
+  const getUserSaleHistory = () => userSaleHistory;
+  const addToUserSaleHistory = (cardAmount) => {
     try {
       const validatedAmount = AmountMath.coerce(brands.Items, cardAmount);
       userSaleHistory = AmountMath.add(userSaleHistory, validatedAmount);
@@ -238,13 +238,31 @@ const start = (zcf) => {
       console.log(error);
     }
   };
-  const removeUserOwnedNfts = (cardAmount) => {
+  const removeFromUserSaleHistory = (cardAmount) => {
     try {
       const validatedAmount = AmountMath.coerce(brands.Items, cardAmount);
       userSaleHistory = AmountMath.subtract(userSaleHistory, validatedAmount);
       userSaleHistoryUpdater.updateState(userSaleHistory);
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const updateUserSaleHistory = () => {
+    for (const { id, status } of walletOffers) {
+      if (id === offerId && (status === 'complete' || status === 'accept')) {
+        console.log(
+          id,
+          NFTAmountForRemoval,
+          NFTAmountForAddition,
+          offerAmount,
+          'offerId:',
+        );
+        E(publicFacet).removeFromUserSaleHistory(NFTAmountForRemoval);
+        E(publicFacet).addToUserSaleHistory(NFTAmountForAddition);
+        E(publicFacetSwap).updateAvailableOffers(offerAmount);
+        return true;
+      }
     }
   };
 
@@ -256,10 +274,11 @@ const start = (zcf) => {
     getSellerSession,
     getCompletedPromiseForKey,
     getSessionDetailsForKey,
-    getUserOwnedNftNotifier,
-    getUserOwnedNfts,
-    addUserOwnedNfts,
-    removeUserOwnedNfts,
+    getUserSaleHistoryNotifier,
+    getUserSaleHistory,
+    addToUserSaleHistory,
+    removeFromUserSaleHistory,
+    updateUserSaleHistory,
   });
 
   const creatorFacet = Far('AuctionItemsCreatorFacet', {

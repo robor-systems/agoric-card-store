@@ -1,12 +1,6 @@
 // The code in this file requires an understanding of Autodux.
 // See: https://github.com/ericelliott/autodux
 import autodux from 'autodux';
-import { v4 as uuidv4 } from 'uuid';
-import agoricLogo from 'assets/crypto-icons/agoric-logo.png';
-import bldLogo from 'assets/crypto-icons/bld-logo.png';
-import kirkLogo from 'assets/crypto-icons/kirk-logo.png';
-import usdcLogo from 'assets/crypto-icons/usdc-logo.png';
-import { stringifyPurseValue } from '@agoric/ui-components';
 
 export const {
   reducer,
@@ -14,31 +8,46 @@ export const {
   actions: {
     setApproved,
     setConnected,
-    setPurses,
-    mergeBrandToInfo,
-    addToBrandToInfo,
-    setCollaterals,
-    resetState,
-    setTreasury,
-    setVaultCollateral,
-    setVaultConfiguration,
-    createVault,
-    setVaultToManageId,
-    updateVault,
-    updateOffers,
-    resetVault,
-    setAutoswap,
-    setAssets,
+    setCardPurse,
+    setTokenPurses,
+    setAvailableCards,
     setError,
+    setBoughtCard,
+    setActiveCard,
+    setActiveCardBid,
+    setTokenDisplayInfo,
+    setTokenPetname,
+    setOpenExpandModal,
+    setActiveTab,
+    setType,
+    setUserOffers,
+    setOpenEnableAppDialog,
+    setUserNfts,
+    setUserCards,
+    setNeedToApproveOffer,
   },
 } = autodux({
-  slice: 'treasury',
+  slice: 'cardStore',
   initial: {
     approved: true,
     connected: false,
-    account: null,
-    purses: null,
+    cardPurse: [],
+    tokenPurses: [],
+    availableCards: [],
     error: {},
+    boughtCard: false,
+    activeCard: null,
+    activeCardBid: null,
+    tokenDisplayInfo: null,
+    tokenPetname: null,
+    openExpandModal: null,
+    activeTab: 0,
+    type: 'Sell Product',
+    userOffers: [],
+    openEnableAppDialog: false,
+    userNfts: [],
+    userCards: [],
+    needToApproveOffer: false,
   },
   actions: {},
 });
