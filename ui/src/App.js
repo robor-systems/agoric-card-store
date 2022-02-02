@@ -28,12 +28,13 @@ import {
   makeMatchingInvitation,
   removeItemFromSale,
 } from './services/swap';
+import { mintNFT } from './mintNFT';
 
 const {
   INSTANCE_BOARD_ID,
   INSTALLATION_BOARD_ID,
   SWAP_WRAPPER_INSTANCE_BOARD_ID,
-  // MAIN_CONTRACT_BOARD_INSTANCE_ID,
+  MAIN_CONTRACT_BOARD_INSTANCE_ID,
   issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID },
   brandBoardIds: { Money: MONEY_BRAND_BOARD_ID, Card: CARD_BRAND_BOARD_ID },
 } = dappConstants;
@@ -148,7 +149,7 @@ function App() {
           availableOfferNotifier,
         )) {
           console.log('available offers from swap:', availableOffers);
-          setUserOffers(availableOffers.value);
+          setUserOffers(availableOffers.value || []);
         }
 
         const userOwnedNftsNotifier = await E(
@@ -216,6 +217,17 @@ function App() {
     });
     return deactivateWebSocket;
   }, []);
+
+  const handleNFTMint = ({ cardDetails }) => {
+    mintNFT({
+      cardDetails,
+      MAIN_CONTRACT_BOARD_INSTANCE_ID,
+      walletP: walletPRef.current,
+      publicFacetAuction: publicFacetRef.current,
+      CARD_BRAND_BOARD_ID,
+      cardPurse,
+    });
+  };
   const removeCardFromSale = async () => {
     await removeItemFromSale({
       cardDetail: activeCard,
@@ -330,6 +342,8 @@ function App() {
         userNfts={userNfts}
         handleClick={handleCardClick}
         type={type}
+        handleNFTMint={handleNFTMint}
+        tokenDisplayInfo={tokenDisplayInfo}
       />
       <ModalWrapper
         open={activeCard && !openExpandModal}
@@ -354,10 +368,11 @@ function App() {
       <ModalWrapper
         open={openExpandModal && activeCard}
         onClose={handleCardModalClose}
-        style="modal-img"
+        style="modal-img w-full mx-6"
       >
-        <div className="pb-12 w-full h-full object-cover flex justify-center items-center">
+        <div className="pb-12 object-contain flex justify-center items-center">
           <img
+            style={{ maxWidth: '30%' }}
             src={`https://gateway.pinata.cloud/ipfs/${activeCard?.image}`}
             alt="Card Media"
           />

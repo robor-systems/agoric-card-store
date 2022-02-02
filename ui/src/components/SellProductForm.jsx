@@ -11,7 +11,9 @@ function SellProductForm({ makeSwapInvitation, tokenDisplayInfo, onClose }) {
   const [price, setPrice] = useState(0);
   return (
     <div className="form flex flex-col gap-y-6 self">
-      <Select />
+      <Select label="Sale Type" style={'bg-fieldBg'}>
+        <option>Fixed Price</option>
+      </Select>
       <Input value={price} handleChange={setPrice} label="Price" />
       <DateTimeField />
       <Button

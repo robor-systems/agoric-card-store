@@ -8,6 +8,7 @@ import SearchIcon from '../assets/icons/search.png';
 import FilterIcon from '../assets/icons/filter.png';
 // import { makeStyles } from '@material-ui/core/styles';
 
+import AddNewNFTForm from './AddNewNFTForm';
 import BaseballCard from './BaseballCard.jsx';
 import Loader from './common/Loader.jsx';
 
@@ -19,6 +20,8 @@ const CardDisplay = ({
   userOffers,
   userCards,
   userNfts,
+  tokenDisplayInfo,
+  handleNFTMint,
 }) => {
   // const isReady1 = cardPurse && cardPurse?.currentAmount?.value?.length > 0;
   // const isReady2 = userCards && userCards.length > 0;
@@ -28,14 +31,15 @@ const CardDisplay = ({
   const [myCardLoader, setMyCardLoader] = useState(true);
   const [myCards, setMyCards] = useState([]);
   const [secondaryCards, setSecondaryCards] = useState([]);
+  console.log(userCards, userOffers, userNfts, 'all card arrs');
   const getUserCards = (params) => {
     console.log('params:', params);
-    const userOffersMap = params?.userOffers.reduce(function (map, obj) {
+    const userOffersMap = params?.userOffers.reduce((map, obj) => {
       map[obj.id] = { ...obj };
       return map;
     }, {});
     console.log('userOfferMap:', userOffersMap);
-    const userNftsMap = params?.userNfts.reduce(function (map, obj) {
+    const userNftsMap = params?.userNfts.reduce((map, obj) => {
       map[obj.id] = { ...obj };
       return map;
     }, {});
@@ -71,9 +75,10 @@ const CardDisplay = ({
   }, [userOffers, userCards, userNfts]);
   switch (activeTab) {
     case 0:
+      console.log(myCards, 'MyCards');
       cards =
         myCards?.length > 0 ? (
-          <div className="grid grid-cols-3 gap-x-8 gap-y-10">
+          <div className="grid sm:grid-cols-1  md:grid-cols-2 xl:grid-cols-3  gap-x-6 gap-y-10">
             {myCards?.map((cardDetail) => (
               <div key={cardDetail.name}>
                 <BaseballCard
@@ -94,7 +99,7 @@ const CardDisplay = ({
       console.log(userOffers, 'userCards');
       cards =
         secondaryCards?.length !== 0 ? (
-          <div className="grid grid-cols-3 gap-x-8 gap-y-10">
+          <div className="grid sm:grid-cols-1  md:grid-cols-2 xl:grid-cols-3  gap-x-6 gap-y-10">
             {secondaryCards?.map((cardDetail) => {
               console.log(cardDetail, 'inside map ');
               return (
@@ -116,7 +121,7 @@ const CardDisplay = ({
     case 2:
       console.log('Cardlist:', cardList);
       cards = (
-        <div className="grid grid-cols-3 gap-x-8 gap-y-10">
+        <div className="grid sm:grid-cols-1  md:grid-cols-2 xl:grid-cols-3  gap-x-6 gap-y-10">
           {cardList.map((cardDetail) => {
             console.log('cardDetail:', cardDetail);
             return (
@@ -134,20 +139,29 @@ const CardDisplay = ({
         </div>
       );
       break;
+    case 3:
+      cards = (
+        <AddNewNFTForm
+          tokenDisplayInfo={tokenDisplayInfo}
+          handleNFTMint={handleNFTMint}
+        />
+      );
+      break;
     default:
       break;
   }
 
   return (
-    <div className="display-card flex flex-col items-center w-10/12">
+    <div className="display-card flex flex-col px-4 items-center max-w-6xl w-full">
       <h1 className="text-3xl font-semibold mb-14">
         {activeTab === 0 && 'My Cards'}
         {activeTab === 1 && 'Marketplace'}
         {activeTab === 2 && 'Primary Sales'}
+        {activeTab === 3 && 'Create New Item'}
       </h1>
-      {activeTab !== 0 && (
-        <div className="flex gap-x-4 justify-center w-full px-2 mb-14">
-          <div className="flex w-3/4 border justify-between px-4 border-alternativeLight rounded items-center">
+      {activeTab !== 0 && activeTab !== 3 && (
+        <div className="flex flex-col gap-y-8 sm:flex-row gap-x-4 justify-center w-full px-2 mb-14">
+          <div className="flex  sm:w-3/4 border justify-between px-4 border-alternativeLight rounded items-center">
             <input
               className="outline-none focus:outline-none rounded h-12 text-lg"
               placeholder="Search"
@@ -165,7 +179,7 @@ const CardDisplay = ({
               backgroundPositionY: 'center',
               backgroundPositionX: '95%',
             }}
-            className="bg-no-repeat cursor-pointer text-primaryLight border border-alternativeLight bg-white rounded w-1/5 h-12 px-3.5 text-lg outline-none focus:outline-none font-normal"
+            className="bg-no-repeat cursor-pointer text-primaryLight border border-alternativeLight bg-white rounded sm:w-1/5 h-12 px-3.5 text-lg outline-none focus:outline-none font-normal"
           >
             <option></option>
           </select>
