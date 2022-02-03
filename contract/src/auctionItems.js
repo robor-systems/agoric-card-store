@@ -248,24 +248,6 @@ const start = (zcf) => {
     }
   };
 
-  const updateUserSaleHistory = () => {
-    for (const { id, status } of walletOffers) {
-      if (id === offerId && (status === 'complete' || status === 'accept')) {
-        console.log(
-          id,
-          NFTAmountForRemoval,
-          NFTAmountForAddition,
-          offerAmount,
-          'offerId:',
-        );
-        E(publicFacet).removeFromUserSaleHistory(NFTAmountForRemoval);
-        E(publicFacet).addToUserSaleHistory(NFTAmountForAddition);
-        E(publicFacetSwap).updateAvailableOffers(offerAmount);
-        return true;
-      }
-    }
-  };
-
   const publicFacet = Far('AuctionItemsPublicFacet', {
     getAvailableItems,
     getAvailableItemsNotifier,
@@ -278,7 +260,6 @@ const start = (zcf) => {
     getUserSaleHistory,
     addToUserSaleHistory,
     removeFromUserSaleHistory,
-    updateUserSaleHistory,
   });
 
   const creatorFacet = Far('AuctionItemsCreatorFacet', {

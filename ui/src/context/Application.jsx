@@ -143,32 +143,32 @@ export default function Provider({ children }) {
           dispatch(setUserOffers(availableOffers.value || []));
         }
 
-        const userOwnedNftsNotifier = await E(
+        const userSaleHistoryNotifier = await E(
           publicFacet,
         ).getUserSaleHistoryNotifier();
 
-        console.log('userOwnedNftsNotifier:', userOwnedNftsNotifier);
-        for await (const userOwnedNfts of iterateNotifier(
-          userOwnedNftsNotifier,
+        console.log('userOwnedNftsNotifier:', userSaleHistoryNotifier);
+        for await (const userSaleHistory of iterateNotifier(
+          userSaleHistoryNotifier,
         )) {
-          console.log('userNfts:', userOwnedNfts);
-          dispatch(setUserNfts(userOwnedNfts.value));
+          console.log('userNfts:', userSaleHistory);
+          dispatch(setUserNfts(userSaleHistory.value));
         }
       }
       watchOffers().catch((err) => console.log('got watchOffer errs', err));
 
       async function watchSale() {
         console.log('watch offer');
-        const userOwnedNftsNotifier = await E(
+        const userSaleHistoryNotifier = await E(
           publicFacet,
         ).getUserSaleHistoryNotifier();
 
-        console.log('userOwnedNftsNotifier:', userOwnedNftsNotifier);
-        for await (const userOwnedNfts of iterateNotifier(
-          userOwnedNftsNotifier,
+        console.log('userOwnedNftsNotifier:', userSaleHistoryNotifier);
+        for await (const userSaleHistory of iterateNotifier(
+          userSaleHistoryNotifier,
         )) {
-          console.log('userNfts:', userOwnedNfts);
-          dispatch(setUserNfts(userOwnedNfts.value));
+          console.log('userNfts:', userSaleHistory);
+          dispatch(setUserNfts(userSaleHistory.value));
         }
       }
       watchSale().catch((err) => console.log('got watchSale errs', err));

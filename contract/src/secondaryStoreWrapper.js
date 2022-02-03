@@ -56,8 +56,6 @@ const start = (zcf) => {
     return sellerSeat;
   };
 
-  
-
   const getAvailableOfferNotifier = () => availableOfferNotifier;
   const getAvailableOffers = () => availableOffers;
   const updateAvailableOffers = (cardAmount) => {
