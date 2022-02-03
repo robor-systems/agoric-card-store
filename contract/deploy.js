@@ -61,6 +61,11 @@ export default async function deployContract(
   const bundle = await bundleSource(pathResolve(`./src/contract.js`));
   const installation = await E(zoe).install(bundle);
 
+  // CMT (haseeb@robor.systems): Following lines of code provide:
+  // - The bundle URL of the secondary store contract.
+  // - The bundle path name.
+  // - Using the path name the contract is bundled up.
+  // - The bundle is then installed on zoe and an installation object is returned.
   const swapbundleUrl = await importMetaResolve(
     './src/secondaryStore.js',
     import.meta.url,
@@ -69,6 +74,11 @@ export default async function deployContract(
   const swapBundle = await bundleSource(swapbundlePath);
   const swapInstallation = await E(zoe).install(swapBundle);
 
+  // CMT (haseeb@robor.systems): Following lines of code provide:
+  // - The bundle URL of the secondary store wrapper contract.
+  // - The bundle path name.
+  // - Using the path name the contract is bundled up.
+  // - The bundle is then installed on zoe and an installation object is returned.
   const swapWrapperBundleUrl = await importMetaResolve(
     './src/secondaryStoreWrapper.js',
     import.meta.url,
@@ -77,7 +87,11 @@ export default async function deployContract(
   const swapWrapperBundle = await bundleSource(swapWrapperBundlePath);
   const swapWrapperInstallation = await E(zoe).install(swapWrapperBundle);
 
-  // We also need to bundle and install the auctionItems contract
+  // CMT (haseeb@robor.systems): Following lines of code provide:
+  // - The bundle URL of the auctionItems contract
+  // - The bundle path name.
+  // - Using the path name the contract is bundled up.
+  // - The bundle is then installed on zoe and an installation object is returned.
   const bundleUrl = await importMetaResolve(
     './src/auctionItems.js',
     import.meta.url,
@@ -86,7 +100,11 @@ export default async function deployContract(
   const auctionItemsBundle = await bundleSource(bundlePath);
   const auctionItemsInstallation = await E(zoe).install(auctionItemsBundle);
 
-  // Auction logic, hope that we can add this to Zoe later
+  // CMT (haseeb@robor.systems): Following lines of code provide:
+  // - The bundle URL of the auction logic
+  // - The bundle path name.
+  // - Using the path name the contract is bundled up.
+  // - The bundle is then installed on zoe and an installation object is returned.
   const auctionBundleUrl = await importMetaResolve(
     '@agoric/zoe/src/contracts/auction/index.js',
     import.meta.url,

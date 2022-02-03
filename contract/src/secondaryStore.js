@@ -34,21 +34,37 @@ import {
  */
 
 const start = (zcf) => {
+  // CMT (haseeb@robor.systems): Making an assertion that the issuerKeyWordRecord has the same key as defined in the assertion.
   assertIssuerKeywords(zcf, harden(['Items', 'Money']));
   /** @type {OfferHandler} */
+  // CMT (haseeb@robor.systems): makeMatchingInvitation is the an offer handler and it is called when the seller seat
+  // is used to get the offer results of the offer created by the seller. It returns an invitation Payment which is resolved into
+  // an exclusive invitation for the buyer.
   const makeMatchingInvitation = (SellerSeat) => {
+    // CMT (haseeb@robor.systems): Making assertion that the proposal structure is the same as defined in the assertion.
     assertProposalShape(SellerSeat, {
       give: { Items: null },
       want: { Money: null },
       exit: { onDemand: null },
     });
+    // CMT (haseeb@robor.systems): Using the seller seat to get the proposal used to created the offer.
     const { want, give } = SellerSeat.getProposal();
     /** @type {OfferHandler} */
+
+    // CMT (haseeb@robor.systems): matchingSeatOfferHandler is the offerHandler for the buyer offer. This handler is called
+    // when the buyer makes an offer in response to the seller offer using the exclusive invitation. If the offer is valid
+    // this handler swaps the assets between seller and buyer and the instance of the contract is shutdown.
     const matchingSeatOfferHandler = (buyerMatchingSeat) => {
+      // CMT (haseeb@robor.systems): swap function swaps the assets amounts between seller and buyer and allocates these
+      // these swapper amount to the respective seat. The seats are exited when the swap is completed.
       const swapResult = swap(zcf, SellerSeat, buyerMatchingSeat);
+      // CMT (haseeb@robor.systems): zcf.shutdown() shuts down the instance of the contract.
       zcf.shutdown();
+      // CMT (haseeb@robor.systems): The swapResult is just a default string.
       return swapResult;
     };
+
+    // CMT (haseeb@robor.systems): matchingSeatInvitation returns the invitation payment when seller seat asks for result of the offer.
     const matchingSeatInvitation = zcf.makeInvitation(
       matchingSeatOfferHandler,
       'matchOffer',
@@ -60,6 +76,7 @@ const start = (zcf) => {
     return matchingSeatInvitation;
   };
 
+  // CMT (haseeb@robor.systems): creatorInvitation is the invitation used to create the first offer.
   const creatorInvitation = zcf.makeInvitation(
     makeMatchingInvitation,
     'firstOffer',
