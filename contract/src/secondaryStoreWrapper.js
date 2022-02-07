@@ -1,6 +1,6 @@
 /**
  * @file An abstraction over the secondary store contract.
- * @author Robor <info@robor.tech>
+ * @author Hussain <haseeb.asim@robor.systems>
  */
 
 // @ts-check

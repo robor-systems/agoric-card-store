@@ -1,6 +1,6 @@
 /**
  * @file Safely swaps the digital assets between two parties.
- * @author Robor <info@robor.tech>
+ * @author Hussain <hussain.rizvi@robor.systems>
  */
 
 // @ts-check
