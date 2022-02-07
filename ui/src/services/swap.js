@@ -61,6 +61,7 @@ const makeMatchingInvitation = async ({
     cardPurse.brand,
     harden([{ ...cardDetail, boughtFor: sellingPrice }]),
   );
+  console.log(NFTAmountForAddition, 'NFTAmountForAddition');
   console.log('amount:', offerAmount);
   setLoading(false);
   onClose();

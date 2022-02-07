@@ -92,7 +92,7 @@ body,
 
   .card {
     width: 360px;
-    height: 490px;
+    max-height: 490px;
   }
 
   .card-image-only {

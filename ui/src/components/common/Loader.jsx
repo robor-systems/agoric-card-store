@@ -9,7 +9,9 @@ function Loader({ color, size }) {
           size !== undefined ? size : 8
         } border-2 border-${
           !color ? 'secondary' : color
-        } border-solid rounded-full animate-spin ${color && 'absolute right-3'}`}
+        } border-solid rounded-full animate-spin ${
+          color && 'absolute right-3'
+        }`}
       ></div>
     </div>
   );

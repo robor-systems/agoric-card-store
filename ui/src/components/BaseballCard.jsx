@@ -19,7 +19,7 @@ const BaseballCard = ({
   return (
     <div
       className={`transition-all duration-300 flex flex-col py-3 border border-alternativeLight card card-shadow rounded-md ${
-        (imageOnly && 'card-image-only py-2.5') || (onAuction && 'py-10')
+        imageOnly && 'card-image-only py-2.5'
       }`}
     >
       <div
@@ -89,7 +89,7 @@ const BaseballCard = ({
               </p>
               <p className="text-lg">
                 {type === 'Buy Product' || onSale
-                  ? stringifyValueRUN(cardDetail.sellingPrice, {
+                  ? stringifyValueRUN(cardDetail.price, {
                       decimalPlaces: 6,
                     })
                   : stringifyValueRUN(cardDetail.boughtFor, {

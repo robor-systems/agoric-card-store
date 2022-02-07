@@ -31,6 +31,14 @@ function AddNewNFTForm({ tokenDisplayInfo, handleNFTMint }) {
         attributes,
       };
       // console.log(cardDetails);
+      setForm({
+        title: '',
+        image: '',
+        creatorName: '',
+        price: '',
+        description: '',
+      });
+      setAttributes([]);
       handleNFTMint({ cardDetails });
     } catch (error) {
       console.log(error);
