@@ -1,3 +1,8 @@
+/**
+ * @file An abstraction over the secondary store contract.
+ * @author Hussain <haseeb.asim@robor.systems>
+ */
+
 // @ts-check
 import '@agoric/zoe/exported';
 
