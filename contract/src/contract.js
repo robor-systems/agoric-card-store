@@ -4,9 +4,7 @@ import '@agoric/zoe/exported';
 import { makeIssuerKit, AssetKind, AmountMath } from '@agoric/ertp';
 import { Far } from '@agoric/marshal';
 import { E } from '@agoric/eventual-send';
-
 import { FIRST_PRICE } from '@agoric/zoe/src/contracts/auction';
-
 /**
  * This contract mints non-fungible tokens (baseball cards) and creates a contract
  * instance to auction the cards in exchange for some sort of money.
@@ -38,6 +36,7 @@ const start = (zcf) => {
     // https://github.com/Agoric/agoric-sdk/issues/855
     const proposal = harden({
       give: { Items: newCardsForSaleAmount },
+      exit: { onDemand: null },
     });
     const paymentKeywordRecord = harden({ Items: allCardsForSalePayment });
 
@@ -47,7 +46,7 @@ const start = (zcf) => {
     });
 
     const auctionItemsTerms = harden({
-      bidDuration: 300n,
+      bidDuration: 1n,
       winnerPriceOption: FIRST_PRICE,
       ...zcf.getTerms(),
       auctionInstallation,
@@ -78,12 +77,23 @@ const start = (zcf) => {
     });
   };
 
+  const mintUserCard = async (cardDetails) => {
+    const newUserCardAmount = AmountMath.make(brand, harden([cardDetails]));
+    const newUserCardPayment = mint.mintPayment(harden(newUserCardAmount));
+    return harden(newUserCardPayment);
+  };
+
+  const publicFacet = Far('PublicFacet for card store', {
+    mintUserCard,
+  });
+
   const creatorFacet = Far('Card store creator', {
     auctionCards,
+    getMinter: () => mint,
     getIssuer: () => issuer,
   });
 
-  return harden({ creatorFacet });
+  return harden({ creatorFacet, publicFacet });
 };
 
 harden(start);

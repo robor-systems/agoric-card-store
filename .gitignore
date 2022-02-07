@@ -4,3 +4,4 @@ _agstate/yarn-links/
 ui/.cache/
 ui/dist/
 ui/build
+ui/src/conf

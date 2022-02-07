@@ -2,123 +2,133 @@
 @tailwind components;
 @tailwind utilities;
 
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root,
+.App {
+  height: 100%;
 }
 
 :root {
-    --color-secondary: #3EB2FF;
-    --color-secondary-dark: #29A9FF;
-    --color-alternative: #EB5757;
-    --color-alternative-light: #CFCFCF;
-    --color-field:#F1F1F1;
-    --color-primary: #363636;
-    --color-primary-light: #A1A1A1;
+  --color-secondary: #3eb2ff;
+  --color-secondary-dark: #29a9ff;
+  --color-alternative: #eb5757;
+  --color-alternative-light: #cfcfcf;
+  --color-field: #f1f1f1;
+  --color-primary: #363636;
+  --color-primary-light: #a1a1a1;
 }
 
-@layer base{
-    p,span,h1,h2{
-        @apply text-primary;
-    }
+@layer base {
+  p,
+  span,
+  h1,
+  h2 {
+    @apply text-primary;
+  }
 
-    select{
-        appearance:none;
-        -moz-appearance:none;
-        -webkit-appearance:none;
-    }
+  select {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+  }
 
-    input::placeholder{
-        color:var(--color-primary-light)
-    }
-    
-    select::placeholder{
-        color:var(--color-primary)
-    }
+  input::placeholder {
+    color: var(--color-primary-light);
+  }
 
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-    input[type=number] {
-        appearance: none;
-        -moz-appearance: none;
-    }
+  select::placeholder {
+    color: var(--color-primary);
+  }
 
-    input[type="date"]::-webkit-calendar-picker-indicator {
-        display: none;
-        -webkit-appearance: none;
-    }
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    appearance: none;
+    -moz-appearance: none;
+  }
+
+  input[type='date']::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+  }
 }
 
 @layer utilities {
-    .nav-shadow{
-        box-shadow: 0px 3px 8px #0000001F;
-    }
-    
-    .modal-shadow{
-        box-shadow: 0px 6px 16px #00000029;
-    }
+  .nav-shadow {
+    box-shadow: 0px 3px 8px #0000001f;
+  }
 
-    .btn-shadow:hover{
-        box-shadow: 0px 3px 6px #00000029;
-    }
+  .modal-shadow {
+    box-shadow: 0px 6px 16px #00000029;
+  }
 
-    .modal{
-        max-height:640px !important;        
-    }
+  .btn-shadow:hover {
+    box-shadow: 0px 3px 6px #00000029;
+  }
+/* 
+  .modal {
+    max-height: 640px !important;
+  } */
 
-    .modal-img{
-        width:1269px;
-    }
+  .modal-img {
+    width: 1269px;
+  }
 
-    .modal::-webkit-scrollbar {
-        display: none;
-    }
+  .modal::-webkit-scrollbar {
+    display: none;
+  }
 
-    .card {
-        width:360px;
-        height:490px;
-    }
+  .card {
+    width: 360px;
+    height: 490px;
+  }
 
-    .card-image-only{
-        width:308px !important;
-        height: 377px !important;;
-    }
+  .card-image-only {
+    width: 308px !important;
+    height: 377px !important;
+  }
 
-    .card:hover{
-        box-shadow: 0px 6px 18px #00000029;
-    }
+  .card:hover {
+    box-shadow: 0px 6px 18px #00000029;
+  }
 
-    .card-media{
-        width:336px;
-        height:336px;
-    }
+  .card-media {
+    width: 336px;
+    height: 336px;
+  }
 
-    .card-media-small{
-        width: 288px !important;;
-        height: 288px !important;
-    }
+  .card-media-small {
+    width: 288px !important;
+    height: 288px !important;
+  }
 
-    .media-action,
-    .overlay,
-    .media-action-expand{
-        visibility:hidden;
-    }
+  .media-action,
+  .overlay,
+  .media-action-expand {
+    visibility: hidden;
+  }
 
-    .card-media:hover .overlay, 
-    .card-media:hover .media-action, 
-    .card-media:hover .media-action-expand {
-        visibility:visible;
-    }
+  .card-media:hover .overlay,
+  .card-media:hover .media-action,
+  .card-media:hover .media-action-expand {
+    visibility: visible;
+  }
 
-    .display-card{
-        margin: 72px auto ;
-    }
+  .display-card {
+    margin: 72px auto;
+  }
 
-    .form{
-        width:336px;
-    }
+  .form {
+    width: 336px;
+  }
 }

@@ -53,13 +53,29 @@ export default async function deployContract(
     // second time, the original id is just returned.
     board,
   } = home;
-
+  
   // First, we must bundle up our contract code (./src/contract.js)
   // and install it on Zoe. This returns an installationHandle, an
   // opaque, unforgeable identifier for our contract code that we can
   // reuse again and again to create new, live contract instances.
   const bundle = await bundleSource(pathResolve(`./src/contract.js`));
   const installation = await E(zoe).install(bundle);
+
+  const swapbundleUrl = await importMetaResolve(
+    './src/secondaryStore.js',
+    import.meta.url,
+  );
+  const swapbundlePath = new URL(swapbundleUrl).pathname;
+  const swapBundle = await bundleSource(swapbundlePath);
+  const swapInstallation = await E(zoe).install(swapBundle);
+
+  const swapWrapperBundleUrl = await importMetaResolve(
+    './src/secondaryStoreWrapper.js',
+    import.meta.url,
+  );
+  const swapWrapperBundlePath = new URL(swapWrapperBundleUrl).pathname;
+  const swapWrapperBundle = await bundleSource(swapWrapperBundlePath);
+  const swapWrapperInstallation = await E(zoe).install(swapWrapperBundle);
 
   // We also need to bundle and install the auctionItems contract
   const bundleUrl = await importMetaResolve(
@@ -90,11 +106,15 @@ export default async function deployContract(
   // strings to objects.
   const CONTRACT_NAME = 'cardStore';
   const INSTALLATION_BOARD_ID = await E(board).getId(installation);
+  const SWAP_INSTALLATION_BOARD_ID = await E(board).getId(swapInstallation);
   const AUCTION_ITEMS_INSTALLATION_BOARD_ID = await E(board).getId(
     auctionItemsInstallation,
   );
   const AUCTION_INSTALLATION_BOARD_ID = await E(board).getId(
     auctionInstallation,
+  );
+  const SWAP_WRAPPER_INSTALLATION_BOARD_ID = await E(board).getId(
+    swapWrapperInstallation,
   );
   console.log('- SUCCESS! contract code installed on Zoe');
   console.log(`-- Contract Name: ${CONTRACT_NAME}`);
@@ -105,6 +125,10 @@ export default async function deployContract(
   console.log(
     `-- Auction Items Installation Board Id: ${AUCTION_ITEMS_INSTALLATION_BOARD_ID}`,
   );
+  console.log(`-- Swap Installation Board Id: ${SWAP_INSTALLATION_BOARD_ID}`);
+  console.log(
+    `-- Swap Wrapper Installation Board Id: ${SWAP_WRAPPER_INSTALLATION_BOARD_ID}`,
+  );
 
   // Save the constants somewhere where the UI and api can find it.
   const dappConstants = {
@@ -112,6 +136,8 @@ export default async function deployContract(
     INSTALLATION_BOARD_ID,
     AUCTION_INSTALLATION_BOARD_ID,
     AUCTION_ITEMS_INSTALLATION_BOARD_ID,
+    SWAP_INSTALLATION_BOARD_ID,
+    SWAP_WRAPPER_INSTALLATION_BOARD_ID,
   };
   const defaultsFolder = pathResolve(`../ui/src/conf`);
   const defaultsFile = pathResolve(`../ui/src/conf/installationConstants.js`);
