@@ -34,6 +34,5 @@ export function stringifyValue(value, displayInfo) {
 export function stringifyValueRUN(value, displayInfo) {
   const { assetKind = AssetKind.NAT } = displayInfo || {};
   const val = formatValue(value, assetKind, 6, 0);
-  console.log(value, 'testing val');
   return val.toString().concat(' RUN');
 }

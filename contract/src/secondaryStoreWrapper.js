@@ -12,7 +12,24 @@ import { makeNotifierKit } from '@agoric/notifier';
 import { AmountMath } from '@agoric/ertp';
 
 /**
+ * The secondary store wrapper is an abstraction over the secondary store contract. This abstraction is responsible for
+ * providing the seller seat, keeping account of all the offers and their values.
  *
+ * The getSellerSeat function creates an instance of the secondary store contract which returns a creator invitation. Using this
+ * invitation an offer is created which also requires a proposal and a paymentKeywordRecord. The proposal contains the amounts of
+ * the assets that are to be exchanged. The paymentKeyword Record holds the payment of the asset that the seller has to give when the
+ * offer resolves. When the offer is created it return a seller seat that resolves into an invitation that the buyer can use to buy the
+ * baseball card.
+ *
+ * The notifiers in the abstraction are responsible for storing the details of every offer that is created by getSellerSeat function.
+ * The userOwnedNftsUpdater function sends an update to the front-end every time an offer is created or resolved, so that only those cards
+ * can be displayed on sale for which an offer has been created.
+ *
+ * The seller seat is resolved into an invitation at the front-end. The reason for this is that we need to have access to the wallet bridge which
+ * is used to send an offer to the wallet. The offer contains the reference of the buyer invitation and the original proposal. When the user accepts the offer,
+ * the wallet creates a payment of the asset that is to be swapped and required by the seller. The wallet creates an offer and send it to the secondary store contract,
+ * which swaps the assets and return them to the respective parties. The baseball card automatically goes into the wallet of the buyer and the seller receives
+ * the asset they wanted into there payout.
  *
  * @type {ContractStartFn}
  */
