@@ -61,7 +61,7 @@ export default async function deployContract(
   const bundle = await bundleSource(pathResolve(`./src/contract.js`));
   const installation = await E(zoe).install(bundle);
 
-  // CMT (haseeb@robor.systems): Following lines of code provide:
+  // CMT (haseeb.asim@robor.systems): Following lines of code provide:
   // - The bundle URL of the secondary store contract.
   // - The bundle path name.
   // - Using the path name the contract is bundled up.
@@ -74,7 +74,7 @@ export default async function deployContract(
   const swapBundle = await bundleSource(swapbundlePath);
   const swapInstallation = await E(zoe).install(swapBundle);
 
-  // CMT (haseeb@robor.systems): Following lines of code provide:
+  // CMT (haseeb.asim@robor.systems): Following lines of code provide:
   // - The bundle URL of the secondary store wrapper contract.
   // - The bundle path name.
   // - Using the path name the contract is bundled up.
@@ -87,7 +87,7 @@ export default async function deployContract(
   const swapWrapperBundle = await bundleSource(swapWrapperBundlePath);
   const swapWrapperInstallation = await E(zoe).install(swapWrapperBundle);
 
-  // CMT (haseeb@robor.systems): Following lines of code provide:
+  // CMT (haseeb.asim@robor.systems): Following lines of code provide:
   // - The bundle URL of the auctionItems contract
   // - The bundle path name.
   // - Using the path name the contract is bundled up.
@@ -100,7 +100,7 @@ export default async function deployContract(
   const auctionItemsBundle = await bundleSource(bundlePath);
   const auctionItemsInstallation = await E(zoe).install(auctionItemsBundle);
 
-  // CMT (haseeb@robor.systems): Following lines of code provide:
+  // CMT (haseeb.asim@robor.systems): Following lines of code provide:
   // - The bundle URL of the auction logic
   // - The bundle path name.
   // - Using the path name the contract is bundled up.

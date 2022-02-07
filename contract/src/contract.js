@@ -77,7 +77,7 @@ const start = (zcf) => {
     });
   };
 
-  // CMT (haseeb@robor.systems)
+  // CMT (haseeb.asim@robor.systems)
   // The mintUserCard function accepts details of the asset and using these details,
   // it creates an Amount which is used to mint a payment of the asset, this payment
   // is then passed to front-end where it is deposited into the wallet.
@@ -87,7 +87,7 @@ const start = (zcf) => {
     return harden(newUserCardPayment);
   };
 
-  // CMT (haseeb@robor.systems): The public facet for contract.js
+  // CMT (haseeb.asim@robor.systems): The public facet for contract.js
   const publicFacet = Far('PublicFacet for card store', {
     mintUserCard,
   });

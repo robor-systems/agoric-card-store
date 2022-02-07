@@ -45,10 +45,10 @@ const start = (zcf) => {
 
   assertNatAssetKind(zcf, moneyBrand);
 
-  // CMT (haseeb@robor.systems): The amount that contains all the information of the sales that has been made through primary-marketplace
+  // CMT (haseeb.asim@robor.systems): The amount that contains all the information of the sales that has been made through primary-marketplace
   let userSaleHistory = AmountMath.make(brands.Items, harden([]));
 
-  // CMT (haseeb@robor.systems):The notifiers that are used to notify the front-end about the existing sale history or update the front-end in case a new sale has been completed.
+  // CMT (haseeb.asim@robor.systems):The notifiers that are used to notify the front-end about the existing sale history or update the front-end in case a new sale has been completed.
   const {
     notifier: userSaleHistoryNotifier,
     updater: userSaleHistoryUpdater,

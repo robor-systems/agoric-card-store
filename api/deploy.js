@@ -65,7 +65,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
   // grab the installation that our contract deploy script put
   // in the public board.
 
-  // CMT (haseeb@robor.systems): These constants contain the board ids of the installation of all the contracts in card-store-dapp.
+  // CMT (haseeb.asim@robor.systems): These constants contain the board ids of the installation of all the contracts in card-store-dapp.
   const {
     INSTALLATION_BOARD_ID,
     AUCTION_INSTALLATION_BOARD_ID,
@@ -75,23 +75,23 @@ export default async function deployApi(homePromise, { pathResolve }) {
     CONTRACT_NAME,
   } = installationConstants;
 
-  // CMT (haseeb@robor.systems): Fetching the installation of the contract.js from the board.
+  // CMT (haseeb.asim@robor.systems): Fetching the installation of the contract.js from the board.
   const installation = await E(board).getValue(INSTALLATION_BOARD_ID);
 
-  // CMT (haseeb@robor.systems): Fetching the installation of the auctionItems.js from the board.
+  // CMT (haseeb.asim@robor.systems): Fetching the installation of the auctionItems.js from the board.
   const auctionItemsInstallation = await E(board).getValue(
     AUCTION_ITEMS_INSTALLATION_BOARD_ID,
   );
 
-  // CMT (haseeb@robor.systems): Fetching the installation of the auction logic from the board.
+  // CMT (haseeb.asim@robor.systems): Fetching the installation of the auction logic from the board.
   const auctionInstallation = await E(board).getValue(
     AUCTION_INSTALLATION_BOARD_ID,
   );
 
-  // CMT (haseeb@robor.systems): Fetching the installation of the secondary Store.js from the board.
+  // CMT (haseeb.asim@robor.systems): Fetching the installation of the secondary Store.js from the board.
   const swapInstallation = await E(board).getValue(SWAP_INSTALLATION_BOARD_ID);
 
-  // CMT (haseeb@robor.systems): Fetching the installation of the secondary Store Wrapper from the board.
+  // CMT (haseeb.asim@robor.systems): Fetching the installation of the secondary Store Wrapper from the board.
   const swapWrapperInstallation = await E(board).getValue(
     SWAP_WRAPPER_INSTALLATION_BOARD_ID,
   );
@@ -110,30 +110,30 @@ export default async function deployApi(homePromise, { pathResolve }) {
    * @type {ERef<Issuer>}
    */
 
-  // CMT (haseeb@robor.systems): Fetching the promise of issuer of RUN currency from the board
+  // CMT (haseeb.asim@robor.systems): Fetching the promise of issuer of RUN currency from the board
   const moneyIssuerP = E(home.agoricNames).lookup('issuer', 'RUN');
 
-  // CMT (haseeb@robor.systems): Fetching the promise of brand of RUN currency from the board.
+  // CMT (haseeb.asim@robor.systems): Fetching the promise of brand of RUN currency from the board.
   const moneyBrandP = E(moneyIssuerP).getBrand();
 
-  // CMT (haseeb@robor.systems): Resolving the promises to obtain issuer, brand and display info of RUN currency.
+  // CMT (haseeb.asim@robor.systems): Resolving the promises to obtain issuer, brand and display info of RUN currency.
   const [moneyIssuer, moneyBrand, { decimalPlaces = 0 }] = await Promise.all([
     moneyIssuerP,
     moneyBrandP,
     E(moneyBrandP).getDisplayInfo(),
   ]);
 
-  // CMT (haseeb@robor.systems): Cards Array from card.js. Hardening it so that it becomes immutable.
+  // CMT (haseeb.asim@robor.systems): Cards Array from card.js. Hardening it so that it becomes immutable.
   const allCardNames = harden(cards);
 
-  // CMT (haseeb@robor.systems): Calculation of the price of each card.
+  // CMT (haseeb.asim@robor.systems): Calculation of the price of each card.
   const moneyValue =
     PRICE_PER_CARD_IN_MONEY_UNITS * 10n ** BigInt(decimalPlaces);
 
-  // CMT (haseeb@robor.systems): Minimum Bid Amount for each card.
+  // CMT (haseeb.asim@robor.systems): Minimum Bid Amount for each card.
   const minBidPerCard = AmountMath.make(moneyBrand, moneyValue);
 
-  // CMT (haseeb@robor.systems): Calling the auctionCards function form the contract.js using it's public facet.
+  // CMT (haseeb.asim@robor.systems): Calling the auctionCards function form the contract.js using it's public facet.
   // The function takes in the required params and creates an instance of the auctionItems contract and returns it's public facet
   //  and instance.
   const {
@@ -148,49 +148,49 @@ export default async function deployApi(homePromise, { pathResolve }) {
     chainTimerService,
   );
 
-  // CMT (haseeb@robor.systems): Using the publicFacet of contract.js to get the minter for the baseball cards.
+  // CMT (haseeb.asim@robor.systems): Using the publicFacet of contract.js to get the minter for the baseball cards.
   const minter = await E(baseballCardSellerFacet).getMinter();
 
   console.log('- SUCCESS! contract instance is running on Zoe');
   console.log('Retrieving Board IDs for issuers and brands');
 
-  // CMT (haseeb@robor.systems): Fetching promise of the global issuer for invitations.
+  // CMT (haseeb.asim@robor.systems): Fetching promise of the global issuer for invitations.
   const invitationIssuerP = E(zoe).getInvitationIssuer();
 
-  // CMT (haseeb@robor.systems): Fetching promise of invitation brand using invitation issuer.
+  // CMT (haseeb.asim@robor.systems): Fetching promise of invitation brand using invitation issuer.
   const invitationBrandP = E(invitationIssuerP).getBrand();
 
-  // CMT (haseeb@robor.systems): Using the publicFacet of the contract.js, fetching promise of issuer of the baseball cards.
+  // CMT (haseeb.asim@robor.systems): Using the publicFacet of the contract.js, fetching promise of issuer of the baseball cards.
   const cardIssuerP = E(publicFacet).getItemsIssuer();
 
-  // CMT (haseeb@robor.systems): Resolving all the above promises to obtain cardIssuer, cardBrand, invitationBrand.
+  // CMT (haseeb.asim@robor.systems): Resolving all the above promises to obtain cardIssuer, cardBrand, invitationBrand.
   const [cardIssuer, cardBrand, invitationBrand] = await Promise.all([
     cardIssuerP,
     E(cardIssuerP).getBrand(),
     invitationBrandP,
   ]);
 
-  // CMT (haseeb@robor.systems): Creating issuerKeyWordRecord for Secondary Store Wrapper which contains
+  // CMT (haseeb.asim@robor.systems): Creating issuerKeyWordRecord for Secondary Store Wrapper which contains
   // all the issuer that are required in the contract.
   const issuerKeywordRecord = harden({
     Items: cardIssuer,
     Money: moneyIssuer,
   });
 
-  // CMT (haseeb@robor.systems): Secondary Store Wrapper terms which can be accessed within the instance.
+  // CMT (haseeb.asim@robor.systems): Secondary Store Wrapper terms which can be accessed within the instance.
   const swapWrapperTerms = harden({
     swapInstallation,
     cardMinter: minter,
   });
 
-  // CMT (haseeb@robor.systems): Creating an instance of the  secondary store wrapper and getting the instance.
+  // CMT (haseeb.asim@robor.systems): Creating an instance of the  secondary store wrapper and getting the instance.
   const { instance: swapWrapperInstance } = await E(zoe).startInstance(
     swapWrapperInstallation,
     issuerKeywordRecord,
     swapWrapperTerms,
   );
 
-  // CMT (haseeb@robor.systems): Storing each important variable on the board and getting their board ids.
+  // CMT (haseeb.asim@robor.systems): Storing each important variable on the board and getting their board ids.
   const [
     INSTANCE_BOARD_ID,
     CARD_BRAND_BOARD_ID,
