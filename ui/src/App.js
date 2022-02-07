@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './styles/global.css';
 
+import { useParams } from 'react-router-dom';
 import Header from './components/Header.jsx';
 import CardDisplay from './components/CardDisplay.jsx';
 import ApproveOfferSnackbar from './components/ApproveOfferSnackbar.jsx';
@@ -12,9 +13,11 @@ import ModalContent from './components/ModalContent';
 
 import Main from './services/main';
 import { useApplicationContext } from './context/Application';
+import NFTCreationSnackbar from './components/NFTCreationSnackbar';
+import { setActiveTab } from './store/store';
 
-function App(props) {
-  console.log(props, 'props');
+function App() {
+  const { activeTab } = useParams();
 
   const {
     state,
@@ -27,7 +30,27 @@ function App(props) {
   } = useApplicationContext();
 
   const { activeCard, openExpandModal } = state;
+  useEffect(() => {
+    console.log(activeTab, 'activeTab::');
+    switch (activeTab) {
+      case 'mycards':
+        dispatch(setActiveTab(0));
+        break;
+      case 'marketplace':
+        dispatch(setActiveTab(1));
+        break;
+      case 'primarysales':
+        dispatch(setActiveTab(2));
+        break;
+      case 'create':
+        dispatch(setActiveTab(3));
+        break;
 
+      default:
+        dispatch(setActiveTab(0));
+        break;
+    }
+  }, []);
   const {
     handleCardBidOpen,
     submitCardOffer,
@@ -87,6 +110,7 @@ function App(props) {
       <EnableAppDialog />
       <ApproveOfferSnackbar />
       <BoughtCardSnackbar />
+      <NFTCreationSnackbar />
     </div>
   );
 }

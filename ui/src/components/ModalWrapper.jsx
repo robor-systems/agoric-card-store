@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+
 import CancelIcon from '../assets/icons/cancel.png';
 
 const ModalWrapper = ({ open, onClose, children, style }) => {
+  useEffect(() => {
+    window.addEventListener('keyup', onClose, false);
+    return () => {
+      window.removeEventListener('keyup', onClose, false);
+    };
+  }, []);
+
   return (
     open && (
       <div className="fixed inset-0 h-full w-full">

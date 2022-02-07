@@ -69,6 +69,7 @@ function ModalContent({
             <SellProductForm
               makeSwapInvitation={makeSwapInvitation}
               tokenDisplayInfo={tokenDisplayInfo}
+              cardPrice={cardDetail.boughtFor || cardDetail.price}
               onClose={onClose}
             />
           </div>

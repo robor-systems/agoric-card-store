@@ -1,7 +1,7 @@
 import React from 'react';
 import CalenderIcon from '../../assets/icons/date-icon.png';
 
-function DateTimeField({ noLabels = false }) {
+function DateTimeField({ noLabels = false, disabled }) {
   return (
     <div>
       {!noLabels && (
@@ -12,6 +12,7 @@ function DateTimeField({ noLabels = false }) {
       )}
       <div className="flex relative justify-between  border border-alternativeLight rounded items-center">
         <input
+          disabled={disabled}
           type="date"
           className="w-full h-12 pl-4 outline-none pr-4 focus:outline-none text-primaryLight"
         />

@@ -25,6 +25,7 @@ export const {
     setUserNfts,
     setUserCards,
     setNeedToApproveOffer,
+    setCreationSnackbar,
   },
 } = autodux({
   slice: 'cardStore',
@@ -48,6 +49,7 @@ export const {
     userNfts: [],
     userCards: [],
     needToApproveOffer: false,
+    creationSnackbar: false,
   },
   actions: {},
 });

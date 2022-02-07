@@ -8,6 +8,7 @@ function Input({
   type = 'number',
   noLabel,
   fieldName,
+  placeHolder,
 }) {
   return (
     <div>
@@ -20,7 +21,7 @@ function Input({
         <input
           type={type}
           className="outline-none focus:outline-none w-full h-12 rounded pl-4 "
-          placeholder={type === 'number' ? '0.00' : label}
+          placeholder={type === 'number' ? '0.00' : placeHolder || label}
           value={value}
           required={true}
           name={fieldName}

@@ -124,6 +124,7 @@ const Main = (
       publicFacet,
       CARD_BRAND_BOARD_ID,
       cardPurse,
+      dispatch,
     });
   };
   return {

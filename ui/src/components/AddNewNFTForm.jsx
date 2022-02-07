@@ -5,8 +5,11 @@ import Button from './common/Button';
 import Input from './common/InputField';
 import { makeValue } from '../utils/amount';
 import AttributeSelectorForm from './AttributeSelectorForm';
+import { setCreationSnackbar } from '../store/store';
+import { useApplicationContext } from '../context/Application';
 
 function AddNewNFTForm({ tokenDisplayInfo, handleNFTMint }) {
+  const { dispatch } = useApplicationContext();
   const [Form, setForm] = useState({
     title: '',
     image: '',
@@ -39,6 +42,7 @@ function AddNewNFTForm({ tokenDisplayInfo, handleNFTMint }) {
         description: '',
       });
       setAttributes([]);
+      dispatch(setCreationSnackbar(true));
       handleNFTMint({ cardDetails });
     } catch (error) {
       console.log(error);
@@ -80,7 +84,8 @@ function AddNewNFTForm({ tokenDisplayInfo, handleNFTMint }) {
         handleChange={(val) => {
           setForm({ ...Form, image: val });
         }}
-        label="Image url"
+        label="Image CID"
+        placeHolder="Please provide a valid ipfs CID"
         type="text"
       />
       <Input

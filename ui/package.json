@@ -106,7 +106,8 @@
     "is-ipfs": "6.0.2",
     "axios": "0.25.0",
     "nanoid": "^3.2.0",
-    "autodux": "^5.0.3"
+    "autodux": "^5.0.3",
+    "react-router-dom":"5.3.0"
   },
   "devDependencies": {
     "@babel/eslint-plugin": "^7.12.1",
