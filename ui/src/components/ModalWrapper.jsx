@@ -3,10 +3,15 @@ import React, { useEffect } from 'react';
 import CancelIcon from '../assets/icons/cancel.png';
 
 const ModalWrapper = ({ open, onClose, children, style }) => {
+  const handleKeyClose = (e) => {
+    if (e.key === 'Escape') {
+      onClose();
+    }
+  };
   useEffect(() => {
-    window.addEventListener('keyup', onClose, false);
+    window.addEventListener('keyup', handleKeyClose, false);
     return () => {
-      window.removeEventListener('keyup', onClose, false);
+      window.removeEventListener('keyup', handleKeyClose, false);
     };
   }, []);
 
