@@ -5,6 +5,7 @@ import { makeIssuerKit, AssetKind, AmountMath } from '@agoric/ertp';
 import { Far } from '@agoric/marshal';
 import { E } from '@agoric/eventual-send';
 import { FIRST_PRICE } from '@agoric/zoe/src/contracts/auction';
+import { addToUserSaleHistory } from './auctionItems';
 /**
  * This contract mints non-fungible tokens (baseball cards) and creates a contract
  * instance to auction the cards in exchange for some sort of money.
@@ -84,6 +85,8 @@ const start = (zcf) => {
   const mintUserCard = async (cardDetails) => {
     const newUserCardAmount = AmountMath.make(brand, harden([cardDetails]));
     const newUserCardPayment = mint.mintPayment(harden(newUserCardAmount));
+    console.log(addToUserSaleHistory);
+    addToUserSaleHistory(newUserCardAmount);
     return harden(newUserCardPayment);
   };
 

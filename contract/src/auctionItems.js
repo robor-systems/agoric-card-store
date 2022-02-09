@@ -13,6 +13,15 @@ import {
 } from '@agoric/zoe/src/contractSupport/index.js';
 import '@agoric/zoe/exported.js';
 
+// CMT (haseeb.asim@robor.systems): The amount that contains all the information of the sales that has been made through primary-marketplace
+let userSaleHistory;
+let cardBrand;
+// CMT (haseeb.asim@robor.systems):The notifiers that are used to notify the front-end about the existing sale history or update the front-end in case a new sale has been completed.
+const {
+  notifier: userSaleHistoryNotifier,
+  updater: userSaleHistoryUpdater,
+} = makeNotifierKit();
+
 /**
  * Auction a list of NFT items which identified by `string`, with timeAuthority, minBidPerItem,
  * needs {Money, Items}
@@ -42,18 +51,12 @@ const start = (zcf) => {
 
   const moneyBrand = brands.Money;
   const itemBrand = brands.Items;
-
+  cardBrand = itemBrand;
   assertNatAssetKind(zcf, moneyBrand);
 
-  // CMT (haseeb.asim@robor.systems): The amount that contains all the information of the sales that has been made through primary-marketplace
-  let userSaleHistory = AmountMath.make(brands.Items, harden([]));
-
-  // CMT (haseeb.asim@robor.systems):The notifiers that are used to notify the front-end about the existing sale history or update the front-end in case a new sale has been completed.
-  const {
-    notifier: userSaleHistoryNotifier,
-    updater: userSaleHistoryUpdater,
-  } = makeNotifierKit();
-
+  // CMT (haseeb.asim@robor.systems): Creating the amount that contains all the information of the sales that has been made through primary-marketplace
+  userSaleHistory = AmountMath.make(brands.Items, harden([]));
+  console.log(userSaleHistory, 'userSaleHistory');
   /** @type Record<string, AuctionSession> */
   const sellerSessions = {};
   let availableItems = AmountMath.make(itemBrand, harden([]));
@@ -232,24 +235,6 @@ const start = (zcf) => {
 
   const getUserSaleHistoryNotifier = () => userSaleHistoryNotifier;
   const getUserSaleHistory = () => userSaleHistory;
-  const addToUserSaleHistory = (cardAmount) => {
-    try {
-      const validatedAmount = AmountMath.coerce(brands.Items, cardAmount);
-      userSaleHistory = AmountMath.add(userSaleHistory, validatedAmount);
-      userSaleHistoryUpdater.updateState(userSaleHistory);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const removeFromUserSaleHistory = (cardAmount) => {
-    try {
-      const validatedAmount = AmountMath.coerce(brands.Items, cardAmount);
-      userSaleHistory = AmountMath.subtract(userSaleHistory, validatedAmount);
-      userSaleHistoryUpdater.updateState(userSaleHistory);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const publicFacet = Far('AuctionItemsPublicFacet', {
     getAvailableItems,
@@ -261,8 +246,6 @@ const start = (zcf) => {
     getSessionDetailsForKey,
     getUserSaleHistoryNotifier,
     getUserSaleHistory,
-    addToUserSaleHistory,
-    removeFromUserSaleHistory,
   });
 
   const creatorFacet = Far('AuctionItemsCreatorFacet', {
@@ -279,5 +262,28 @@ const start = (zcf) => {
   return harden({ creatorFacet, creatorInvitation, publicFacet });
 };
 
+const addToUserSaleHistory = (cardAmount) => {
+  try {
+    console.log(cardAmount);
+    console.log(userSaleHistory);
+    // const validatedAmount = AmountMath.coerce(cardAmount.brand, cardAmount);
+    userSaleHistory = AmountMath.add(userSaleHistory, cardAmount);
+    userSaleHistoryUpdater.updateState(userSaleHistory);
+  } catch (error) {
+    console.log(error);
+  }
+};
+const removeFromUserSaleHistory = (cardAmount) => {
+  try {
+    const validatedAmount = AmountMath.coerce(cardBrand.Items, cardAmount);
+    userSaleHistory = AmountMath.subtract(userSaleHistory, validatedAmount);
+    userSaleHistoryUpdater.updateState(userSaleHistory);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+harden(addToUserSaleHistory);
+harden(removeFromUserSaleHistory);
 harden(start);
-export { start };
+export { start, addToUserSaleHistory, removeFromUserSaleHistory };

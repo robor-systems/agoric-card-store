@@ -11,6 +11,16 @@ import { E } from '@agoric/eventual-send';
 import { makeNotifierKit } from '@agoric/notifier';
 import { AmountMath } from '@agoric/ertp';
 
+// CMT (haseeb.asim@robor.systems): AvailableOffers is an amount that stores all the important information about the offers that are created
+// using this contract. It helps in determining which card is on sale.
+let availableOffers;
+const walletP = {};
+// CMT (haseeb.asim@robor.systems): Available Offer Notifier is used to send updates regarding available offers to the front-end.
+const {
+  notifier: availableOfferNotifier,
+  updater: availableOfferUpdater,
+} = makeNotifierKit();
+
 /**
  * The secondary store wrapper is an abstraction over the secondary store contract. This abstraction is responsible for
  * providing the seller seat, keeping account of all the offers and their values.
@@ -42,15 +52,7 @@ const start = (zcf) => {
   // CMT (haseeb.asim@robor.systems) : zcf.getZoeService provides user-facing Zoe Service API to the contract code.
   const zoe = zcf.getZoeService();
 
-  // AvailableOffers is an amount that stores all the important information about the offers that are created
-  // using this contract. It helps in determining which card is on sale.
-  let availableOffers = AmountMath.make(brands.Items, harden([]));
-
-  // CMT (haseeb.asim@robor.systems): Available Offer Notifier is used to send updates regarding available offers to the front-end.
-  const {
-    notifier: availableOfferNotifier,
-    updater: availableOfferUpdater,
-  } = makeNotifierKit();
+  availableOffers = AmountMath.make(brands.Items, harden([]));
 
   // CMT (haseeb.asim@robor.systems): getSellerSeat function is used to create an offer for a specific asset (baseball card).
   // The function returns a seller seat which resolves into an exclusive buyer invitation that can be used to buy the asset on sale.
@@ -131,10 +133,9 @@ const start = (zcf) => {
   // CMT (haseeb.asim@robor.systems): A function to easily access the availableOffers amount at the front-end.
   const getAvailableOffers = () => availableOffers;
 
-  // CMT (haseeb.asim@robor.systems): A function to subtract the provided amount from the availableOffers.
-  const updateAvailableOffers = (cardAmount) => {
-    availableOffers = AmountMath.subtract(availableOffers, cardAmount);
-    availableOfferUpdater.updateState(availableOffers);
+  const setWalletP = (wallet, offerId) => {
+    walletP.ref = wallet;
+    walletP.offerId = offerId;
   };
 
   // CMT (haseeb.asim@robor.systems): publicFacet to access all the public function of the contract.
@@ -142,11 +143,18 @@ const start = (zcf) => {
     getSellerSeat,
     getAvailableOfferNotifier,
     getAvailableOffers,
-    updateAvailableOffers,
+    setWalletP,
   });
 
   return harden({ publicFacet });
 };
+// CMT (haseeb.asim@robor.systems): A function to subtract the provided amount from the availableOffers.
+const updateAvailableOffers = (cardAmount) => {
+  availableOffers = AmountMath.subtract(availableOffers, cardAmount);
+  availableOfferUpdater.updateState(availableOffers);
+};
 
+harden(walletP);
+harden(updateAvailableOffers);
 harden(start);
-export { start };
+export { start, updateAvailableOffers, walletP };

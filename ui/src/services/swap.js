@@ -15,12 +15,13 @@ const makeMatchingInvitation = async ({
   boughtFor,
   walletP,
   BuyerExclusiveInvitation,
-  publicFacet,
+  // publicFacet,
   publicFacetSwap,
   cardOffer,
   setLoading,
   onClose,
 }) => {
+  console.log(cardOffer, 'cardOffer from swap');
   const zoe = E(walletP).getZoe();
   console.log('myExclusiveInvitation:', BuyerExclusiveInvitation);
   const BuyerInvitationValue = await E(zoe).getInvitationDetails(
@@ -28,6 +29,7 @@ const makeMatchingInvitation = async ({
   );
   console.log('Buyers Invitation Value:', BuyerInvitationValue);
   console.log('sellingprice:', sellingPrice);
+  cardDetail.price = sellingPrice;
   const offerConfig = {
     id: Date.now(),
     invitation: BuyerExclusiveInvitation,
@@ -49,20 +51,23 @@ const makeMatchingInvitation = async ({
   };
   console.log('offerconfig:', offerConfig);
   const offerId = await E(walletP).addOffer(offerConfig);
+  await E(publicFacetSwap).setWalletP(walletP, offerId);
   console.log('result from wallet:', offerId);
   console.log('cardOffer:', cardOffer);
   console.log('cardDetail:', cardDetail);
+  console.log('boughtFor:', boughtFor);
+
   const offerAmount = AmountMath.make(cardPurse.brand, harden([cardOffer]));
-  const NFTAmountForRemoval = AmountMath.make(
-    cardPurse.brand,
-    harden([{ ...cardDetail, boughtFor }]),
-  );
-  const NFTAmountForAddition = AmountMath.make(
-    cardPurse.brand,
-    harden([{ ...cardDetail, boughtFor: sellingPrice }]),
-  );
-  console.log(NFTAmountForAddition, 'NFTAmountForAddition');
-  console.log('amount:', offerAmount);
+  // const NFTAmountForRemoval = AmountMath.make(
+  //   cardPurse.brand,
+  //   harden([{ ...cardDetail, boughtFor }]),
+  // );
+  // const NFTAmountForAddition = AmountMath.make(
+  //   cardPurse.brand,
+  //   harden([{ ...cardDetail, boughtFor: sellingPrice }]),
+  // );
+  // console.log(NFTAmountForAddition, 'NFTAmountForAddition');
+  // console.log('amount:', offerAmount);
   setLoading(false);
   onClose();
   const notifier = await E(walletP).getOffersNotifier();
@@ -70,15 +75,15 @@ const makeMatchingInvitation = async ({
     console.log(' walletOffer:', walletOffers);
     for (const { id, status } of walletOffers) {
       if (id === offerId && (status === 'complete' || status === 'accept')) {
-        console.log(
-          id,
-          NFTAmountForRemoval,
-          NFTAmountForAddition,
-          offerAmount,
-          'offerId:',
-        );
-        E(publicFacet).removeFromUserSaleHistory(NFTAmountForRemoval);
-        E(publicFacet).addToUserSaleHistory(NFTAmountForAddition);
+        // console.log(
+        //   id,
+        //   NFTAmountForRemoval,
+        //   NFTAmountForAddition,
+        //   offerAmount,
+        //   'offerId:',
+        // );
+        // E(publicFacet).removeFromUserSaleHistory(NFTAmountForRemoval);
+        // E(publicFacet).addToUserSaleHistory(NFTAmountForAddition);
         E(publicFacetSwap).updateAvailableOffers(offerAmount);
         return true;
       }
