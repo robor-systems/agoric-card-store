@@ -5,19 +5,11 @@
 
 // @ts-check
 // Eventually will be importable from '@agoric/zoe-contract-support'
-import { AmountMath } from '@agoric/ertp';
-import { E } from '@agoric/eventual-send';
-import { makeAsyncIterableFromNotifier as iterateNotifier } from '@agoric/notifier';
 import {
   assertIssuerKeywords,
   swap,
   assertProposalShape,
 } from '@agoric/zoe/src/contractSupport/index.js';
-import {
-  addToUserSaleHistory,
-  removeFromUserSaleHistory,
-} from './auctionItems';
-import { walletP } from './secondaryStoreWrapper';
 
 /**
  * Trade one item for another.
@@ -42,44 +34,6 @@ import { walletP } from './secondaryStoreWrapper';
  */
 
 const start = (zcf) => {
-  console.log(addToUserSaleHistory, 'addToUserSaleHistory');
-  console.log(removeFromUserSaleHistory, 'removeFromUserSaleHistory');
-
-  const updateNotifiers = async ({ Items, Money, cardBrand }) => {
-    console.log(walletP, 'walletp');
-    console.log(Items, Money, cardBrand, 'updateNotifiers Params');
-    // const offerAmount = AmountMath.make(cardBrand, harden([cardOffer]));
-    const cardDetail = AmountMath.getValue(cardBrand, Items);
-    console.log(cardDetail, 'cardDetails:');
-    const sellingPrice = AmountMath.getValue(cardBrand, Money);
-    console.log(sellingPrice, 'selling Price');
-    const NFTAmountForRemoval = AmountMath.make(
-      cardBrand,
-      // @ts-ignore
-      harden([{ ...cardDetail, undefined }]),
-    );
-    const NFTAmountForAddition = AmountMath.make(
-      cardBrand,
-      // @ts-ignore
-      harden([{ ...cardDetail, boughtFor: sellingPrice }]),
-    );
-    const notifier = await E(walletP.ref).getOffersNotifier();
-    for await (const walletOffers of iterateNotifier(notifier)) {
-      console.log(' walletOffer:', walletOffers);
-      for (const { id, status } of walletOffers) {
-        if (
-          id === walletP.offerId &&
-          (status === 'complete' || status === 'accept')
-        ) {
-          removeFromUserSaleHistory(NFTAmountForRemoval);
-          addToUserSaleHistory(NFTAmountForAddition);
-          // updateAvailableOffers(offerAmount);
-          console.log('successfullll');
-        }
-      }
-    }
-  };
-
   // CMT (haseeb.asim@robor.systems): Making an assertion that the issuerKeyWordRecord has the same key as defined in the assertion.
   assertIssuerKeywords(zcf, harden(['Items', 'Money']));
   /** @type {OfferHandler} */
@@ -101,13 +55,9 @@ const start = (zcf) => {
     // when the buyer makes an offer in response to the seller offer using the exclusive invitation. If the offer is valid
     // this handler swaps the assets between seller and buyer and the instance of the contract is shutdown.
     const matchingSeatOfferHandler = (buyerMatchingSeat) => {
-      const { Items, Money } = buyerMatchingSeat.getCurrentAllocation();
-      const { want: buyerWant } = buyerMatchingSeat.getProposal();
-
       // CMT (haseeb.asim@robor.systems): swap function swaps the assets amounts between seller and buyer and allocates these
       // these swapper amount to the respective seat. The seats are exited when the swap is completed.
       const swapResult = swap(zcf, SellerSeat, buyerMatchingSeat);
-      updateNotifiers({ Items, Money, cardBrand: buyerWant.Items.brand });
       // CMT (haseeb.asim@robor.systems): zcf.shutdown() shuts down the instance of the contract.
       zcf.shutdown();
       // CMT (haseeb.asim@robor.systems): The swapResult is just a default string.

@@ -1,6 +1,6 @@
 import { E } from '@agoric/captp';
 // import { AmountMath } from '@agoric/ertp';
-import { setActiveTab, setCreationSnackbar } from '../store/store';
+import { setActiveTab, setCreationSnackbar, setType } from '../store/store';
 
 export const mintNFT = async ({
   cardDetails,
@@ -28,4 +28,5 @@ export const mintNFT = async ({
   // await E(publicFacet).addToUserSaleHistory(AmountForAddition);
   dispatch(setCreationSnackbar(false));
   dispatch(setActiveTab(0));
+  dispatch(setType('Sell Product'));
 };
