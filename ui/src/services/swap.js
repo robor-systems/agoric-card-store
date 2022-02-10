@@ -1,6 +1,5 @@
 import { AmountMath } from '@agoric/ertp';
 import { E } from '@agoric/eventual-send';
-// import { makeAsyncIterableFromNotifier as iterateNotifier } from '@agoric/notifier';
 /*
  * This function should be called when the buyer buys a card from
  * secondary market place
