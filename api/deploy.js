@@ -137,6 +137,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
   // The function takes in the required params and creates an instance of the auctionItems contract and returns it's public facet
   //  and instance.
   const {
+    auctionItemsCreatorFacet: creatorFacet,
     auctionItemsPublicFacet: publicFacet,
     auctionItemsInstance: instance,
   } = await E(baseballCardSellerFacet).auctionCards(
@@ -181,6 +182,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
   const swapWrapperTerms = harden({
     swapInstallation,
     cardMinter: minter,
+    auctionItemsCreator: creatorFacet,
   });
 
   // CMT (haseeb.asim@robor.systems): Creating an instance of the  secondary store wrapper and getting the instance.

@@ -5,7 +5,7 @@ import Button from './common/Button';
 import Input from './common/InputField';
 import { makeValue } from '../utils/amount';
 import AttributeSelectorForm from './AttributeSelectorForm';
-import { setCreationSnackbar } from '../store/store';
+import { setAddFormLoader, setCreationSnackbar } from '../store/store';
 import { useApplicationContext } from '../context/Application';
 
 function AddNewNFTForm({ tokenDisplayInfo, handleNFTMint }) {
@@ -42,6 +42,7 @@ function AddNewNFTForm({ tokenDisplayInfo, handleNFTMint }) {
         description: '',
       });
       setAttributes([]);
+      dispatch(setAddFormLoader(true));
       dispatch(setCreationSnackbar(true));
       handleNFTMint({ cardDetails });
     } catch (error) {
@@ -129,12 +130,12 @@ function AddNewNFTForm({ tokenDisplayInfo, handleNFTMint }) {
           handleAttributeChange={handleAttributeChange}
           handleRemoveAttribute={handleRemoveAttribute}
         />
-        <p
+        <button
           onClick={handleAddAttribute}
           className="text-secondary text-lg mt-3 cursor-pointer w-max"
         >
           + Add More
-        </p>
+        </button>
       </div>
       <Button onClick={handleSubmit} text="Create" styles="w-full mt-auto" />
     </div>

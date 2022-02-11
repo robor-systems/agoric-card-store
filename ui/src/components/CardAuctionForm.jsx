@@ -43,6 +43,7 @@ const CardAuctionForm = ({ tokenPurses, tokenDisplayInfo, onSubmit }) => {
       {error && <p className="red">{error}</p>}
       <div>
         <Select
+          style={'border-2 border-alternativeLight'}
           label="Purse"
           value={selectedPurse.pursePetname}
           handleChange={(event) => {

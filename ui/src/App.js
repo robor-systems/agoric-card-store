@@ -15,6 +15,8 @@ import Main from './services/main';
 import { useApplicationContext } from './context/Application';
 import NFTCreationSnackbar from './components/NFTCreationSnackbar';
 import { setActiveTab } from './store/store';
+import Loader from './components/common/Loader';
+import CheckIcon from './assets/icons/checkIcon.svg';
 
 function App() {
   const { activeTab } = useParams();
@@ -29,9 +31,8 @@ function App() {
     CARD_BRAND_BOARD_ID,
   } = useApplicationContext();
 
-  const { activeCard, openExpandModal } = state;
+  const { activeCard, openExpandModal, addFormLoader, checkIcon } = state;
   useEffect(() => {
-    console.log(activeTab, 'activeTab::');
     switch (activeTab) {
       case 'mycards':
         dispatch(setActiveTab(0));
@@ -72,7 +73,16 @@ function App() {
   );
 
   return (
-    <div>
+    <div className="relative w-full h-full">
+      {addFormLoader && (
+        <div className="fixed z-50 bg-gray-300 bg-opacity-50 flex justify-center items-center w-full h-full">
+          {checkIcon ? (
+            <img src={CheckIcon} width="52px" height="52px" alt="checkIcon" />
+          ) : (
+            <Loader size={12} />
+          )}
+        </div>
+      )}
       <Header />
       <CardDisplay
         handleClick={handleCardClick}

@@ -19,7 +19,7 @@ const start = (zcf) => {
   );
 
   const zoeService = zcf.getZoeService();
-
+  let auctionItemsCreator;
   const auctionCards = async (
     newCardNames,
     moneyIssuer,
@@ -70,6 +70,7 @@ const start = (zcf) => {
       proposal,
       paymentKeywordRecord,
     );
+    auctionItemsCreator = creatorFacet;
     return harden({
       auctionItemsCreatorFacet: creatorFacet,
       auctionItemsInstance: instance,
@@ -84,6 +85,7 @@ const start = (zcf) => {
   const mintUserCard = async (cardDetails) => {
     const newUserCardAmount = AmountMath.make(brand, harden([cardDetails]));
     const newUserCardPayment = mint.mintPayment(harden(newUserCardAmount));
+    await E(auctionItemsCreator).addToUserSaleHistory(newUserCardAmount);
     return harden(newUserCardPayment);
   };
 

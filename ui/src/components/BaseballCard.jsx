@@ -91,7 +91,7 @@ const BaseballCard = ({
               </p>
               <p className="text-lg">
                 {type === 'Buy Product' || onSale
-                  ? stringifyValueRUN(cardDetail.price, {
+                  ? stringifyValueRUN(cardDetail.sellingPrice, {
                       decimalPlaces: 6,
                     })
                   : stringifyValueRUN(cardDetail.boughtFor, {

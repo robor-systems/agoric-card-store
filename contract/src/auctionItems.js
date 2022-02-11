@@ -261,8 +261,6 @@ const start = (zcf) => {
     getSessionDetailsForKey,
     getUserSaleHistoryNotifier,
     getUserSaleHistory,
-    addToUserSaleHistory,
-    removeFromUserSaleHistory,
   });
 
   const creatorFacet = Far('AuctionItemsCreatorFacet', {
@@ -272,6 +270,8 @@ const start = (zcf) => {
     makeWithdrawInvitation,
     getCompletedPromiseForKey,
     getSessionDetailsForKey,
+    addToUserSaleHistory,
+    removeFromUserSaleHistory,
   });
 
   const creatorInvitation = zcf.makeInvitation(sell, 'seller');
