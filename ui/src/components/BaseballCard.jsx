@@ -1,8 +1,7 @@
 import React from 'react';
-import Tag from '../assets/icons/tag.png';
+// import Tag from '../assets/icons/tag.png';
 import User from '../assets/icons/user.png';
 import Expand from '../assets/icons/expand.png';
-// import { images } from '../images';
 import Button from './common/Button';
 import { stringifyValueRUN } from '../utils/amount';
 
@@ -20,7 +19,7 @@ const BaseballCard = ({
   return (
     <div
       className={`transition-all duration-300 flex flex-col py-3 border border-alternativeLight card card-shadow rounded-md ${
-        (imageOnly && 'card-image-only py-2.5') || (onAuction && 'py-10')
+        imageOnly && 'card-image-only py-2.5'
       }`}
     >
       <div
@@ -70,11 +69,13 @@ const BaseballCard = ({
         <div className="px-3">
           <div className="flex justify-between items-center">
             <p className="text-lg mb-1">{cardDetail?.name}</p>
-            {onSale && <img className="w-6 h-6" src={Tag} alt="sale-tag" />}
+            {/* {onSale && <img className="w-6 h-6" src={Tag} alt="sale-tag" />} */}
           </div>
           <div className="flex items-center">
             <img className="w-6 h-6 mr-2" src={User} alt="user-icon" />
-            <span className="text-secondary">jane_doe</span>
+            <span className="text-secondary capitalize">
+              {cardDetail.creatorName || 'jane doe'}
+            </span>
           </div>
         </div>
       </div>
@@ -90,7 +91,7 @@ const BaseballCard = ({
               </p>
               <p className="text-lg">
                 {type === 'Buy Product' || onSale
-                  ? stringifyValueRUN(cardDetail.sellingPrice, {
+                  ? stringifyValueRUN(cardDetail.price, {
                       decimalPlaces: 6,
                     })
                   : stringifyValueRUN(cardDetail.boughtFor, {
@@ -98,14 +99,14 @@ const BaseballCard = ({
                     })}
               </p>
             </div>
-            {type !== 'Sell Product' ? (
+            {/* {type !== 'Sell Product' ? (
               <div>
                 <p className="text-base text-primaryLight">Sale Ending In</p>
                 <p className="text-lg">8 hours</p>
               </div>
             ) : (
               <></>
-            )}
+            )} */}
           </div>
         </>
       )}

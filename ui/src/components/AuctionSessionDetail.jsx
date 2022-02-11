@@ -1,38 +1,11 @@
 import React from 'react';
-import Box from '@material-ui/core/Box';
 
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
 import { stringifyValue } from '../utils/amount';
 
 const toDateString = (bigIntTs) => {
   const ts = parseInt(bigIntTs.toString(), 10);
   return new Date(ts * 1000).toISOString();
 };
-
-const useStyles = makeStyles((theme) => {
-  return {
-    root: {
-      marginBottom: theme.spacing(2),
-    },
-    item: {
-      marginBottom: theme.spacing(0.5),
-      '& strong': {
-        display: 'inline-block',
-        minWidth: '200px',
-      },
-    },
-    history: {
-      background: '#f5f5f5',
-      padding: theme.spacing(1),
-      maxHeight: '120px',
-      overflow: 'scroll',
-    },
-    historyItem: {
-      marginBottom: theme.spacing(1),
-    },
-  };
-});
 
 const AuctionSessionDetail = ({
   bidDuration,
@@ -44,53 +17,52 @@ const AuctionSessionDetail = ({
   tokenDisplayInfo,
   timeUnit = 'second',
 }) => {
-  const classes = useStyles();
   const showHistory = Array.isArray(bids);
   const isHistoryEmpty = showHistory && bids.length < 1;
 
   return (
-    <Box className={classes.root}>
-      <Typography className={classes.item}>
+    <div className="mb-2">
+      <p className="flex w-3/4 justify-between">
         <strong>Duration:</strong> {stringifyValue(bidDuration)} {timeUnit}(s)
-      </Typography>
-      <Typography className={classes.item}>
+      </p>
+      <p className="flex w-3/4 justify-between">
         <strong>Winner price option:</strong> {winnerPriceOption}
-      </Typography>
-      <Typography className={classes.item}>
+      </p>
+      <p className="flex w-3/4 justify-between">
         <strong>Minimum bid:</strong>{' '}
         {stringifyValue(minimumBid.value, tokenDisplayInfo)} {tokenPetname}
-      </Typography>
+      </p>
       {closesAfter ? (
-        <Typography className={classes.item}>
+        <p className="flex w-3/4 justify-between">
           <strong>Closes after:</strong> {toDateString(closesAfter)}
-        </Typography>
+        </p>
       ) : (
-        <Typography className={classes.item}>
+        <p className="flex w-3/4 justify-between">
           <strong>Status:</strong> Not started.
-        </Typography>
+        </p>
       )}
       {showHistory ? (
-        <Box className={classes.item}>
-          <Typography>
+        <div className="mt-2">
+          <p>
             <strong>History</strong>
-          </Typography>
-          <Box className={classes.history}>
+          </p>
+          <div className="w-full bg-alternativeLight p-2 rounded-md">
             {isHistoryEmpty
               ? 'No bid for now. Session will be started after the first bid.'
               : bids.map((amount, idx) => (
-                  <Typography className={classes.historyItem} key={idx}>
+                  <p className="" key={idx}>
                     {stringifyValue(amount.value, tokenDisplayInfo)}{' '}
                     {tokenPetname}
-                  </Typography>
+                  </p>
                 ))}
-          </Box>
-        </Box>
+          </div>
+        </div>
       ) : (
-        <Typography className={classes.item}>
+        <p>
           <strong>Bids:</strong> {bids}
-        </Typography>
+        </p>
       )}
-    </Box>
+    </div>
   );
 };
 

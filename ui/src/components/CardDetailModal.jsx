@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
-import CircularProgress from '@material-ui/core/CircularProgress';
+// import Box from '@material-ui/core/Box';
+// import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 import AuctionSessionDetail from './AuctionSessionDetail.jsx';
 import CardAuctionForm from './CardAuctionForm.jsx';
+import Loader from './common/Loader.jsx';
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -107,8 +107,8 @@ const CardDetailModal = ({
   const { details, error } = state;
 
   return (
-    <Box className={classes.detail}>
-      {error && <Typography color="error">{error}</Typography>}
+    <div className={classes.detail}>
+      {error && <p color="error">{error}</p>}
       {details ? (
         <>
           <AuctionSessionDetail
@@ -130,12 +130,17 @@ const CardDetailModal = ({
           />
         </>
       ) : (
-        <Box textAlign="center" marginTop="40px" padding="120px">
-          <CircularProgress size="2rem" />
-          <Typography>Fetching details...</Typography>
-        </Box>
+        <div
+          className="flex flex-col items-center mt-10 p-32"
+          textAlign="center"
+          marginTop="40px"
+          padding="120px"
+        >
+          <Loader />
+          <p>Fetching details...</p>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };
 

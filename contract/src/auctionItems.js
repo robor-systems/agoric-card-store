@@ -45,7 +45,10 @@ const start = (zcf) => {
 
   assertNatAssetKind(zcf, moneyBrand);
 
+  // CMT (haseeb.asim@robor.systems): The amount that contains all the information of the sales that has been made through primary-marketplace
   let userSaleHistory = AmountMath.make(brands.Items, harden([]));
+
+  // CMT (haseeb.asim@robor.systems):The notifiers that are used to notify the front-end about the existing sale history or update the front-end in case a new sale has been completed.
   const {
     notifier: userSaleHistoryNotifier,
     updater: userSaleHistoryUpdater,
@@ -155,7 +158,7 @@ const start = (zcf) => {
         // XXX we can not get the allocated amount, because it is prone to
         // race-condition when multiple auctions are completed consecutively
         const amount = AmountMath.make(itemBrand, harden([cardOffer]));
-        addUserOwnedNfts(amount);
+        addToUserSaleHistory(amount);
         availableItems = AmountMath.subtract(availableItems, itemAmount);
         availableItemsUpdater.updateState(availableItems);
       }
@@ -227,9 +230,9 @@ const start = (zcf) => {
     return zcf.makeInvitation(withdraw, 'withdraw');
   };
 
-  const getUserOwnedNftNotifier = () => userSaleHistoryNotifier;
-  const getUserOwnedNfts = () => userSaleHistory;
-  const addUserOwnedNfts = (cardAmount) => {
+  const getUserSaleHistoryNotifier = () => userSaleHistoryNotifier;
+  const getUserSaleHistory = () => userSaleHistory;
+  const addToUserSaleHistory = (cardAmount) => {
     try {
       const validatedAmount = AmountMath.coerce(brands.Items, cardAmount);
       userSaleHistory = AmountMath.add(userSaleHistory, validatedAmount);
@@ -238,7 +241,7 @@ const start = (zcf) => {
       console.log(error);
     }
   };
-  const removeUserOwnedNfts = (cardAmount) => {
+  const removeFromUserSaleHistory = (cardAmount) => {
     try {
       const validatedAmount = AmountMath.coerce(brands.Items, cardAmount);
       userSaleHistory = AmountMath.subtract(userSaleHistory, validatedAmount);
@@ -256,10 +259,10 @@ const start = (zcf) => {
     getSellerSession,
     getCompletedPromiseForKey,
     getSessionDetailsForKey,
-    getUserOwnedNftNotifier,
-    getUserOwnedNfts,
-    addUserOwnedNfts,
-    removeUserOwnedNfts,
+    getUserSaleHistoryNotifier,
+    getUserSaleHistory,
+    addToUserSaleHistory,
+    removeFromUserSaleHistory,
   });
 
   const creatorFacet = Far('AuctionItemsCreatorFacet', {

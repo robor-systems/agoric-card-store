@@ -7,8 +7,9 @@ import bundleSource from '@agoric/bundle-source';
 import { E } from '@agoric/eventual-send';
 import { makeFakeVatAdmin } from '@agoric/zoe/tools/fakeVatAdmin.js';
 import { makeZoeKit } from '@agoric/zoe';
-import { makeIssuerKit, AmountMath } from '@agoric/ertp';
+import { makeIssuerKit, AmountMath, AssetKind } from '@agoric/ertp';
 import buildManualTimer from '@agoric/zoe/tools/manualTimer.js';
+import { details } from '@agoric/assert';
 
 const contractPath = new URL('../src/contract.js', import.meta.url).pathname;
 
@@ -40,6 +41,22 @@ const setupCardsContract = async () => {
   const auctionBundle = await bundleSource(auctionBundlePath);
   const auctionInstallation = await E(zoe).install(auctionBundle);
 
+  const swapbundleUrl = await importMetaResolve(
+    '../src/secondaryStore.js',
+    import.meta.url,
+  );
+  const swapbundlePath = new URL(swapbundleUrl).pathname;
+  const swapBundle = await bundleSource(swapbundlePath);
+  const swapInstallation = await E(zoe).install(swapBundle);
+
+  const swapWrapperBundleUrl = await importMetaResolve(
+    '../src/secondaryStoreWrapper.js',
+    import.meta.url,
+  );
+  const swapWrapperBundlePath = new URL(swapWrapperBundleUrl).pathname;
+  const swapWrapperBundle = await bundleSource(swapWrapperBundlePath);
+  const swapWrapperInstallation = await E(zoe).install(swapWrapperBundle);
+
   const timer = buildManualTimer(console.log);
   const contractTerms = harden({
     bidDuration: 1n,
@@ -51,10 +68,210 @@ const setupCardsContract = async () => {
     installation,
     auctionInstallation,
     auctionItemsInstallation,
+    swapInstallation,
+    swapWrapperInstallation,
     timer,
     contractTerms,
   };
 };
+
+test('zoe - sell baseball cards, secondary-store-wrapper', async (t) => {
+  t.plan(2);
+  // We'll use an imaginary currency "moola" as the money that we
+  // require to buy baseball cards
+  const {
+    mint: moolaMint,
+    issuer: moolaIssuer,
+    brand: moolaBrand,
+  } = makeIssuerKit('moola');
+
+  const {
+    issuer: cardIssuer,
+    mint: cardMinter,
+    brand: cardBrand,
+  } = makeIssuerKit('baseball cards', AssetKind.SET);
+
+  const {
+    zoe,
+    swapInstallation,
+    swapWrapperInstallation,
+  } = await setupCardsContract();
+
+  const issuerKeywordRecord = harden({
+    Items: cardIssuer,
+    Money: moolaIssuer,
+  });
+
+  const swapWrapperTerms = harden({
+    swapInstallation,
+    cardMinter,
+  });
+
+  const { publicFacet } = await E(zoe).startInstance(
+    swapWrapperInstallation,
+    issuerKeywordRecord,
+    swapWrapperTerms,
+  );
+
+  const cardDetail = {
+    name: 'john doe',
+    description: 'john doe card',
+    price: 1n,
+  };
+
+  const cardAmount = AmountMath.make(cardBrand, harden([cardDetail]));
+  const moolaAmount = AmountMath.make(moolaBrand, cardDetail.price);
+  const sellerSeat = await E(publicFacet).getSellerSeat({
+    cardDetail,
+    sellingPrice: cardDetail.price,
+  });
+
+  const availabeOffers = await E(publicFacet).getAvailableOffers();
+  const availableOffersValue = AmountMath.getValue(cardBrand, availabeOffers);
+
+  const buyerExclusiveInvitation =
+    availableOffersValue[0].BuyerExclusiveInvitation;
+
+  const { instance } = await E(zoe).getInvitationDetails(
+    buyerExclusiveInvitation,
+  );
+  const buyerIssuer = await E(zoe).getIssuers(instance);
+  const buyerInvitationValue = await E(zoe).getInvitationDetails(
+    buyerExclusiveInvitation,
+  );
+
+  t.log(buyerInvitationValue, 'buyerInvitationValue');
+  t.log(buyerIssuer, 'buyerIssuer');
+  assert(buyerIssuer.Items === cardIssuer, details`unexpected Items issuer`);
+  assert(buyerIssuer.Money === moolaIssuer, details`unexpected Money issuer`);
+  assert(
+    AmountMath.isEqual(buyerInvitationValue.Items, cardAmount),
+    details`wrong items`,
+  );
+  assert(
+    AmountMath.isEqual(buyerInvitationValue.Money, moolaAmount),
+    details`wrong money`,
+  );
+
+  const buyerProposal = harden({
+    want: { Items: cardAmount },
+    give: { Money: moolaAmount },
+    exit: { onDemand: null },
+  });
+
+  const buyerPayment = moolaMint.mintPayment(moolaAmount);
+  const buyerSeat = await E(zoe).offer(
+    buyerExclusiveInvitation,
+    buyerProposal,
+    harden({ Money: buyerPayment }),
+  );
+
+  const sellerMoneyPayout = await sellerSeat.getPayout('Money');
+  const moolaGainedAmount = await moolaIssuer.getAmountOf(sellerMoneyPayout);
+  t.log(moolaGainedAmount, 'moolaGainedAmount');
+
+  t.deepEqual(moolaGainedAmount, AmountMath.make(moolaBrand, cardDetail.price));
+
+  const buyerItemsPayout = await buyerSeat.getPayout('Items');
+  const buyerCardGain = await cardIssuer.getAmountOf(buyerItemsPayout);
+  t.log(buyerCardGain, 'buyerCardGain');
+  t.deepEqual(buyerCardGain, cardAmount);
+});
+
+test('zoe - sell baseball cards, secondary-store', async (t) => {
+  t.plan(2);
+  // We'll use an imaginary currency "moola" as the money that we
+  // require to buy baseball cards
+  const { zoe, swapInstallation } = await setupCardsContract();
+  const {
+    mint: moolaMint,
+    issuer: moolaIssuer,
+    brand: moolaBrand,
+  } = makeIssuerKit('moola');
+
+  const {
+    issuer: cardIssuer,
+    mint: cardMinter,
+    brand: cardBrand,
+  } = makeIssuerKit('baseball cards', AssetKind.SET);
+
+  const issuerKeywordRecord = harden({
+    Items: cardIssuer,
+    Money: moolaIssuer,
+  });
+
+  const { creatorInvitation } = await E(zoe).startInstance(
+    swapInstallation,
+    issuerKeywordRecord,
+  );
+  const shouldBeInvitationMsg = `The swapAsset instance should return a creatorInvitation`;
+  assert(creatorInvitation, shouldBeInvitationMsg);
+
+  const cardDetail = {
+    name: 'john doe',
+    description: 'john doe card',
+    price: 1n,
+  };
+
+  const cardAmount = AmountMath.make(cardBrand, harden([cardDetail]));
+  const moolaAmount = AmountMath.make(moolaBrand, cardDetail.price);
+
+  const Proposal = harden({
+    give: { Items: cardAmount },
+    want: { Money: moolaAmount },
+  });
+
+  const userCardPayment = E(cardMinter).mintPayment(cardAmount);
+  const payment = harden({ Items: userCardPayment });
+
+  const sellerSeat = await E(zoe).offer(creatorInvitation, Proposal, payment);
+
+  const invitationP = await E(sellerSeat).getOfferResult();
+  const { instance } = await E(zoe).getInvitationDetails(invitationP);
+  const buyerIssuer = await E(zoe).getIssuers(instance);
+
+  const invitationIssuer = await E(zoe).getInvitationIssuer();
+
+  const buyerExclusiveInvitation = await E(invitationIssuer).claim(invitationP);
+  const buyerInvitationValue = await E(zoe).getInvitationDetails(
+    buyerExclusiveInvitation,
+  );
+
+  assert(buyerIssuer.Items === cardIssuer, details`unexpected Items issuer`);
+  assert(buyerIssuer.Money === moolaIssuer, details`unexpected Money issuer`);
+  assert(
+    AmountMath.isEqual(buyerInvitationValue.Items, cardAmount),
+    details`wrong items`,
+  );
+  assert(
+    AmountMath.isEqual(buyerInvitationValue.Money, moolaAmount),
+    details`wrong money`,
+  );
+
+  const buyerProposal = harden({
+    want: { Items: cardAmount },
+    give: { Money: moolaAmount },
+    exit: { onDemand: null },
+  });
+
+  const buyerPayment = moolaMint.mintPayment(moolaAmount);
+  const buyerSeat = await E(zoe).offer(
+    buyerExclusiveInvitation,
+    buyerProposal,
+    harden({ Money: buyerPayment }),
+  );
+
+  const sellerMoneyPayout = await sellerSeat.getPayout('Money');
+  const moolaGainedAmount = await moolaIssuer.getAmountOf(sellerMoneyPayout);
+  t.log(moolaGainedAmount, 'moolaGainedAmount');
+
+  t.deepEqual(moolaGainedAmount, AmountMath.make(moolaBrand, cardDetail.price));
+
+  const buyerItemsPayout = await buyerSeat.getPayout('Items');
+  const buyerCardGain = await cardIssuer.getAmountOf(buyerItemsPayout);
+  t.log(buyerCardGain, 'buyerCardGain');
+  t.deepEqual(buyerCardGain, cardAmount);
+});
 
 test('zoe - sell baseball cards, normal case', async (t) => {
   t.plan(5);

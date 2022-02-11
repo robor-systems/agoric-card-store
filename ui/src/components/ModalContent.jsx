@@ -4,23 +4,27 @@ import Button from './common/Button';
 import EditProductForm from './EditProductForm';
 import SellProductForm from './SellProductForm';
 import CardDetailModal from './CardDetailModal';
+import { useApplicationContext } from '../context/Application';
 
 function ModalContent({
   makeSwapInvitation,
   makeMatchingSeatInvitation,
   removeCardFromSale,
   onClose,
-  type,
-  cardDetail,
   onGetCardDetail,
   onBidCard,
-  tokenPurses,
-  tokenPetname,
-  tokenDisplayInfo,
   handleClick,
 }) {
   const [isLoading, setLoading] = useState(false);
-  console.log(isLoading);
+  const { state } = useApplicationContext();
+  const {
+    type,
+    activeCard: cardDetail,
+    tokenPurses,
+    tokenPetname,
+    tokenDisplayInfo,
+  } = state;
+
   const populateContent = () => {
     switch (type) {
       case 'Sell Product':
@@ -65,6 +69,7 @@ function ModalContent({
             <SellProductForm
               makeSwapInvitation={makeSwapInvitation}
               tokenDisplayInfo={tokenDisplayInfo}
+              cardPrice={cardDetail.boughtFor || cardDetail.price}
               onClose={onClose}
             />
           </div>

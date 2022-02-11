@@ -1,26 +1,10 @@
 import React, { useState } from 'react';
-import Box from '@material-ui/core/Box';
-import Select from '@material-ui/core/Select';
-import TextField from '@material-ui/core/TextField';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
 import Button from './common/Button';
+import Input from './common/InputField';
+import Select from './common/SelectField';
 import { makeValue, stringifyValue } from '../utils/amount';
 
-const useStyles = makeStyles((theme) => {
-  return {
-    root: {},
-    item: {
-      marginBottom: theme.spacing(1),
-    },
-  };
-});
-
 const CardAuctionForm = ({ tokenPurses, tokenDisplayInfo, onSubmit }) => {
-  const classes = useStyles();
   const [state, setFormState] = useState({
     error: null,
     isSubmitting: false,
@@ -54,50 +38,56 @@ const CardAuctionForm = ({ tokenPurses, tokenDisplayInfo, onSubmit }) => {
   };
 
   const { error, isSubmitting } = state;
-
   return (
-    <Box className={classes.root}>
-      {error && <Typography color="error">{error}</Typography>}
-      <FormControl className={classes.item} fullWidth>
-        <InputLabel id="auction-purse-select-label">Purse</InputLabel>
+    <div className="flex flex-col gap-y-4">
+      {error && <p className="red">{error}</p>}
+      <div>
         <Select
-          labelId="auction-purse-select-label"
-          className={classes.purseSelect}
-          value={selectedPurse}
-          onChange={(event) => {
-            setSelectedPurse(event.target.value);
+          label="Purse"
+          value={selectedPurse.pursePetname}
+          handleChange={(event) => {
+            console.log(event.target.value);
+            const selectedOption = event.target.value;
+            tokenPurses?.forEach((purse) => {
+              console.log('for running');
+              purse.pursePetname === selectedOption && setSelectedPurse(purse);
+            });
           }}
         >
-          {tokenPurses.map((p) => (
-            <MenuItem key={p.pursePetname} value={p} disabled={!p.value}>
-              {p.pursePetname} ({stringifyValue(p.value, p.displayInfo)}{' '}
-              {p.brandPetname})
-            </MenuItem>
-          ))}
+          {tokenPurses.map((p) => {
+            return (
+              <option
+                key={p.pursePetname}
+                value={p.pursePetname}
+                // disabled={!p.value}
+              >
+                {p.pursePetname} ({stringifyValue(p.value, p.displayInfo)}{' '}
+                {p.brandPetname})
+              </option>
+            );
+          })}
         </Select>
-      </FormControl>
-      <FormControl className={classes.item} fullWidth>
-        <TextField
-          id="outlined-error"
+      </div>
+      <div>
+        <Input
           label="Bid amount"
           type="number"
           value={amount}
-          onChange={(event) => {
-            setAmount(event.target.value);
+          handleChange={(val) => {
+            setAmount(val);
           }}
         />
-      </FormControl>
-      <FormControl className={classes.item} fullWidth>
+      </div>
+      <div className="">
         <Button
+          styles={'w-full mt-auto relative'}
           disabled={isSubmitting}
           onClick={submitBidOffer}
-          variant="contained"
-          color="primary"
           text={isSubmitting ? 'Submitting' : 'Bid'}
           isLoading={isSubmitting}
         />
-      </FormControl>
-    </Box>
+      </div>
+    </div>
   );
 };
 

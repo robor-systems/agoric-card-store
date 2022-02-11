@@ -23,12 +23,14 @@ export function makeValue(value, displayInfo) {
  *
  * @param {any} value
  * @param {AmountDisplayInfo} [displayInfo]
+ * @param {boolean} [noDecimal]
  * @returns {string}
  * This is borrowed from wallet ui
  */
-export function stringifyValue(value, displayInfo) {
+export function stringifyValue(value, displayInfo, noDecimal) {
   const { assetKind = AssetKind.NAT, decimalPlaces = 0 } = displayInfo || {};
-  return formatValue(value, assetKind, decimalPlaces, decimalPlaces);
+  const show = noDecimal ? 0 : decimalPlaces;
+  return formatValue(value, assetKind, decimalPlaces, show);
 }
 
 export function stringifyValueRUN(value, displayInfo) {

@@ -61,6 +61,7 @@ const makeMatchingInvitation = async ({
     cardPurse.brand,
     harden([{ ...cardDetail, boughtFor: sellingPrice }]),
   );
+  console.log(NFTAmountForAddition, 'NFTAmountForAddition');
   console.log('amount:', offerAmount);
   setLoading(false);
   onClose();
@@ -69,8 +70,15 @@ const makeMatchingInvitation = async ({
     console.log(' walletOffer:', walletOffers);
     for (const { id, status } of walletOffers) {
       if (id === offerId && (status === 'complete' || status === 'accept')) {
-        E(publicFacet).removeUserOwnedNfts(NFTAmountForRemoval);
-        E(publicFacet).addUserOwnedNfts(NFTAmountForAddition);
+        console.log(
+          id,
+          NFTAmountForRemoval,
+          NFTAmountForAddition,
+          offerAmount,
+          'offerId:',
+        );
+        E(publicFacet).removeFromUserSaleHistory(NFTAmountForRemoval);
+        E(publicFacet).addToUserSaleHistory(NFTAmountForAddition);
         E(publicFacetSwap).updateAvailableOffers(offerAmount);
         return true;
       }
@@ -82,18 +90,22 @@ const makeMatchingInvitation = async ({
  * This function should be called when the user puts a card
  * which he own on sale in the secondary marketplace
  */
-const getSellerSeat = async ({ cardDetail, sellingPrice, publicFacet }) => {
-  const sellerSeatInvitation = await E(publicFacet).getSellerSeat({
+const getSellerSeat = async ({ cardDetail, sellingPrice, publicFacetSwap }) => {
+  const sellerSeatInvitation = await E(publicFacetSwap).getSellerSeat({
     cardDetail,
     sellingPrice,
   });
   return sellerSeatInvitation;
 };
 
-const removeItemFromSale = async ({ cardDetail, cardPurse, publicFacet }) => {
+const removeItemFromSale = async ({
+  cardDetail,
+  cardPurse,
+  publicFacetSwap,
+}) => {
   await E(cardDetail.sellerSeat).tryExit();
   const amount = AmountMath.make(cardPurse.brand, harden([cardDetail]));
-  await E(publicFacet).updateAvailableOffers(amount);
+  await E(publicFacetSwap).updateAvailableOffers(amount);
 };
 
 export { getSellerSeat, makeMatchingInvitation, removeItemFromSale };
