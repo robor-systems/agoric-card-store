@@ -123,7 +123,7 @@ export default function AttributeSelectorForm({
                 </div>
               )}
             </div>
-            <div className="w-max">
+            <button className="w-max">
               <img
                 src={Cancel}
                 width="14px"
@@ -131,7 +131,7 @@ export default function AttributeSelectorForm({
                 alt="cancel"
                 onClick={() => handleRemoveAttribute(index)}
               />
-            </div>
+            </button>
           </div>
         );
       })}

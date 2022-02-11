@@ -26,6 +26,8 @@ export const {
     setUserCards,
     setNeedToApproveOffer,
     setCreationSnackbar,
+    setAddFormLoader,
+    setCheckIcon,
   },
 } = autodux({
   slice: 'cardStore',
@@ -50,6 +52,8 @@ export const {
     userCards: [],
     needToApproveOffer: false,
     creationSnackbar: false,
+    addFormLoader: false,
+    checkIcon: false,
   },
   actions: {},
 });

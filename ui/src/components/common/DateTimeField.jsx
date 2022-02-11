@@ -5,7 +5,11 @@ function DateTimeField({ noLabels = false, disabled }) {
   return (
     <div>
       {!noLabels && (
-        <span className="text-lg leading-none">
+        <span
+          className={`text-lg leading-none ${
+            disabled && 'text-primaryLight select-none'
+          }`}
+        >
           Sale End Date & Time{' '}
           <span className="text-primaryLight">(optional)</span>
         </span>

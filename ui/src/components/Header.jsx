@@ -1,13 +1,34 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import { useApplicationContext } from '../context/Application';
 import { setActiveTab, setType } from '../store/store';
 
 const Header = () => {
   const { state, dispatch } = useApplicationContext();
   const { connected: walletConnected, activeTab } = state;
-
+  const history = useHistory();
   const walletStatus = walletConnected ? 'Connected' : 'Not connected';
-  console.log(activeTab);
+  useEffect(() => {
+    switch (activeTab) {
+      case 0:
+        history.push('/mycards');
+        break;
+      case 1:
+        history.push('/marketplace');
+        break;
+      case 2:
+        history.push('/primarysales');
+        break;
+      case 3:
+        history.push('/create');
+        break;
+
+      default:
+        dispatch(setActiveTab(0));
+        break;
+    }
+    console.log('the header useEffect is working');
+  }, [activeTab]);
 
   const TabButton = ({ tabIndex, text, width }) => {
     return (
