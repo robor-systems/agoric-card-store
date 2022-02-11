@@ -66,6 +66,25 @@ const start = (zcf) => {
     updater: availableItemsUpdater,
   } = makeNotifierKit();
 
+  const addToUserSaleHistory = (cardAmount) => {
+    try {
+      const validatedAmount = AmountMath.coerce(brands.Items, cardAmount);
+      userSaleHistory = AmountMath.add(userSaleHistory, validatedAmount);
+      userSaleHistoryUpdater.updateState(userSaleHistory);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const removeFromUserSaleHistory = (cardAmount) => {
+    try {
+      const validatedAmount = AmountMath.coerce(brands.Items, cardAmount);
+      userSaleHistory = AmountMath.subtract(userSaleHistory, validatedAmount);
+      userSaleHistoryUpdater.updateState(userSaleHistory);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const sell = (seat) => {
     sellerSeat.incrementBy(seat.decrementBy(seat.getCurrentAllocation()));
     zcf.reallocate(sellerSeat, seat);
@@ -232,24 +251,6 @@ const start = (zcf) => {
 
   const getUserSaleHistoryNotifier = () => userSaleHistoryNotifier;
   const getUserSaleHistory = () => userSaleHistory;
-  const addToUserSaleHistory = (cardAmount) => {
-    try {
-      const validatedAmount = AmountMath.coerce(brands.Items, cardAmount);
-      userSaleHistory = AmountMath.add(userSaleHistory, validatedAmount);
-      userSaleHistoryUpdater.updateState(userSaleHistory);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const removeFromUserSaleHistory = (cardAmount) => {
-    try {
-      const validatedAmount = AmountMath.coerce(brands.Items, cardAmount);
-      userSaleHistory = AmountMath.subtract(userSaleHistory, validatedAmount);
-      userSaleHistoryUpdater.updateState(userSaleHistory);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const publicFacet = Far('AuctionItemsPublicFacet', {
     getAvailableItems,
