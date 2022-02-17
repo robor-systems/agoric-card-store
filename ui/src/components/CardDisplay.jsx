@@ -22,6 +22,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
   // const isReady2 = userCards && userCards.length > 0;
   const isReady = cardList && cardList.length > 0;
   let cards;
+  const [menuOption, setMenuOption] = useState('Name');
   // const [cards, setCards] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const [secondaryLoader, setSecondaryLoader] = useState(true);
@@ -29,7 +30,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
   const [myCards, setMyCards] = useState([]);
   const [secondaryCards, setSecondaryCards] = useState([]);
   // const [filteredCards, setFilteredCards] = useState([]);
-  const menuOptions = ['Name', 'Author', 'Price'];
+  let menuOptions;
   console.log(userCards, userOffers, userNfts, 'all card arrs');
   const getUserCards = (params) => {
     console.log('params:', params);
@@ -62,13 +63,25 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
     setSecondaryLoader(false);
     return arr;
   };
-  const getFilteredList = (list) => {
+  const getFilteredList = (list, option) => {
     return list.filter((el) => {
       if (searchInput === '') {
         return el;
       } else {
-        return el.name.toLowerCase().includes(searchInput.toLocaleLowerCase());
+        console.log('option:', option);
+        switch (option) {
+          case 'Name':
+            return el.name
+              .toLowerCase()
+              .includes(searchInput.toLocaleLowerCase());
+          case 'Author':
+            return el.creatorName
+              .toLowerCase()
+              .includes(searchInput.toLocaleLowerCase());
+          default:
+        }
       }
+      return false;
     });
   };
   useEffect(() => {
@@ -102,7 +115,8 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
         );
       break;
     case 1: {
-      const filteredList = getFilteredList(secondaryCards);
+      menuOptions = ['Name', 'Author'];
+      const filteredList = getFilteredList(secondaryCards, menuOption);
       console.log(userOffers, 'userCards');
       cards =
         filteredList?.length !== 0 ? (
@@ -127,7 +141,8 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
       break;
     }
     case 2: {
-      const filtered = getFilteredList(cardList);
+      menuOptions = ['Name'];
+      const filtered = getFilteredList(cardList, menuOption);
       console.log('Cardlist:', filtered);
       cards = (
         <div className="grid sm:grid-cols-1  md:grid-cols-2 xl:grid-cols-3  gap-x-6 gap-y-10">
@@ -161,7 +176,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
       break;
   }
   return (
-    <div className="display-card flex flex-col px-4 items-center max-w-6xl w-full">
+    <div className="display-card flex flex-col px-4 items-center max-w-6xl w-full pb-8">
       <h1 className="text-3xl font-semibold mb-14">
         {activeTab === 0 && 'My Cards'}
         {activeTab === 1 && 'Marketplace'}
@@ -172,7 +187,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
         <div className="flex flex-col gap-y-8 sm:flex-row gap-x-4 justify-center w-full px-2 mb-14">
           <div className="flex  sm:w-3/4 border justify-between px-4 border-alternativeLight rounded items-center">
             <input
-              className="outline-none focus:outline-none rounded h-12 text-lg"
+              className="outline-none focus:outline-none rounded h-12 text-lg w-full"
               placeholder="Search"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
@@ -191,6 +206,10 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
               backgroundPositionX: '95%',
             }}
             className="bg-no-repeat cursor-pointer text-primaryLight border border-alternativeLight bg-white rounded sm:w-1/5 h-12 px-3.5 text-lg outline-none focus:outline-none font-normal"
+            value={menuOption}
+            onChange={(e) => {
+              setMenuOption(e.target.value);
+            }}
           >
             {menuOptions.map((item, i) => (
               <option key={i} value={item}>

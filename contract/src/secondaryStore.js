@@ -37,7 +37,7 @@ const start = (zcf) => {
   // CMT (haseeb.asim@robor.systems): Making an assertion that the issuerKeyWordRecord has the same key as defined in the assertion.
   assertIssuerKeywords(zcf, harden(['Items', 'Money']));
   /** @type {OfferHandler} */
-  // CMT (haseeb.asim@robor.systems): makeMatchingInvitation is the an offer handler and it is called when the seller seat
+// CMT (haseeb.asim@robor.systems): makeMatchingInvitation  the an offer handler and it is called when the seller seat
   // is used to get the offer results of the offer created by the seller. It returns an invitation Payment which is resolved into
   // an exclusive invitation for the buyer.
   const makeMatchingInvitation = (SellerSeat) => {

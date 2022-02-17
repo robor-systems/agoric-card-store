@@ -40,13 +40,8 @@ const start = (zcf) => {
   // CMT (haseeb.asim@robor.systems) : zcf.getTerms is used to acquire the terms of the contract,
   // these terms initially contain brands and issuers related to the contract but more information
   // can be provided when an instance of the contract is being created.
-  const {
-    brands,
-    issuers,
-    swapInstallation,
-    cardMinter,
-    auctionItemsCreator,
-  } = zcf.getTerms();
+  const { brands, issuers, swapInstallation, cardMinter, auctionItemsCreator } =
+    zcf.getTerms();
 
   // CMT (haseeb.asim@robor.systems) : zcf.getZoeService provides user-facing Zoe Service API to the contract code.
   const zoe = zcf.getZoeService();
@@ -56,10 +51,8 @@ const start = (zcf) => {
   let availableOffers = AmountMath.make(brands.Items, harden([]));
 
   // CMT (haseeb.asim@robor.systems): Available Offer Notifier is used to send updates regarding available offers to the front-end.
-  const {
-    notifier: availableOfferNotifier,
-    updater: availableOfferUpdater,
-  } = makeNotifierKit();
+  const { notifier: availableOfferNotifier, updater: availableOfferUpdater } =
+    makeNotifierKit();
 
   // CMT (haseeb.asim@robor.systems): A function to easily access the availableOfferNotifier at the front-end.
   const getAvailableOfferNotifier = () => availableOfferNotifier;
@@ -229,13 +222,9 @@ const start = (zcf) => {
     getAvailableOfferNotifier,
     getAvailableOffers,
     makeMatchingInvitation,
-  });
-  // CMT (haseeb.asim@robor.systems): Creator facet for the contract. It provides functions that can only be used by the creator of the contract.
-  const creatorFacet = Far('CreatorFacetForSwapInvitation', {
     updateAvailableOffers,
   });
-
-  return harden({ publicFacet, creatorFacet });
+  return harden({ publicFacet });
 };
 
 harden(start);
