@@ -58,7 +58,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
     const ids = params?.userCards?.map((card) => card.id);
     // change !== to === to filter user owned cards from secondaryMarketplace
     const arr = params?.userOffers?.filter(
-      (card) => ids.indexOf(card.id) !== -1,
+      (card) => ids.indexOf(card.id) === -1,
     );
     setSecondaryLoader(false);
     return arr;
