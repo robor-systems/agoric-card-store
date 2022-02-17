@@ -8,6 +8,7 @@ const Header = () => {
   const { connected: walletConnected, activeTab } = state;
   const history = useHistory();
   const walletStatus = walletConnected ? 'Connected' : 'Not connected';
+  // dispatch(setActiveTab(0));
   useEffect(() => {
     switch (activeTab) {
       case 0:
@@ -23,9 +24,10 @@ const Header = () => {
         history.push('/create');
         break;
 
-      default:
+      default: {
         dispatch(setActiveTab(0));
         break;
+      }
     }
     console.log('the header useEffect is working');
   }, [activeTab]);
@@ -45,6 +47,9 @@ const Header = () => {
               break;
             case 2:
               dispatch(setType('Bid Product'));
+              break;
+            case 3:
+              dispatch(setType('Mint Nft'));
               break;
             default:
           }
