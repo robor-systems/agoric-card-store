@@ -33,24 +33,20 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
   let menuOptions;
   console.log(userCards, userOffers, userNfts, 'all card arrs');
   const getUserCards = (params) => {
-    console.log('params:', params);
     const userOffersMap = params?.userOffers.reduce((map, obj) => {
       map[obj.id] = { ...obj };
       return map;
     }, {});
-    console.log('userOfferMap:', userOffersMap);
     const userNftsMap = params?.userNfts.reduce((map, obj) => {
       map[obj.id] = { ...obj };
       return map;
     }, {});
-    console.log('userNftsMap:', userNftsMap);
     const arr = params?.userCards.map((offer) => {
       let obj = {};
       if (userOffersMap[offer.id]) obj = { ...userOffersMap[offer.id] };
       if (userNftsMap[offer.id]) obj = { ...obj, ...userNftsMap[offer.id] };
       return obj;
     });
-    console.log('array:', arr);
     setMyCardLoader(false);
     return arr;
   };
@@ -58,7 +54,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
     const ids = params?.userCards?.map((card) => card.id);
     // change !== to === to filter user owned cards from secondaryMarketplace
     const arr = params?.userOffers?.filter(
-      (card) => ids.indexOf(card.id) === -1,
+      (card) => ids.indexOf(card.id) !== -1,
     );
     setSecondaryLoader(false);
     return arr;
@@ -68,7 +64,6 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
       if (searchInput === '') {
         return el;
       } else {
-        console.log('option:', option);
         switch (option) {
           case 'Name':
             return el.name
@@ -85,7 +80,6 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
     });
   };
   useEffect(() => {
-    console.log('userOffers:', userOffers);
     userCards?.length > 0 &&
       userNfts?.length > 0 &&
       setMyCards(getUserCards({ userCards, userOffers, userNfts }));
@@ -94,7 +88,6 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
   }, [userOffers, userCards, userNfts]);
   switch (activeTab) {
     case 0:
-      console.log(myCards, 'MyCards');
       cards =
         myCards?.length > 0 ? (
           <div className="grid sm:grid-cols-1  md:grid-cols-2 xl:grid-cols-3  gap-x-6 gap-y-10">
@@ -117,12 +110,10 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
     case 1: {
       menuOptions = ['Name', 'Author'];
       const filteredList = getFilteredList(secondaryCards, menuOption);
-      console.log(userOffers, 'userCards');
       cards =
         filteredList?.length !== 0 ? (
           <div className="grid sm:grid-cols-1  md:grid-cols-2 xl:grid-cols-3  gap-x-6 gap-y-10">
             {filteredList?.map((cardDetail) => {
-              console.log(cardDetail, 'inside map ');
               return (
                 <div key={cardDetail.id}>
                   <BaseballCard
@@ -143,11 +134,9 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
     case 2: {
       menuOptions = ['Name'];
       const filtered = getFilteredList(cardList, menuOption);
-      console.log('Cardlist:', filtered);
       cards = (
         <div className="grid sm:grid-cols-1  md:grid-cols-2 xl:grid-cols-3  gap-x-6 gap-y-10">
           {filtered.map((cardDetail) => {
-            console.log('cardDetail:', cardDetail);
             return (
               <div key={cardDetail.name}>
                 <BaseballCard

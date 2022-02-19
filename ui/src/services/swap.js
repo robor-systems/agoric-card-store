@@ -28,19 +28,26 @@ const makeMatchingInvitation = async ({
     BuyerExclusiveInvitation,
     cardOffer,
     _id: Date.now(),
+    setLoading,
+    onClose,
   });
-  setLoading(false);
-  onClose();
+
   return result;
 };
 /*
  * This function should be called when the user puts a card
  * which he own on sale in the secondary marketplace
  */
-const getSellerSeat = async ({ cardDetail, sellingPrice, publicFacetSwap }) => {
+const getSellerSeat = async ({
+  cardDetail,
+  sellingPrice,
+  publicFacetSwap,
+  currentCard,
+}) => {
   const sellerSeatInvitation = await E(publicFacetSwap).getSellerSeat({
     cardDetail,
     sellingPrice,
+    currentCard,
   });
   return sellerSeatInvitation;
 };

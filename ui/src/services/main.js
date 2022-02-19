@@ -21,8 +21,7 @@ const Main = (
   MAIN_CONTRACT_BOARD_INSTANCE_ID,
   CARD_BRAND_BOARD_ID,
 ) => {
-  const { cardPurse, tokenPurses, activeCard } = state;
-  console.log('main running');
+  const { cardPurse, tokenPurses, activeCard, userCards } = state;
   const submitCardOffer = (
     name,
     price,
@@ -40,8 +39,7 @@ const Main = (
       price: BigInt(price),
       onClose,
       setFormState,
-    }).then((result) => {
-      console.log('Your offer id for this current offer:', result);
+    }).then(() => {
       dispatch(setNeedToApproveOffer(true));
     });
   };
@@ -73,9 +71,9 @@ const Main = (
     setLoading,
     onClose,
   }) => {
-    console.log('cardDetail:', cardDetail);
     const Obj = { ...cardDetail };
-    const { BuyerExclusiveInvitation, sellingPrice, boughtFor } = Obj;
+    const { BuyerExclusiveInvitation, sellingPrice, boughtFor, sellerSeat } =
+      Obj;
     delete Obj.sellerSeat;
     delete Obj.sellingPrice;
     delete Obj.boughtFor;
@@ -88,6 +86,7 @@ const Main = (
       sellingPrice,
       boughtFor,
       walletP,
+      sellerSeat,
       BuyerExclusiveInvitation,
       publicFacetSwap,
       publicFacet,
@@ -98,11 +97,15 @@ const Main = (
   };
 
   const makeInvitationAndSellerSeat = async ({ price }) => {
+    const currentCard = userCards.filter(
+      (item) => item.id === activeCard.id,
+    )[0];
     const params = {
       publicFacetSwap,
       sellingPrice: BigInt(price),
       walletP,
       cardDetail: activeCard,
+      currentCard,
     };
     const sellerSeatInvitation = await getSellerSeat(params);
     return sellerSeatInvitation;
