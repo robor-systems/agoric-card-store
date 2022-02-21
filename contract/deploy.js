@@ -61,6 +61,13 @@ export default async function deployContract(
   const bundle = await bundleSource(pathResolve(`./src/contract.js`));
   const installation = await E(zoe).install(bundle);
 
+  const swapContractbundleUrl = await importMetaResolve(
+    './src/swapContract.js',
+    import.meta.url,
+  );
+  const swapContractbundlePath = new URL(swapContractbundleUrl).pathname;
+  const swapContractBundle = await bundleSource(swapContractbundlePath);
+  const swapContractInstallation = await E(zoe).install(swapContractBundle);
   // CMT (haseeb.asim@robor.systems): Following lines of code provide:
   // - The bundle URL of the secondary store contract.
   // - The bundle path name.
@@ -134,6 +141,9 @@ export default async function deployContract(
   const SWAP_WRAPPER_INSTALLATION_BOARD_ID = await E(board).getId(
     swapWrapperInstallation,
   );
+  const SWAP_CONTRACT_INSTALLATION_BOARD_ID = await E(board).getId(
+    swapContractInstallation,
+  );
   console.log('- SUCCESS! contract code installed on Zoe');
   console.log(`-- Contract Name: ${CONTRACT_NAME}`);
   console.log(`-- Installation Board Id: ${INSTALLATION_BOARD_ID}`);
@@ -147,7 +157,9 @@ export default async function deployContract(
   console.log(
     `-- Swap Wrapper Installation Board Id: ${SWAP_WRAPPER_INSTALLATION_BOARD_ID}`,
   );
-
+  console.log(
+    `-- Swap Contract Installation Board Id: ${SWAP_CONTRACT_INSTALLATION_BOARD_ID}`,
+  );
   // Save the constants somewhere where the UI and api can find it.
   const dappConstants = {
     CONTRACT_NAME,
@@ -156,6 +168,7 @@ export default async function deployContract(
     AUCTION_ITEMS_INSTALLATION_BOARD_ID,
     SWAP_INSTALLATION_BOARD_ID,
     SWAP_WRAPPER_INSTALLATION_BOARD_ID,
+    SWAP_CONTRACT_INSTALLATION_BOARD_ID,
   };
   const defaultsFolder = pathResolve(`../ui/src/conf`);
   const defaultsFile = pathResolve(`../ui/src/conf/installationConstants.js`);
