@@ -15,9 +15,9 @@ const makeMatchingInvitation = async ({
   BuyerExclusiveInvitation,
   publicFacetSwap,
   cardOffer,
-  setLoading,
-  onClose,
 }) => {
+  console.log('cardPursePetname:', cardPurse.pursePetname);
+  console.log('cardbrand:', cardPurse.brand);
   const result = await E(publicFacetSwap).makeMatchingInvitation({
     cardPurse,
     tokenPurses,
@@ -28,8 +28,6 @@ const makeMatchingInvitation = async ({
     BuyerExclusiveInvitation,
     cardOffer,
     _id: Date.now(),
-    setLoading,
-    onClose,
   });
 
   return result;
