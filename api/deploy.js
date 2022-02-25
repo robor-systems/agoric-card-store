@@ -59,6 +59,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     // have a one-to-one bidirectional mapping. If a value is added a
     // second time, the original id is just returned.
     board,
+    wallet,
   } = home;
 
   // To get the backend of our dapp up and running, first we need to
@@ -183,6 +184,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     swapInstallation,
     cardMinter: minter,
     auctionItemsCreator: creatorFacet,
+    userWallet: wallet,
   });
 
   // CMT (haseeb.asim@robor.systems): Creating an instance of the  secondary store wrapper and getting the instance.
@@ -191,6 +193,8 @@ export default async function deployApi(homePromise, { pathResolve }) {
     issuerKeywordRecord,
     swapWrapperTerms,
   );
+
+    
 
   // CMT (haseeb.asim@robor.systems): Storing each important variable on the board and getting their board ids.
   const [

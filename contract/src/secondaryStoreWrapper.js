@@ -40,13 +40,8 @@ const start = (zcf) => {
   // CMT (haseeb.asim@robor.systems) : zcf.getTerms is used to acquire the terms of the contract,
   // these terms initially contain brands and issuers related to the contract but more information
   // can be provided when an instance of the contract is being created.
-  const {
-    brands,
-    issuers,
-    swapInstallation,
-    cardMinter,
-    auctionItemsCreator,
-  } = zcf.getTerms();
+  const { brands, issuers, swapInstallation, auctionItemsCreator, userWallet } =
+    zcf.getTerms();
 
   // CMT (haseeb.asim@robor.systems) : zcf.getZoeService provides user-facing Zoe Service API to the contract code.
   const zoe = zcf.getZoeService();
@@ -56,10 +51,8 @@ const start = (zcf) => {
   let availableOffers = AmountMath.make(brands.Items, harden([]));
 
   // CMT (haseeb.asim@robor.systems): Available Offer Notifier is used to send updates regarding available offers to the front-end.
-  const {
-    notifier: availableOfferNotifier,
-    updater: availableOfferUpdater,
-  } = makeNotifierKit();
+  const { notifier: availableOfferNotifier, updater: availableOfferUpdater } =
+    makeNotifierKit();
 
   // CMT (haseeb.asim@robor.systems): A function to easily access the availableOfferNotifier at the front-end.
   const getAvailableOfferNotifier = () => availableOfferNotifier;
@@ -75,25 +68,32 @@ const start = (zcf) => {
 
   // CMT (haseeb.asim@robor.systems): getSellerSeat function is used to create an offer for a specific asset (baseball card).
   // The function returns a seller seat which resolves into an exclusive buyer invitation that can be used to buy the asset on sale.
-  const getSellerSeat = async ({ cardDetail, sellingPrice }) => {
+  const getSellerSeat = async ({ cardDetail, sellingPrice, currentCard }) => {
     // CMT (haseeb.asim@robor.systems): cardAmount is the amount of the asset that a user wants to sell.
-    const cardAmount = AmountMath.make(brands.Items, harden([cardDetail]));
+    const offerAmount = AmountMath.make(brands.Items, harden([currentCard]));
 
     // CMT (haseeb.asim@robor.systems): saleAmount is the amount of the price at which the seller want to sell the asset.
     const saleAmount = AmountMath.make(brands.Money, sellingPrice);
 
     // Proposal for the offer which defines that which asset is on sale and which asset is required in return.
     const Proposal = harden({
-      give: { Items: cardAmount },
+      give: { Items: offerAmount },
       want: { Money: saleAmount },
     });
 
     // CMT (haseeb.asim@robor.systems): minted payment for the asset (baseball card) on sale.
-    const userCardPayment = E(cardMinter).mintPayment(cardAmount);
+    // const userCardPayment = E(cardMinter).mintPayment(offerAmount);
 
     // CMT (haseeb.asim@robor.systems): payment object contains the payment of the asset on sale.
-    const payment = harden({ Items: userCardPayment });
-
+    const withdrawedPayment = await E(
+      E(userWallet).getPurse(['cardStore', 'Card']),
+    ).withdraw(offerAmount);
+    console.log('withdrawed Amount:', withdrawedPayment);
+    const userCardClaimedPayment = await E(issuers.Items).claim(
+      withdrawedPayment,
+      offerAmount,
+    );
+    const payment = harden({ Items: userCardClaimedPayment });
     // CMT (haseeb.asim@robor.systems): startInstance starts the instance of the contract secondary-store and returns a creator-invitation.
     // This invitation is used to create the offer.
     const { creatorInvitation } = await E(zoe).startInstance(
@@ -161,6 +161,10 @@ const start = (zcf) => {
   }) => {
     // CMT (haseeb.asim@robor.systems): Creating an offer template that will be used by the wallet to call the buyer seat offer handler which will swap the assets
     // and return the payouts.
+    const invitationIssuer = await E(zoe).getInvitationIssuer();
+    const { value: invitationValue } = await E(invitationIssuer).getAmountOf(
+      BuyerExclusiveInvitation,
+    );
     const offerConfig = {
       id: _id,
       invitation: BuyerExclusiveInvitation,
@@ -168,13 +172,15 @@ const start = (zcf) => {
         want: {
           Items: {
             pursePetname: cardPurse.pursePetname,
-            value: harden([cardDetail]),
+            value: harden(invitationValue[0].Items.value),
+            brand: invitationValue[0].Items.brand,
           },
         },
         give: {
           Money: {
             pursePetname: tokenPurses[1].pursePetname,
-            value: sellingPrice,
+            value: invitationValue[0].Money.value,
+            brand: invitationValue[0].Money.brand,
           },
         },
         exit: { onDemand: null },
@@ -182,12 +188,11 @@ const start = (zcf) => {
     };
     // CMT (haseeb.asim@robor.systems): Adding the offer to the wallet. We get an offerId associated to the offer we sent to the wallet.
     const offerId = await E(walletP).addOffer(offerConfig);
-
     // CMT (haseeb.asim@robor.systems): An empty amount object.
     let amount = {};
 
     // CMT (haseeb.asim@robor.systems): offerAmount to update the available offers notifier.
-    const offerAmount = AmountMath.make(cardPurse.brand, harden([cardOffer]));
+    const offerAmount = AmountMath.make(brands.Items, harden([cardOffer]));
 
     // CMT (haseeb.asim@robor.systems): checking if the cardOffer contains a valid boughtFor variable.
     if (cardOffer.boughtFor) {
@@ -195,16 +200,12 @@ const start = (zcf) => {
     } else {
       amount = cardDetail;
     }
-
     // CMT (haseeb.asim@robor.systems): Creating the amount that is to be removed from userSaleHistory
-    const NFTAmountForRemoval = AmountMath.make(
-      cardPurse.brand,
-      harden([amount]),
-    );
+    const NFTAmountForRemoval = AmountMath.make(brands.Items, harden([amount]));
 
     // CMT (haseeb.asim@robor.systems): Creating the amount that is to be added to the userSaleHistory
     const NFTAmountForAddition = AmountMath.make(
-      cardPurse.brand,
+      brands.Items,
       harden([{ ...cardDetail, boughtFor: sellingPrice }]),
     );
     // CMT (haseeb.asim@robor.systems): wallet offer notifier that provides updates about change in offer status.
@@ -213,8 +214,12 @@ const start = (zcf) => {
     for await (const walletOffers of iterateNotifier(notifier)) {
       for (const { id, status } of walletOffers) {
         if (id === offerId && (status === 'complete' || status === 'accept')) {
-          E(auctionItemsCreator).removeFromUserSaleHistory(NFTAmountForRemoval);
-          E(auctionItemsCreator).addToUserSaleHistory(NFTAmountForAddition);
+          await E(auctionItemsCreator).removeFromUserSaleHistory(
+            NFTAmountForRemoval,
+          );
+          await E(auctionItemsCreator).addToUserSaleHistory(
+            NFTAmountForAddition,
+          );
           updateAvailableOffers(offerAmount);
           return true;
         }
@@ -229,13 +234,9 @@ const start = (zcf) => {
     getAvailableOfferNotifier,
     getAvailableOffers,
     makeMatchingInvitation,
-  });
-  // CMT (haseeb.asim@robor.systems): Creator facet for the contract. It provides functions that can only be used by the creator of the contract.
-  const creatorFacet = Far('CreatorFacetForSwapInvitation', {
     updateAvailableOffers,
   });
-
-  return harden({ publicFacet, creatorFacet });
+  return harden({ publicFacet });
 };
 
 harden(start);
