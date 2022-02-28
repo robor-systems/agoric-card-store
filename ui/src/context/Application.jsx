@@ -34,6 +34,7 @@ const {
   INSTALLATION_BOARD_ID,
   SWAP_WRAPPER_INSTANCE_BOARD_ID,
   MAIN_CONTRACT_BOARD_INSTANCE_ID,
+  SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
   issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID },
   brandBoardIds: { Money: MONEY_BRAND_BOARD_ID, Card: CARD_BRAND_BOARD_ID },
 } = dappConstants;
@@ -42,9 +43,10 @@ const {
 let walletP;
 let publicFacet;
 let publicFacetSwap;
+let publicFacetSimpleExchange;
 /* eslint-enable */
 
-export { walletP, publicFacet, publicFacetSwap };
+export { walletP, publicFacet, publicFacetSwap, publicFacetSimpleExchange };
 
 export const ApplicationContext = createContext();
 
@@ -128,8 +130,25 @@ export default function Provider({ children }) {
         SWAP_WRAPPER_INSTANCE_BOARD_ID,
       );
       publicFacetSwap = await E(zoe).getPublicFacet(swapWrapperInstance);
+      const result = await E(publicFacetSwap).testFunction();
+      console.log(result);
       //   publicFacetSwapRef.current = publicFacetSwap;
+      const simpleExchangeWrapperInstance = await E(board).getValue(
+        SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
+      );
+      console.log(
+        simpleExchangeWrapperInstance,
+        'simpleExchangeWrapperInstance',
+      );
 
+      publicFacetSimpleExchange = await E(zoe).getPublicFacet(
+        simpleExchangeWrapperInstance,
+      );
+      console.log(publicFacetSimpleExchange, 'publicfacetsimpleexchange');
+      console.log(
+        await E(publicFacetSimpleExchange).getAvailableOffers(),
+        'getAvailableOffers:',
+      );
       async function watchOffers() {
         console.log('watch offer');
         const availableOfferNotifier = await E(

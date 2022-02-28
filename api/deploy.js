@@ -74,6 +74,8 @@ export default async function deployApi(homePromise, { pathResolve }) {
     SWAP_INSTALLATION_BOARD_ID,
     SWAP_WRAPPER_INSTALLATION_BOARD_ID,
     CONTRACT_NAME,
+    SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
+    SIMPLE_EXCHANGE_WRAPPER_INSTALLATION_BOARD_ID,
   } = installationConstants;
 
   // CMT (haseeb.asim@robor.systems): Fetching the installation of the contract.js from the board.
@@ -97,6 +99,12 @@ export default async function deployApi(homePromise, { pathResolve }) {
     SWAP_WRAPPER_INSTALLATION_BOARD_ID,
   );
 
+  const simpleExchangeInstallation = await E(board).getValue(
+    SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
+  );
+  const simpleExchangeWrapperInstallation = await E(board).getValue(
+    SIMPLE_EXCHANGE_WRAPPER_INSTALLATION_BOARD_ID,
+  );
   // Second, we can use the installation to create a new instance of
   // our contract code on Zoe. A contract instance is a running
   // program that can take offers through Zoe. Making an instance will
@@ -194,7 +202,30 @@ export default async function deployApi(homePromise, { pathResolve }) {
     swapWrapperTerms,
   );
 
-    
+  const { publicFacet: simpleExchangePublicFacet } = await E(zoe).startInstance(
+    simpleExchangeInstallation,
+    harden({
+      Asset: cardIssuer,
+      Price: moneyIssuer,
+    }),
+  );
+
+  const { instance: simpleExchangeWrapperInstance } = await E(
+    zoe,
+  ).startInstance(
+    simpleExchangeWrapperInstallation,
+    harden({
+      Asset: cardIssuer,
+      Price: moneyIssuer,
+    }),
+    harden({
+      simpleExchangeInstallation,
+      simpleExchangePublicFacet,
+      cardMinter: minter,
+      auctionItemsCreator: creatorFacet,
+      userWallet: wallet,
+    }),
+  );
 
   // CMT (haseeb.asim@robor.systems): Storing each important variable on the board and getting their board ids.
   const [
@@ -208,6 +239,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     SWAP_INSTANCE_BOARD_ID,
     SWAP_WRAPPER_INSTANCE_BOARD_ID,
     MAIN_CONTRACT_BOARD_INSTANCE_ID,
+    SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
   ] = await Promise.all([
     E(board).getId(instance),
     E(board).getId(cardBrand),
@@ -219,6 +251,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     E(board).getId(swapInstallation),
     E(board).getId(swapWrapperInstance),
     E(board).getId(baseballCardInstance),
+    E(board).getId(simpleExchangeWrapperInstance),
   ]);
 
   console.log(`-- Contract Name: ${CONTRACT_NAME}`);
@@ -232,6 +265,10 @@ export default async function deployApi(homePromise, { pathResolve }) {
   );
   console.log(
     `-- MAIN_CONTRACT_BOARD_INSTANCE_ID: ${MAIN_CONTRACT_BOARD_INSTANCE_ID}`,
+  );
+
+  console.log(
+    `-- SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID: ${SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID}`,
   );
 
   const API_URL = process.env.API_URL || `http://127.0.0.1:${API_PORT || 8000}`;
@@ -258,6 +295,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     API_URL,
     CONTRACT_NAME,
     MAIN_CONTRACT_BOARD_INSTANCE_ID,
+    SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
   };
   const defaultsFile = pathResolve(`../ui/src/conf/defaults.js`);
   console.log('writing', defaultsFile);

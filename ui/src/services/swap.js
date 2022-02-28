@@ -1,5 +1,6 @@
 import { AmountMath } from '@agoric/ertp';
 import { E } from '@agoric/eventual-send';
+import { publicFacetSimpleExchange } from '../context/Application';
 /*
  * This function should be called when the buyer buys a card from
  * secondary market place
@@ -13,12 +14,12 @@ const makeMatchingInvitation = async ({
   boughtFor,
   walletP,
   BuyerExclusiveInvitation,
-  publicFacetSwap,
+  // publicFacetSwap,
   cardOffer,
 }) => {
   console.log('cardPursePetname:', cardPurse.pursePetname);
   console.log('cardbrand:', cardPurse.brand);
-  const result = await E(publicFacetSwap).makeMatchingInvitation({
+  const result = await E(publicFacetSimpleExchange).makeBuyerOffer({
     cardPurse,
     tokenPurses,
     cardDetail,
@@ -39,13 +40,14 @@ const makeMatchingInvitation = async ({
 const getSellerSeat = async ({
   cardDetail,
   sellingPrice,
-  publicFacetSwap,
-  currentCard,
+  // publicFacetSwap,
 }) => {
-  const sellerSeatInvitation = await E(publicFacetSwap).getSellerSeat({
+  console.log(publicFacetSimpleExchange, 'publicFacetSwapinSwap:');
+  const sellerSeatInvitation = await E(
+    publicFacetSimpleExchange,
+  ).makeSellerOffer({
     cardDetail,
     sellingPrice,
-    currentCard,
   });
   return sellerSeatInvitation;
 };

@@ -2,7 +2,6 @@
 
 import { makeNotifierKit } from '@agoric/notifier';
 
-
 import {
   swap,
   satisfies,

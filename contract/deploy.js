@@ -120,6 +120,28 @@ export default async function deployContract(
   const auctionBundle = await bundleSource(auctionBundlePath);
   const auctionInstallation = await E(zoe).install(auctionBundle);
 
+  const simpleExchangeBundleUrl = await importMetaResolve(
+    '@agoric/zoe/src/contracts/simpleExchange.js',
+    import.meta.url,
+  );
+  const simpleExchangeBundlePath = new URL(simpleExchangeBundleUrl).pathname;
+  const simpleExchangeBundle = await bundleSource(simpleExchangeBundlePath);
+  const simpleExchangeInstallation = await E(zoe).install(simpleExchangeBundle);
+
+  const simpleExchangeWrapperBundleUrl = await importMetaResolve(
+    './src/simpleExchangeWrapper.js',
+    import.meta.url,
+  );
+  const simpleExchangeWrapperBundlePath = new URL(
+    simpleExchangeWrapperBundleUrl,
+  ).pathname;
+  const simpleExchangeWrapperBundle = await bundleSource(
+    simpleExchangeWrapperBundlePath,
+  );
+  const simpleExchangeWrapperInstallation = await E(zoe).install(
+    simpleExchangeWrapperBundle,
+  );
+
   // Let's share this installation with other people, so that
   // they can run our contract code by making a contract
   // instance (see the api deploy script in this repo to see an
@@ -143,6 +165,12 @@ export default async function deployContract(
   );
   const SWAP_CONTRACT_INSTALLATION_BOARD_ID = await E(board).getId(
     swapContractInstallation,
+  );
+  const SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID = await E(board).getId(
+    simpleExchangeInstallation,
+  );
+  const SIMPLE_EXCHANGE_WRAPPER_INSTALLATION_BOARD_ID = await E(board).getId(
+    simpleExchangeWrapperInstallation,
   );
   console.log('- SUCCESS! contract code installed on Zoe');
   console.log(`-- Contract Name: ${CONTRACT_NAME}`);
@@ -169,6 +197,8 @@ export default async function deployContract(
     SWAP_INSTALLATION_BOARD_ID,
     SWAP_WRAPPER_INSTALLATION_BOARD_ID,
     SWAP_CONTRACT_INSTALLATION_BOARD_ID,
+    SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
+    SIMPLE_EXCHANGE_WRAPPER_INSTALLATION_BOARD_ID,
   };
   const defaultsFolder = pathResolve(`../ui/src/conf`);
   const defaultsFile = pathResolve(`../ui/src/conf/installationConstants.js`);

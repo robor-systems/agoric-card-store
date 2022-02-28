@@ -214,9 +214,11 @@ const start = (zcf) => {
     for await (const walletOffers of iterateNotifier(notifier)) {
       for (const { id, status } of walletOffers) {
         if (id === offerId && (status === 'complete' || status === 'accept')) {
+          // eslint-disable-next-line no-await-in-loop
           await E(auctionItemsCreator).removeFromUserSaleHistory(
             NFTAmountForRemoval,
           );
+          // eslint-disable-next-line no-await-in-loop
           await E(auctionItemsCreator).addToUserSaleHistory(
             NFTAmountForAddition,
           );
