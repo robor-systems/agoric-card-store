@@ -210,9 +210,10 @@ export default async function deployApi(homePromise, { pathResolve }) {
     }),
   );
 
-  const { instance: simpleExchangeWrapperInstance } = await E(
-    zoe,
-  ).startInstance(
+  const {
+    // publicFacet: simpleExchangeWrapperPublicFacet,
+    instance: simpleExchangeWrapperInstance,
+  } = await E(zoe).startInstance(
     simpleExchangeWrapperInstallation,
     harden({
       Asset: cardIssuer,
@@ -226,6 +227,14 @@ export default async function deployApi(homePromise, { pathResolve }) {
       userWallet: wallet,
     }),
   );
+
+  // console.log(
+  //   await E(simpleExchangeWrapperPublicFacet).makeSellerOffer({
+  //     cardDetail: { name: 'bob' },
+  //     sellingPrice: 2n,
+  //   }),
+  //   'isSimpleExchangeWrapper??????',
+  // );
 
   // CMT (haseeb.asim@robor.systems): Storing each important variable on the board and getting their board ids.
   const [

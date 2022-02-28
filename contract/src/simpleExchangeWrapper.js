@@ -16,8 +16,7 @@ import { AmountMath } from '@agoric/ertp';
 const start = async (zcf) => {
   const {
     brands,
-    // issuers,
-    // simpleExchangeInstallation,
+    issuers,
     cardMinter,
     simpleExchangePublicFacet,
     auctionItemsCreator,
@@ -46,20 +45,26 @@ const start = async (zcf) => {
   // );
   console.log(simpleExchangePublicFacet, 'simpleExchangePublicFacet');
   const makeSellerOffer = async ({ cardDetail, sellingPrice }) => {
-    const sellerInvitation = await E(
-      simpleExchangePublicFacet,
-    ).makeInvitation();
+    console.log('makeSellerOffer is working correctly');
     const cardAmount = AmountMath.make(brands.Asset, harden([cardDetail]));
-    const priceAmount = AmountMath.make(brands.Price, harden([sellingPrice]));
-    const cardPayment = cardMinter.mintPayment(cardAmount);
+    console.log(cardAmount, 'cardAmount');
+    const priceAmount = AmountMath.make(brands.Price, sellingPrice);
+    console.log(priceAmount, 'priceAmount');
+    const cardPayment = await E(cardMinter).mintPayment(cardAmount);
+    console.log(cardPayment, 'cardPayment');
+    console.log(await E(issuers.Price).getAssetKind());
     const sellerSellOrderProposal = harden({
       give: { Asset: cardAmount },
       want: { Price: priceAmount },
       exit: { onDemand: null },
     });
 
-    const sellerPayment = { Asset: cardPayment };
-
+    const sellerPayment = harden({ Asset: cardPayment });
+    console.log('beforeInvitation');
+    const sellerInvitation = await E(
+      simpleExchangePublicFacet,
+    ).makeInvitation();
+    console.log('afterInvitation');
     const sellerSeat = await E(zoe).offer(
       sellerInvitation,
       sellerSellOrderProposal,
@@ -70,17 +75,47 @@ const start = async (zcf) => {
       sellingPrice,
     };
 
-    const cardOfferAmount = AmountMath.make(brands.Items, harden([cardOffer]));
-
+    const cardOfferAmount = AmountMath.make(brands.Asset, harden([cardOffer]));
+    console.log(cardOfferAmount);
     availableOffers = AmountMath.add(availableOffers, cardOfferAmount);
-
+    console.log(availableOffers);
     availableOfferUpdater.updateState(availableOffers);
 
     return sellerSeat;
   };
-  const testFunction = async () => {
-    return 'testing';
-  };
+  // const testFunction = async (cardDetail, sellingPrice) => {
+  //   const sellerInvitation = await E(
+  //     simpleExchangePublicFacet,
+  //   ).makeInvitation();
+  //   const cardAmount = AmountMath.make(brands.Asset, harden([cardDetail]));
+  //   const priceAmount = AmountMath.make(brands.Price, harden([sellingPrice]));
+  //   const cardPayment = cardMinter.mintPayment(cardAmount);
+  //   const sellerSellOrderProposal = harden({
+  //     give: { Asset: cardAmount },
+  //     want: { Price: priceAmount },
+  //     exit: { onDemand: null },
+  //   });
+
+  //   const sellerPayment = { Asset: cardPayment };
+
+  //   const sellerSeat = await E(zoe).offer(
+  //     sellerInvitation,
+  //     sellerSellOrderProposal,
+  //     sellerPayment,
+  //   );
+  //   const cardOffer = {
+  //     ...cardDetail,
+  //     sellingPrice,
+  //   };
+
+  //   const cardOfferAmount = AmountMath.make(brands.Items, harden([cardOffer]));
+
+  //   availableOffers = AmountMath.add(availableOffers, cardOfferAmount);
+
+  //   availableOfferUpdater.updateState(availableOffers);
+
+  //   return sellerSeat;
+  // };
   const makeBuyerOffer = async ({
     cardPurse,
     tokenPurses,
@@ -99,15 +134,15 @@ const start = async (zcf) => {
       invitation: buyerExclusiveInvitation,
       proposalTemplate: {
         want: {
-          Items: {
+          Asset: {
             pursePetname: cardPurse.pursePetname,
-            value: harden(cardDetail),
+            value: harden([cardDetail]),
             brand: brands.Asset,
           },
         },
         give: {
-          Money: {
-            pursePetname: tokenPurses[1].pursePetname,
+          Price: {
+            pursePetname: tokenPurses[0].pursePetname,
             value: sellingPrice,
             brand: brands.Price,
           },
@@ -121,7 +156,7 @@ const start = async (zcf) => {
     let amount = {};
 
     // CMT (haseeb.asim@robor.systems): offerAmount to update the available offers notifier.
-    const offerAmount = AmountMath.make(brands.Items, harden([cardOffer]));
+    const offerAmount = AmountMath.make(brands.Asset, harden([cardOffer]));
 
     // CMT (haseeb.asim@robor.systems): checking if the cardOffer contains a valid boughtFor variable.
     if (cardOffer.boughtFor) {
@@ -130,11 +165,11 @@ const start = async (zcf) => {
       amount = cardDetail;
     }
     // CMT (haseeb.asim@robor.systems): Creating the amount that is to be removed from userSaleHistory
-    const NFTAmountForRemoval = AmountMath.make(brands.Items, harden([amount]));
+    const NFTAmountForRemoval = AmountMath.make(brands.Asset, harden([amount]));
 
     // CMT (haseeb.asim@robor.systems): Creating the amount that is to be added to the userSaleHistory
     const NFTAmountForAddition = AmountMath.make(
-      brands.Items,
+      brands.Asset,
       harden([{ ...cardDetail, boughtFor: sellingPrice }]),
     );
     // CMT (haseeb.asim@robor.systems): wallet offer notifier that provides updates about change in offer status.
@@ -165,7 +200,7 @@ const start = async (zcf) => {
     getAvailableOfferNotifier,
     getAvailableOffers,
     updateAvailableOffers,
-    testFunction,
+    // sellerOffer: testFunction,
   });
   return harden({ publicFacet });
 };

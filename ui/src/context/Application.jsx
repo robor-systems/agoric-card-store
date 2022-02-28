@@ -130,8 +130,7 @@ export default function Provider({ children }) {
         SWAP_WRAPPER_INSTANCE_BOARD_ID,
       );
       publicFacetSwap = await E(zoe).getPublicFacet(swapWrapperInstance);
-      const result = await E(publicFacetSwap).testFunction();
-      console.log(result);
+
       //   publicFacetSwapRef.current = publicFacetSwap;
       const simpleExchangeWrapperInstance = await E(board).getValue(
         SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
@@ -152,7 +151,7 @@ export default function Provider({ children }) {
       async function watchOffers() {
         console.log('watch offer');
         const availableOfferNotifier = await E(
-          publicFacetSwap,
+          publicFacetSimpleExchange,
         ).getAvailableOfferNotifier();
 
         for await (const availableOffers of iterateNotifier(
@@ -234,6 +233,7 @@ export default function Provider({ children }) {
         walletP,
         publicFacet,
         publicFacetSwap,
+        publicFacetSimpleExchange,
         CARD_BRAND_BOARD_ID,
         MAIN_CONTRACT_BOARD_INSTANCE_ID,
       }}

@@ -1,7 +1,9 @@
 // @ts-check
 
 import { makeNotifierKit } from '@agoric/notifier';
+import { Far } from '@agoric/marshal';
 
+import '@agoric/zoe/exported';
 import {
   swap,
   satisfies,
@@ -13,13 +15,14 @@ import {
  * SimpleExchange is an exchange with a simple matching algorithm, which allows
  * an unlimited number of parties to create new orders or accept existing
  * orders. The notifier allows callers to find the current list of orders.
+ * https://agoric.com/documentation/zoe/guide/contracts/simple-exchange.html
  *
  * The SimpleExchange uses Asset and Price as its keywords. The contract treats
  * the two keywords symmetrically. New offers can be created and existing offers
  * can be accepted in either direction.
  *
- * { give: { 'Asset', simoleans(5) }, want: { 'Price', quatloos(3) } }
- * { give: { 'Price', quatloos(8) }, want: { 'Asset', simoleans(3) } }
+ * { give: { 'Asset', simoleans(5n) }, want: { 'Price', quatloos(3) } }
+ * { give: { 'Price', quatloos(8) }, want: { 'Asset', simoleans(3n) } }
  *
  * The Asset is treated as an exact amount to be exchanged, while the
  * Price is a limit that may be improved on. This simple exchange does
@@ -66,10 +69,14 @@ const start = (zcf) => {
   // the caller can know to add the new offer to the book.
   function swapIfCanTrade(offers, seat) {
     for (const offer of offers) {
-      const satisfiedBy = (xSeat, ySeat) =>
-        satisfies(zcf, xSeat, ySeat.getCurrentAllocation());
+      const satisfiedBy = (xSeat, ySeat) => {
+        console.log('working3');
+        return satisfies(zcf, xSeat, ySeat.getCurrentAllocation());
+      };
       if (satisfiedBy(offer, seat) && satisfiedBy(seat, offer)) {
+        console.log('working4');
         swap(zcf, seat, offer);
+        console.log('working5');
         // return handle to remove
         return offer;
       }
@@ -83,6 +90,8 @@ const start = (zcf) => {
   // unmodified counterOfffers
   function swapIfCanTradeAndUpdateBook(counterOffers, coOffers, seat) {
     const offer = swapIfCanTrade(counterOffers, seat);
+
+    console.log(offer, 'working7');
     if (offer) {
       // remove the matched offer.
       counterOffers = counterOffers.filter((value) => value !== offer);
@@ -90,6 +99,7 @@ const start = (zcf) => {
       // Save the order in the book
       coOffers.push(seat);
     }
+    console.log('working8');
     bookOrdersChanged();
     return counterOffers;
   }
@@ -99,7 +109,9 @@ const start = (zcf) => {
       give: { Asset: null },
       want: { Price: null },
     });
+    console.log('working11');
     buySeats = swapIfCanTradeAndUpdateBook(buySeats, sellSeats, seat);
+    console.log('working12');
     return 'Order Added';
   };
 
@@ -108,7 +120,9 @@ const start = (zcf) => {
       give: { Price: null },
       want: { Asset: null },
     });
+    console.log('working2');
     sellSeats = swapIfCanTradeAndUpdateBook(sellSeats, buySeats, seat);
+    console.log('working9');
     return 'Order Added';
   };
 
@@ -116,14 +130,16 @@ const start = (zcf) => {
   const exchangeOfferHandler = (seat) => {
     // Buy Order
     if (seat.getProposal().want.Asset) {
+      console.log('working1');
       return buy(seat);
     }
     // Sell Order
     if (seat.getProposal().give.Asset) {
+      console.log('working10');
       return sell(seat);
     }
     // Eject because the offer must be invalid
-    throw seat.kickOut(
+    throw seat.fail(
       new Error(`The proposal did not match either a buy or sell order.`),
     );
   };
@@ -132,7 +148,7 @@ const start = (zcf) => {
     zcf.makeInvitation(exchangeOfferHandler, 'exchange');
 
   /** @type {SimpleExchangePublicFacet} */
-  const publicFacet = harden({
+  const publicFacet = Far('SimpleExchangePublicFacet', {
     makeInvitation: makeExchangeInvitation,
     getNotifier: () => notifier,
   });

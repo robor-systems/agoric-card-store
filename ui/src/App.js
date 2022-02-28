@@ -27,6 +27,7 @@ function App() {
     walletP,
     publicFacet,
     publicFacetSwap,
+    publicFacetSimpleExchange,
     MAIN_CONTRACT_BOARD_INSTANCE_ID,
     CARD_BRAND_BOARD_ID,
   } = useApplicationContext();
@@ -80,6 +81,7 @@ function App() {
     walletP,
     publicFacet,
     publicFacetSwap,
+    publicFacetSimpleExchange,
     MAIN_CONTRACT_BOARD_INSTANCE_ID,
     CARD_BRAND_BOARD_ID,
   );

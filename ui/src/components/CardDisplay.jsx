@@ -42,7 +42,10 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
     }, {});
     const arr = params?.userCards.map((offer) => {
       let obj = {};
-      if (userOffersMap[offer.id]) obj = { ...userOffersMap[offer.id] };
+      if (userOffersMap[offer.id]) {
+        console.log(userOffersMap[offer.id]);
+        obj = { ...userOffersMap[offer.id] };
+      }
       if (userNftsMap[offer.id]) obj = { ...obj, ...userNftsMap[offer.id] };
       return obj;
     });
@@ -52,9 +55,12 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
   const getSecondaryCards = (params) => {
     const ids = params?.userCards?.map((card) => card.id);
     // change !== to === to filter user owned cards from secondaryMarketplace
+    console.log(ids, 'filterids');
+    console.log(userOffers, 'useroffersfilter');
     const arr = params?.userOffers?.filter(
-      (card) => ids.indexOf(card.id) === -1,
+      (card) => ids.indexOf(card.id) !== -1,
     );
+    console.log(arr, 'filteredarr');
     setSecondaryLoader(false);
     return arr;
   };
@@ -108,6 +114,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
       break;
     case 1: {
       menuOptions = ['Name', 'Author'];
+      console.log(secondaryCards, 'secondarycards');
       const filteredList = getFilteredList(secondaryCards, menuOption);
       cards =
         filteredList?.length !== 0 ? (

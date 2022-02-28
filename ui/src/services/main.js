@@ -18,6 +18,7 @@ const Main = (
   walletP,
   publicFacet,
   publicFacetSwap,
+  publicFacetSimpleExchange,
   MAIN_CONTRACT_BOARD_INSTANCE_ID,
   CARD_BRAND_BOARD_ID,
 ) => {
@@ -90,6 +91,7 @@ const Main = (
       BuyerExclusiveInvitation,
       publicFacetSwap,
       publicFacet,
+      publicFacetSimpleExchange,
       setLoading,
       onClose,
     });
@@ -104,6 +106,7 @@ const Main = (
       publicFacetSwap,
       sellingPrice: BigInt(price),
       walletP,
+      publicFacetSimpleExchange,
       cardDetail: activeCard,
       currentCard,
     };

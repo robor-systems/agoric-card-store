@@ -61,13 +61,13 @@ export default async function deployContract(
   const bundle = await bundleSource(pathResolve(`./src/contract.js`));
   const installation = await E(zoe).install(bundle);
 
-  const swapContractbundleUrl = await importMetaResolve(
-    './src/swapContract.js',
-    import.meta.url,
-  );
-  const swapContractbundlePath = new URL(swapContractbundleUrl).pathname;
-  const swapContractBundle = await bundleSource(swapContractbundlePath);
-  const swapContractInstallation = await E(zoe).install(swapContractBundle);
+  // const swapContractbundleUrl = await importMetaResolve(
+  //   './src/swapContract.js',
+  //   import.meta.url,
+  // );
+  // const swapContractbundlePath = new URL(swapContractbundleUrl).pathname;
+  // const swapContractBundle = await bundleSource(swapContractbundlePath);
+  // const swapContractInstallation = await E(zoe).install(swapContractBundle);
   // CMT (haseeb.asim@robor.systems): Following lines of code provide:
   // - The bundle URL of the secondary store contract.
   // - The bundle path name.
@@ -121,7 +121,7 @@ export default async function deployContract(
   const auctionInstallation = await E(zoe).install(auctionBundle);
 
   const simpleExchangeBundleUrl = await importMetaResolve(
-    '@agoric/zoe/src/contracts/simpleExchange.js',
+    './src/simpleExchange.js',
     import.meta.url,
   );
   const simpleExchangeBundlePath = new URL(simpleExchangeBundleUrl).pathname;
@@ -163,9 +163,9 @@ export default async function deployContract(
   const SWAP_WRAPPER_INSTALLATION_BOARD_ID = await E(board).getId(
     swapWrapperInstallation,
   );
-  const SWAP_CONTRACT_INSTALLATION_BOARD_ID = await E(board).getId(
-    swapContractInstallation,
-  );
+  // const SWAP_CONTRACT_INSTALLATION_BOARD_ID = await E(board).getId(
+  //   swapContractInstallation,
+  // );
   const SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID = await E(board).getId(
     simpleExchangeInstallation,
   );
@@ -185,9 +185,9 @@ export default async function deployContract(
   console.log(
     `-- Swap Wrapper Installation Board Id: ${SWAP_WRAPPER_INSTALLATION_BOARD_ID}`,
   );
-  console.log(
-    `-- Swap Contract Installation Board Id: ${SWAP_CONTRACT_INSTALLATION_BOARD_ID}`,
-  );
+  // console.log(
+  //   // `-- Swap Contract Installation Board Id: ${SWAP_CONTRACT_INSTALLATION_BOARD_ID}`,
+  // );
   // Save the constants somewhere where the UI and api can find it.
   const dappConstants = {
     CONTRACT_NAME,
@@ -196,7 +196,7 @@ export default async function deployContract(
     AUCTION_ITEMS_INSTALLATION_BOARD_ID,
     SWAP_INSTALLATION_BOARD_ID,
     SWAP_WRAPPER_INSTALLATION_BOARD_ID,
-    SWAP_CONTRACT_INSTALLATION_BOARD_ID,
+    // SWAP_CONTRACT_INSTALLATION_BOARD_ID,
     SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
     SIMPLE_EXCHANGE_WRAPPER_INSTALLATION_BOARD_ID,
   };
