@@ -58,7 +58,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
     console.log(ids, 'filterids');
     console.log(userOffers, 'useroffersfilter');
     const arr = params?.userOffers?.filter(
-      (card) => ids.indexOf(card.id) !== -1,
+      (card) => ids.indexOf(card.id) === -1,
     );
     console.log(arr, 'filteredarr');
     setSecondaryLoader(false);

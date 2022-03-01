@@ -39,12 +39,9 @@ function SellProductForm({
           setLoading(true);
           const amount = makeValue(price, tokenDisplayInfo);
           console.log('amount is:', amount);
-
-          const result = await makeSwapInvitation({ price: amount });
-          if (result) {
-            setLoading(false);
-            onClose();
-          }
+          await makeSwapInvitation({ price: amount });
+          setLoading(false);
+          onClose();
         }}
         isLoading={isLoading}
         text="Place in Marketplace"

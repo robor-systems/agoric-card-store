@@ -175,7 +175,6 @@ const start = async (zcf) => {
     simpleExchangeInstanceBoardId,
   }) => {
     const buyerInvitation = E(simpleExchangePublicFacet).makeInvitation();
-
     const invitationIssuer = E(zoe).getInvitationIssuer();
     const invitationAmount = await E(invitationIssuer).getAmountOf(
       buyerInvitation,
