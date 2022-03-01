@@ -1,5 +1,6 @@
 import { AmountMath } from '@agoric/ertp';
 import { E } from '@agoric/eventual-send';
+import dappConstants from '../utils/constants';
 // import { publicFacetSimpleExchange } from '../context/Application';
 /*
  * This function should be called when the buyer buys a card from
@@ -35,6 +36,10 @@ const makeMatchingInvitation = async ({
     walletP,
     cardOffer,
     _id: Date.now(),
+    simpleExchangeInstallationBoardId:
+      dappConstants.SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
+    simpleExchangeInstanceBoardId:
+      dappConstants.SIMPLE_EXCHANGE_INSTANCE_BOARD_ID,
   });
 
   return result;
@@ -47,11 +52,25 @@ const getSellerSeat = async ({
   cardDetail,
   sellingPrice,
   publicFacetSimpleExchange,
+  cardPurse,
+  tokenPurses,
+  walletP,
 }) => {
   console.log(publicFacetSimpleExchange, 'publicFacetSwapinSwap:');
   const sellerSeatInvitation = await E(
     publicFacetSimpleExchange,
-  ).makeSellerOffer({ cardDetail, sellingPrice });
+  ).makeSellerOffer({
+    cardDetail,
+    sellingPrice,
+    cardPurse,
+    tokenPurses,
+    walletP,
+    _id: Date.now(),
+    simpleExchangeInstallationBoardId:
+      dappConstants.SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
+    simpleExchangeInstanceBoardId:
+      dappConstants.SIMPLE_EXCHANGE_INSTANCE_BOARD_ID,
+  });
   return sellerSeatInvitation;
 };
 

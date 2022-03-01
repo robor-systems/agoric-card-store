@@ -106,6 +106,8 @@ const Main = (
       publicFacetSwap,
       sellingPrice: BigInt(price),
       walletP,
+      cardPurse,
+      tokenPurses,
       publicFacetSimpleExchange,
       cardDetail: activeCard,
       currentCard,

@@ -202,7 +202,10 @@ export default async function deployApi(homePromise, { pathResolve }) {
     swapWrapperTerms,
   );
 
-  const { publicFacet: simpleExchangePublicFacet } = await E(zoe).startInstance(
+  const {
+    publicFacet: simpleExchangePublicFacet,
+    instance: simpleExchangeInstance,
+  } = await E(zoe).startInstance(
     simpleExchangeInstallation,
     harden({
       Asset: cardIssuer,
@@ -249,6 +252,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     SWAP_WRAPPER_INSTANCE_BOARD_ID,
     MAIN_CONTRACT_BOARD_INSTANCE_ID,
     SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
+    SIMPLE_EXCHANGE_INSTANCE_BOARD_ID,
   ] = await Promise.all([
     E(board).getId(instance),
     E(board).getId(cardBrand),
@@ -261,6 +265,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     E(board).getId(swapWrapperInstance),
     E(board).getId(baseballCardInstance),
     E(board).getId(simpleExchangeWrapperInstance),
+    E(board).getId(simpleExchangeInstance),
   ]);
 
   console.log(`-- Contract Name: ${CONTRACT_NAME}`);
@@ -305,6 +310,8 @@ export default async function deployApi(homePromise, { pathResolve }) {
     CONTRACT_NAME,
     MAIN_CONTRACT_BOARD_INSTANCE_ID,
     SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
+    SIMPLE_EXCHANGE_INSTANCE_BOARD_ID,
+    SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
   };
   const defaultsFile = pathResolve(`../ui/src/conf/defaults.js`);
   console.log('writing', defaultsFile);

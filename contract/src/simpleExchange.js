@@ -69,6 +69,11 @@ const start = (zcf) => {
   // the caller can know to add the new offer to the book.
   function swapIfCanTrade(offers, seat) {
     for (const offer of offers) {
+      console.log(
+        offer.getCurrentAllocation(),
+        seat.getCurrentAllocation(),
+        'currentallocations',
+      );
       const satisfiedBy = (xSeat, ySeat) => {
         console.log('working3');
         return satisfies(zcf, xSeat, ySeat.getCurrentAllocation());
@@ -111,6 +116,7 @@ const start = (zcf) => {
     });
     console.log('working11');
     buySeats = swapIfCanTradeAndUpdateBook(buySeats, sellSeats, seat);
+    console.log(buySeats);
     console.log('working12');
     return 'Order Added';
   };
@@ -122,6 +128,7 @@ const start = (zcf) => {
     });
     console.log('working2');
     sellSeats = swapIfCanTradeAndUpdateBook(sellSeats, buySeats, seat);
+    console.log(sellSeats);
     console.log('working9');
     return 'Order Added';
   };

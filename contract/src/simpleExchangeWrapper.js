@@ -16,8 +16,8 @@ import { AmountMath } from '@agoric/ertp';
 const start = async (zcf) => {
   const {
     brands,
-    issuers,
-    cardMinter,
+    // issuers,
+    // cardMinter,
     simpleExchangePublicFacet,
     auctionItemsCreator,
   } = zcf.getTerms();
@@ -44,32 +44,78 @@ const start = async (zcf) => {
   //   },
   // );
   console.log(simpleExchangePublicFacet, 'simpleExchangePublicFacet');
-  const makeSellerOffer = async ({ cardDetail, sellingPrice }) => {
-    console.log('makeSellerOffer is working correctly');
-    const cardAmount = AmountMath.make(brands.Asset, harden([cardDetail]));
-    console.log(cardAmount, 'cardAmount');
-    const priceAmount = AmountMath.make(brands.Price, sellingPrice);
-    console.log(priceAmount, 'priceAmount');
-    const cardPayment = await E(cardMinter).mintPayment(cardAmount);
-    console.log(cardPayment, 'cardPayment');
-    console.log(await E(issuers.Price).getAssetKind());
-    const sellerSellOrderProposal = harden({
-      give: { Asset: cardAmount },
-      want: { Price: priceAmount },
-      exit: { onDemand: null },
-    });
+  const makeSellerOffer = async ({
+    cardDetail,
+    sellingPrice,
+    cardPurse,
+    walletP,
+    tokenPurses,
+    _id,
+    simpleExchangeInstallationBoardId,
+    simpleExchangeInstanceBoardId,
+  }) => {
+    // console.log('makeSellerOffer is working correctly');
+    // const cardAmount = AmountMath.make(brands.Asset, harden([cardDetail]));
+    // console.log(cardAmount, 'cardAmount');
+    // const priceAmount = AmountMath.make(brands.Price, sellingPrice);
+    // console.log(priceAmount, 'priceAmount');
+    // const cardPayment = await E(cardMinter).mintPayment(cardAmount);
+    // console.log(cardPayment, 'cardPayment');
+    // console.log(await E(issuers.Price).getAssetKind());
+    // const sellerSellOrderProposal = harden({
+    //   give: { Asset: cardAmount },
+    //   want: { Price: priceAmount },
+    //   exit: { onDemand: null },
+    // });
 
-    const sellerPayment = harden({ Asset: cardPayment });
-    console.log('beforeInvitation');
+    // const sellerPayment = harden({ Asset: cardPayment });
+    // console.log('beforeInvitation');
     const sellerInvitation = await E(
       simpleExchangePublicFacet,
     ).makeInvitation();
-    console.log('afterInvitation');
-    const sellerSeat = await E(zoe).offer(
+    const invitationIssuer = E(zoe).getInvitationIssuer();
+    const invitationAmount = await E(invitationIssuer).getAmountOf(
       sellerInvitation,
-      sellerSellOrderProposal,
-      sellerPayment,
     );
+    const {
+      value: [{ handle }],
+    } = invitationAmount;
+    const board = E(walletP).getBoard();
+    const invitationHandleBoardId = await E(board).getId(handle);
+    const newCardDetails = { ...cardDetail };
+    delete newCardDetails.boughtFor;
+    const offerConfig = {
+      id: _id,
+      invitation: sellerInvitation,
+      invitationHandleBoardId,
+      simpleExchangeInstallationBoardId,
+      simpleExchangeInstanceBoardId,
+      proposalTemplate: {
+        give: {
+          Asset: {
+            pursePetname: cardPurse.pursePetname,
+            value: harden([newCardDetails]),
+            brand: brands.Asset,
+          },
+        },
+        want: {
+          Price: {
+            pursePetname: tokenPurses[0].pursePetname,
+            value: sellingPrice,
+            brand: brands.Price,
+          },
+        },
+        exit: { onDemand: null },
+      },
+    };
+    // CMT (haseeb.asim@robor.systems): Adding the offer to the wallet. We get an offerId associated to the offer we sent to the wallet.
+    const offerId = await E(walletP).addOffer(offerConfig);
+    // const sellerSeat = await E(zoe).offer(
+    //   sellerInvitation,
+    //   sellerSellOrderProposal,
+    //   sellerPayment,
+    // );
+    console.log(offerId);
     const cardOffer = {
       ...cardDetail,
       sellingPrice,
@@ -81,7 +127,7 @@ const start = async (zcf) => {
     console.log(availableOffers);
     availableOfferUpdater.updateState(availableOffers);
 
-    return sellerSeat;
+    // return sellerSeat;
   };
   // const testFunction = async (cardDetail, sellingPrice) => {
   //   const sellerInvitation = await E(
@@ -125,13 +171,27 @@ const start = async (zcf) => {
     walletP,
     cardOffer,
     _id,
+    simpleExchangeInstallationBoardId,
+    simpleExchangeInstanceBoardId,
   }) => {
     const buyerInvitation = E(simpleExchangePublicFacet).makeInvitation();
+
     const invitationIssuer = E(zoe).getInvitationIssuer();
-    const buyerExclusiveInvitation = E(invitationIssuer).claim(buyerInvitation);
+    const invitationAmount = await E(invitationIssuer).getAmountOf(
+      buyerInvitation,
+    );
+    const {
+      value: [{ handle }],
+    } = invitationAmount;
+    const board = E(walletP).getBoard();
+    const invitationHandleBoardId = await E(board).getId(handle);
+
     const offerConfig = {
       id: _id,
-      invitation: buyerExclusiveInvitation,
+      invitation: buyerInvitation,
+      invitationHandleBoardId,
+      simpleExchangeInstallationBoardId,
+      simpleExchangeInstanceBoardId,
       proposalTemplate: {
         want: {
           Asset: {
