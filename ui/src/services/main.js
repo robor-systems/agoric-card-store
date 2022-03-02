@@ -94,11 +94,16 @@ const Main = (
       publicFacetSimpleExchange,
       setLoading,
       onClose,
+      dispatch,
     });
     return result;
   };
 
-  const makeInvitationAndSellerSeat = async ({ price }) => {
+  const makeInvitationAndSellerSeat = async ({
+    price,
+    setLoading,
+    onClose,
+  }) => {
     const currentCard = userCards.filter(
       (item) => item.id === activeCard.id,
     )[0];
@@ -111,6 +116,10 @@ const Main = (
       publicFacetSimpleExchange,
       cardDetail: activeCard,
       currentCard,
+      setLoading,
+      onClose,
+      state,
+      dispatch,
     };
     const sellerSeatInvitation = await getSellerSeat(params);
     return sellerSeatInvitation;

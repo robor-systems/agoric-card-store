@@ -14,13 +14,8 @@ import { AmountMath } from '@agoric/ertp';
  * @type {ContractStartFn}
  */
 const start = async (zcf) => {
-  const {
-    brands,
-    // issuers,
-    // cardMinter,
-    simpleExchangePublicFacet,
-    auctionItemsCreator,
-  } = zcf.getTerms();
+  const { brands, simpleExchangePublicFacet, auctionItemsCreator } =
+    zcf.getTerms();
   const zoe = zcf.getZoeService();
 
   let availableOffers = AmountMath.make(brands.Asset, harden([]));
@@ -36,13 +31,6 @@ const start = async (zcf) => {
     availableOffers = AmountMath.subtract(availableOffers, cardAmount);
     availableOfferUpdater.updateState(availableOffers);
   };
-  // const { publicFacet: simpleExchangePublicFacet } = await E(zoe).startInstance(
-  //   simpleExchangeInstallation,
-  //   {
-  //     Asset: issuers.Asset,
-  //     Price: issuers.Price,
-  //   },
-  // );
   console.log(simpleExchangePublicFacet, 'simpleExchangePublicFacet');
   const makeSellerOffer = async ({
     cardDetail,
@@ -54,30 +42,23 @@ const start = async (zcf) => {
     simpleExchangeInstallationBoardId,
     simpleExchangeInstanceBoardId,
   }) => {
-    // console.log('makeSellerOffer is working correctly');
-    // const cardAmount = AmountMath.make(brands.Asset, harden([cardDetail]));
-    // console.log(cardAmount, 'cardAmount');
-    // const priceAmount = AmountMath.make(brands.Price, sellingPrice);
-    // console.log(priceAmount, 'priceAmount');
-    // const cardPayment = await E(cardMinter).mintPayment(cardAmount);
-    // console.log(cardPayment, 'cardPayment');
-    // console.log(await E(issuers.Price).getAssetKind());
-    // const sellerSellOrderProposal = harden({
-    //   give: { Asset: cardAmount },
-    //   want: { Price: priceAmount },
-    //   exit: { onDemand: null },
-    // });
-
-    // const sellerPayment = harden({ Asset: cardPayment });
-    // console.log('beforeInvitation');
     const sellerInvitation = await E(
       simpleExchangePublicFacet,
     ).makeInvitation();
+
     const invitationIssuer = E(zoe).getInvitationIssuer();
     const invitationAmount = await E(invitationIssuer).getAmountOf(
       sellerInvitation,
     );
+    // const exclusiveInvitation = await E(invitationIssuer).claim(
+    //   sellerInvitation,
+    // );
+    // const InvitationValue = await E(zoe).getInvitationDetails(
+    //   exclusiveInvitation,
+    // );
+    // console.log('Invitation Amount:', InvitationValue);
     const {
+      // @ts-ignore
       value: [{ handle }],
     } = invitationAmount;
     const board = E(walletP).getBoard();
@@ -110,58 +91,16 @@ const start = async (zcf) => {
     };
     // CMT (haseeb.asim@robor.systems): Adding the offer to the wallet. We get an offerId associated to the offer we sent to the wallet.
     const offerId = await E(walletP).addOffer(offerConfig);
-    // const sellerSeat = await E(zoe).offer(
-    //   sellerInvitation,
-    //   sellerSellOrderProposal,
-    //   sellerPayment,
-    // );
     console.log(offerId);
     const cardOffer = {
       ...cardDetail,
       sellingPrice,
     };
-
     const cardOfferAmount = AmountMath.make(brands.Asset, harden([cardOffer]));
     console.log(cardOfferAmount);
-    availableOffers = AmountMath.add(availableOffers, cardOfferAmount);
-    console.log(availableOffers);
-    availableOfferUpdater.updateState(availableOffers);
-
-    // return sellerSeat;
+    return { offerId, cardOfferAmount };
   };
-  // const testFunction = async (cardDetail, sellingPrice) => {
-  //   const sellerInvitation = await E(
-  //     simpleExchangePublicFacet,
-  //   ).makeInvitation();
-  //   const cardAmount = AmountMath.make(brands.Asset, harden([cardDetail]));
-  //   const priceAmount = AmountMath.make(brands.Price, harden([sellingPrice]));
-  //   const cardPayment = cardMinter.mintPayment(cardAmount);
-  //   const sellerSellOrderProposal = harden({
-  //     give: { Asset: cardAmount },
-  //     want: { Price: priceAmount },
-  //     exit: { onDemand: null },
-  //   });
 
-  //   const sellerPayment = { Asset: cardPayment };
-
-  //   const sellerSeat = await E(zoe).offer(
-  //     sellerInvitation,
-  //     sellerSellOrderProposal,
-  //     sellerPayment,
-  //   );
-  //   const cardOffer = {
-  //     ...cardDetail,
-  //     sellingPrice,
-  //   };
-
-  //   const cardOfferAmount = AmountMath.make(brands.Items, harden([cardOffer]));
-
-  //   availableOffers = AmountMath.add(availableOffers, cardOfferAmount);
-
-  //   availableOfferUpdater.updateState(availableOffers);
-
-  //   return sellerSeat;
-  // };
   const makeBuyerOffer = async ({
     cardPurse,
     tokenPurses,
@@ -212,41 +151,78 @@ const start = async (zcf) => {
     // CMT (haseeb.asim@robor.systems): Adding the offer to the wallet. We get an offerId associated to the offer we sent to the wallet.
     const offerId = await E(walletP).addOffer(offerConfig);
     // CMT (haseeb.asim@robor.systems): An empty amount object.
+    return offerId;
+  };
+
+  const updateNotfiersOnWalletOffersAtSeller = async ({
+    offerId,
+    walletP,
+    cardOfferAmount,
+  }) => {
+    // CMT (hussain.rizvi@robor.systems): wallet offer notifier that provides updates about change in offer status.
+    const notifier = await E(walletP).getOffersNotifier();
+    // CMT (hussain.rizvi@robor.systems): Using the iterator function for notifiers updating the userSaleHistory and available offers.
+    for await (const walletOffers of iterateNotifier(notifier)) {
+      for (const { id, status } of walletOffers) {
+        if (id === offerId) {
+          if (status === 'pending') {
+            availableOffers = AmountMath.add(availableOffers, cardOfferAmount);
+            console.log(availableOffers);
+            availableOfferUpdater.updateState(availableOffers);
+            return true;
+          } else if (status === 'decline') {
+            return false;
+          }
+        }
+      }
+    }
+    return false;
+  };
+
+  const updateNotfiersOnWalletOffersAtBuyer = async ({
+    offerId,
+    cardOffer,
+    cardDetail,
+    boughtFor,
+    sellingPrice,
+    walletP,
+  }) => {
     let amount = {};
-
-    // CMT (haseeb.asim@robor.systems): offerAmount to update the available offers notifier.
+    // CMT (hussain.rizvi@robor.systems): offerAmount to update the available offers notifier.
     const offerAmount = AmountMath.make(brands.Asset, harden([cardOffer]));
-
-    // CMT (haseeb.asim@robor.systems): checking if the cardOffer contains a valid boughtFor variable.
+    // CMT (hussain.rizvi@robor.systems): checking if the cardOffer contains a valid boughtFor variable.
     if (cardOffer.boughtFor) {
       amount = { ...cardDetail, boughtFor };
     } else {
       amount = cardDetail;
     }
-    // CMT (haseeb.asim@robor.systems): Creating the amount that is to be removed from userSaleHistory
+    // CMT (hussain.rizvi@robor.systems): Creating the amount that is to be removed from userSaleHistory
     const NFTAmountForRemoval = AmountMath.make(brands.Asset, harden([amount]));
-
-    // CMT (haseeb.asim@robor.systems): Creating the amount that is to be added to the userSaleHistory
+    // CMT (hussain.rizvi@robor.systems): Creating the amount that is to be added to the userSaleHistory
     const NFTAmountForAddition = AmountMath.make(
       brands.Asset,
       harden([{ ...cardDetail, boughtFor: sellingPrice }]),
     );
-    // CMT (haseeb.asim@robor.systems): wallet offer notifier that provides updates about change in offer status.
+    // CMT (hussain.rizvi@robor.systems): wallet offer notifier that provides updates about change in offer status.
     const notifier = await E(walletP).getOffersNotifier();
-    // CMT (haseeb.asim@robor.systems): Using the iterator function for notifiers updating the userSaleHistory and available offers.
+    // CMT (hussain.rizvi@robor.systems): Using the iterator function for notifiers updating the userSaleHistory and available offers.
     for await (const walletOffers of iterateNotifier(notifier)) {
       for (const { id, status } of walletOffers) {
-        if (id === offerId && (status === 'complete' || status === 'accept')) {
-          // eslint-disable-next-line no-await-in-loop
-          await E(auctionItemsCreator).removeFromUserSaleHistory(
-            NFTAmountForRemoval,
-          );
-          // eslint-disable-next-line no-await-in-loop
-          await E(auctionItemsCreator).addToUserSaleHistory(
-            NFTAmountForAddition,
-          );
-          updateAvailableOffers(offerAmount);
-          return true;
+        if (id === offerId) {
+          if (status === 'complete' || status === 'accept') {
+            // eslint-disable-next-line no-await-in-loop
+            await E(auctionItemsCreator).removeFromUserSaleHistory(
+              NFTAmountForRemoval,
+            );
+            // eslint-disable-next-line no-await-in-loop
+            await E(auctionItemsCreator).addToUserSaleHistory(
+              NFTAmountForAddition,
+            );
+            updateAvailableOffers(offerAmount);
+            return true;
+          } else if (status === 'reject') {
+            return false;
+          }
         }
       }
     }
@@ -259,7 +235,8 @@ const start = async (zcf) => {
     getAvailableOfferNotifier,
     getAvailableOffers,
     updateAvailableOffers,
-    // sellerOffer: testFunction,
+    updateNotfiersOnWalletOffersAtBuyer,
+    updateNotfiersOnWalletOffersAtSeller,
   });
   return harden({ publicFacet });
 };

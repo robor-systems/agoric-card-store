@@ -117,14 +117,11 @@ function ModalContent({
                 style="w-full text-white"
                 onClick={async () => {
                   setLoading(true);
-                  const result = await makeMatchingSeatInvitation({
+                  await makeMatchingSeatInvitation({
                     cardDetail,
                     setLoading,
                     onClose,
                   });
-                  console.log('result:', result);
-                  setLoading(false);
-                  onClose();
                 }}
                 styles="relative"
                 isLoading={isLoading}

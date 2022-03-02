@@ -1,20 +1,24 @@
 import React from 'react';
 import Snackbar from '@material-ui/core/Snackbar';
 import { useApplicationContext } from '../context/Application';
-import { setBoughtCard, setNeedToApproveOffer } from '../store/store';
+import {
+  setBoughtCard,
+  setNeedToApproveOffer,
+  setMessage,
+} from '../store/store';
 
 const BoughtCardSnackbar = () => {
   const { state, dispatch } = useApplicationContext();
-  const { boughtCard: open } = state;
+  const { boughtCard: open, message } = state;
   return (
     <Snackbar
       open={open}
-      message="You just bought a baseball card! Check your Card purse in
-    your wallet to see the cards you own."
-      autoHideDuration={5000}
+      message={message}
+      autoHideDuration={7000}
       onClose={() => {
         dispatch(setNeedToApproveOffer(false));
         dispatch(setBoughtCard(false));
+        dispatch(setMessage(null));
       }}
     />
   );

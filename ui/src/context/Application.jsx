@@ -57,7 +57,7 @@ export function useApplicationContext() {
 /* eslint-disable complexity, react/prop-types */
 export default function Provider({ children }) {
   const [state, dispatch] = useReducer(reducer, defaultState);
-  const { availableCards } = state;
+  const { availableCards, userCards } = state;
   useEffect(() => {
     // Receive callbacks from the wallet connection.
     const otherSide = Far('otherSide', {
@@ -114,7 +114,35 @@ export default function Provider({ children }) {
         }
       }
       watchPurses().catch((err) => console.error('got watchPurses err', err));
-
+      async function watchWallerOffers() {
+        const offerNotifier = E(walletP).getOffersNotifier();
+        try {
+          for await (const offers of iterateNotifier(offerNotifier)) {
+            let pendingOffers = offers.filter((offer) => {
+              if (offer.status === 'pending') {
+                if (offer?.proposalTemplate?.give?.Asset) {
+                  return true;
+                }
+              }
+              return false;
+            });
+            pendingOffers = pendingOffers?.map(
+              (offer) => offer?.proposalTemplate?.give?.Asset?.value[0],
+            );
+            console.log(userCards);
+            console.log('offers in application:', ...pendingOffers);
+            if (pendingOffers?.length > 0) {
+              console.log('offers in application2');
+              dispatch(setUserCards([...userCards, ...pendingOffers]));
+            }
+          }
+        } catch (err) {
+          console.log('offers in application: error');
+        }
+      }
+      watchWallerOffers().catch((err) =>
+        console.error('got watchWalletoffer err', err),
+      );
       await Promise.all([
         E(walletP).suggestInstallation('Installation', INSTALLATION_BOARD_ID),
         E(walletP).suggestInstance('Instance', INSTANCE_BOARD_ID),

@@ -15,6 +15,10 @@ const CardAuctionForm = ({ tokenPurses, tokenDisplayInfo, onSubmit }) => {
   const [amount, setAmount] = useState(0);
 
   const submitBidOffer = () => {
+    if (amount === 0) {
+      setFormState({ ...state, error: 'price must be greater than zero' });
+      return null;
+    }
     if (!onSubmit) {
       return null;
     }
@@ -40,7 +44,6 @@ const CardAuctionForm = ({ tokenPurses, tokenDisplayInfo, onSubmit }) => {
   const { error, isSubmitting } = state;
   return (
     <div className="flex flex-col gap-y-4">
-      {error && <p className="red">{error}</p>}
       <div>
         <Select
           style={'border-2 border-alternativeLight'}
@@ -79,6 +82,8 @@ const CardAuctionForm = ({ tokenPurses, tokenDisplayInfo, onSubmit }) => {
           }}
         />
       </div>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+
       <div className="">
         <Button
           styles={'w-full mt-auto relative'}
