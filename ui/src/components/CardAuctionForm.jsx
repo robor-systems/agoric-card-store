@@ -60,11 +60,7 @@ const CardAuctionForm = ({ tokenPurses, tokenDisplayInfo, onSubmit }) => {
         >
           {tokenPurses.map((p) => {
             return (
-              <option
-                key={p.pursePetname}
-                value={p.pursePetname}
-                // disabled={!p.value}
-              >
+              <option key={p.pursePetname} value={p.pursePetname}>
                 {p.pursePetname} ({stringifyValue(p.value, p.displayInfo)}{' '}
                 {p.brandPetname})
               </option>

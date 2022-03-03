@@ -113,13 +113,15 @@ const getSellerSeat = async ({
 
 const removeItemFromSale = async ({
   cardDetail,
+  publicFacetSimpleExchange,
   cardPurse,
-  publicFacetSwap,
 }) => {
-  console.log('CardDetail:', cardDetail);
-  await E(cardDetail.sellerSeat).tryExit();
-  const amount = AmountMath.make(cardPurse.brand, harden([cardDetail]));
-  await E(publicFacetSwap).updateAvailableOffers(amount);
+  const sellerSeat = await E(publicFacetSimpleExchange).getSellerSeat({
+    id: cardDetail[0].id,
+  });
+  await E(sellerSeat[0].sellerSeat).exit();
+  const amount = AmountMath.make(cardPurse.brand, harden(cardDetail));
+  await E(publicFacetSimpleExchange).updateAvailableOffers(amount);
 };
 
 export { getSellerSeat, makeMatchingInvitation, removeItemFromSale };

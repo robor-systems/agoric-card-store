@@ -37,6 +37,8 @@ const start = (zcf) => {
   let buySeats = [];
   // eslint-disable-next-line no-use-before-define
   const { notifier, updater } = makeNotifierKit(getBookOrders());
+  // const { notifier: sellerSeatNotifier, updater: sellerNotifierUpdater } =
+  //   makeNotifierKit(getSellerSeatDetails());
 
   assertIssuerKeywords(zcf, harden(['Asset', 'Price']));
 
@@ -49,7 +51,10 @@ const start = (zcf) => {
 
   function flattenOrders(seats) {
     const activeSeats = seats.filter((s) => !s.hasExited());
-    return activeSeats.map((seat) => dropExit(seat.getProposal()));
+    console.log('ActiveSeats:', activeSeats);
+    return activeSeats.map((seat) => {
+      return { sellerSeat: seat, proposal: dropExit(seat.getProposal()) };
+    });
   }
 
   function getBookOrders() {
@@ -58,6 +63,18 @@ const start = (zcf) => {
       sells: flattenOrders(sellSeats),
     };
   }
+  // function mapSeatToInvitationDetail(seats) {
+  //   const activeSeats = seats.filter((s) => !s.hasExited());
+  //   console.log('ActiveSeats:', activeSeats);
+  //   return activeSeats.map((seat) => {
+  //     return { sellerSeat: seat, proposal: dropExit(seat.getProposal()) };
+  //   });
+  // }
+  // function getSellerSeatDetails() {
+  //   return {
+  //     sells: mapSeatToInvitationDetail(sellSeats),
+  //   };
+  // }
 
   // Tell the notifier that there has been a change to the book orders
   function bookOrdersChanged() {

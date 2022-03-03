@@ -27,6 +27,7 @@ import {
   setUserNfts,
   setUserOffers,
   setUserCards,
+  setPendingOffers,
 } from '../store/store';
 
 const {
@@ -118,7 +119,7 @@ export default function Provider({ children }) {
         const offerNotifier = E(walletP).getOffersNotifier();
         try {
           for await (const offers of iterateNotifier(offerNotifier)) {
-            let pendingOffers = offers.filter((offer) => {
+            let pendingOffersArray = offers.filter((offer) => {
               if (offer.status === 'pending') {
                 if (offer?.proposalTemplate?.give?.Asset) {
                   return true;
@@ -126,14 +127,14 @@ export default function Provider({ children }) {
               }
               return false;
             });
-            pendingOffers = pendingOffers?.map(
+            pendingOffersArray = pendingOffersArray?.map(
               (offer) => offer?.proposalTemplate?.give?.Asset?.value[0],
             );
             console.log(userCards);
-            console.log('offers in application:', ...pendingOffers);
-            if (pendingOffers?.length > 0) {
-              console.log('offers in application2');
-              dispatch(setUserCards([...userCards, ...pendingOffers]));
+            console.log('offers in application:', pendingOffersArray);
+            if (pendingOffersArray?.length > 0) {
+              console.log('offers in application2:', pendingOffersArray);
+              dispatch(setPendingOffers(pendingOffersArray));
             }
           }
         } catch (err) {

@@ -28,6 +28,8 @@ const start = async (zcf) => {
   const getAvailableOffers = () => availableOffers;
 
   const updateAvailableOffers = (cardAmount) => {
+    console.log('availableOffers:', availableOffers);
+    console.log('cardAmount:', cardAmount);
     availableOffers = AmountMath.subtract(availableOffers, cardAmount);
     availableOfferUpdater.updateState(availableOffers);
   };
@@ -50,13 +52,6 @@ const start = async (zcf) => {
     const invitationAmount = await E(invitationIssuer).getAmountOf(
       sellerInvitation,
     );
-    // const exclusiveInvitation = await E(invitationIssuer).claim(
-    //   sellerInvitation,
-    // );
-    // const InvitationValue = await E(zoe).getInvitationDetails(
-    //   exclusiveInvitation,
-    // );
-    // console.log('Invitation Amount:', InvitationValue);
     const {
       // @ts-ignore
       value: [{ handle }],
@@ -100,7 +95,6 @@ const start = async (zcf) => {
     console.log(cardOfferAmount);
     return { offerId, cardOfferAmount };
   };
-
   const makeBuyerOffer = async ({
     cardPurse,
     tokenPurses,
@@ -229,6 +223,22 @@ const start = async (zcf) => {
     return false;
   };
 
+  const getSellerSeat = async ({ id }) => {
+    const seatNotifier = E(simpleExchangePublicFacet).getNotifier();
+    for await (const BookOrders of iterateNotifier(seatNotifier)) {
+      console.log('BookOrders:', BookOrders);
+      // const sellerSeat = bookOrders.sells;
+      // console.log('seller Seats', sellerSeat);
+      if (BookOrders.sells.length > 0) {
+        console.log('proposal details:', BookOrders.sells[0].proposal.give);
+        const filtered = BookOrders.sells.filter(
+          (item) => item.proposal.give.Asset.value[0].id === id,
+        );
+        console.log('filtered:', filtered);
+        return filtered;
+      }
+    }
+  };
   const publicFacet = Far('PublicFaucetForSimpleExchange', {
     makeBuyerOffer,
     makeSellerOffer,
@@ -237,6 +247,7 @@ const start = async (zcf) => {
     updateAvailableOffers,
     updateNotfiersOnWalletOffersAtBuyer,
     updateNotfiersOnWalletOffersAtSeller,
+    getSellerSeat,
   });
   return harden({ publicFacet });
 };

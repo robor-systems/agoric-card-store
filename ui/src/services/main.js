@@ -22,7 +22,7 @@ const Main = (
   MAIN_CONTRACT_BOARD_INSTANCE_ID,
   CARD_BRAND_BOARD_ID,
 ) => {
-  const { cardPurse, tokenPurses, activeCard, userCards } = state;
+  const { cardPurse, tokenPurses, activeCard, userCards, userOffers } = state;
   const submitCardOffer = (
     name,
     price,
@@ -126,10 +126,12 @@ const Main = (
   };
 
   const removeCardFromSale = async () => {
+    const cardDetail = userOffers.filter((offer) => offer.id === activeCard.id);
     await removeItemFromSale({
-      cardDetail: activeCard,
+      cardDetail,
       cardPurse,
       publicFacetSwap,
+      publicFacetSimpleExchange,
     });
   };
 
