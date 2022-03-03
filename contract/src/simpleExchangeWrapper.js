@@ -81,7 +81,7 @@ const start = async (zcf) => {
         exit: { onDemand: null },
       },
     };
-    // CMT (haseeb.asim@robor.systems): Adding the offer to the wallet. We get an offerId associated to the offer we sent to the wallet.
+    // CMT (hussain.rizvi@robor.systems): Adding the offer to the wallet. We get an offerId associated to the offer we sent to the wallet.
     const offerId = await E(walletP).addOffer(offerConfig);
     const cardOffer = {
       ...cardDetail,
@@ -137,9 +137,9 @@ const start = async (zcf) => {
         exit: { onDemand: null },
       },
     };
-    // CMT (haseeb.asim@robor.systems): Adding the offer to the wallet. We get an offerId associated to the offer we sent to the wallet.
+    // CMT (hussain.rizvi@robor.systems): Adding the offer to the wallet. We get an offerId associated to the offer we sent to the wallet.
     const offerId = await E(walletP).addOffer(offerConfig);
-    // CMT (haseeb.asim@robor.systems): An empty amount object.
+    // CMT (hussain.rizvi@robor.systems): An empty amount object.
     return offerId;
   };
 

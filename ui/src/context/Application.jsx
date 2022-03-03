@@ -130,12 +130,7 @@ export default function Provider({ children }) {
             pendingOffersArray = pendingOffersArray?.map(
               (offer) => offer?.proposalTemplate?.give?.Asset?.value[0],
             );
-            console.log(userCards);
-            console.log('offers in application:', pendingOffersArray);
-            if (pendingOffersArray?.length > 0) {
-              console.log('offers in application2:', pendingOffersArray);
-              dispatch(setPendingOffers(pendingOffersArray));
-            }
+            dispatch(setPendingOffers(pendingOffersArray));
           }
         } catch (err) {
           console.log('offers in application: error');
@@ -164,21 +159,10 @@ export default function Provider({ children }) {
       const simpleExchangeWrapperInstance = await E(board).getValue(
         SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
       );
-      console.log(
-        simpleExchangeWrapperInstance,
-        'simpleExchangeWrapperInstance',
-      );
-
       publicFacetSimpleExchange = await E(zoe).getPublicFacet(
         simpleExchangeWrapperInstance,
       );
-      console.log(publicFacetSimpleExchange, 'publicfacetsimpleexchange');
-      console.log(
-        await E(publicFacetSimpleExchange).getAvailableOffers(),
-        'getAvailableOffers:',
-      );
       async function watchOffers() {
-        console.log('watch offer');
         const availableOfferNotifier = await E(
           publicFacetSimpleExchange,
         ).getAvailableOfferNotifier();
@@ -186,7 +170,6 @@ export default function Provider({ children }) {
         for await (const availableOffers of iterateNotifier(
           availableOfferNotifier,
         )) {
-          console.log('available offers from swap:', availableOffers);
           dispatch(setUserOffers(availableOffers.value || []));
         }
 
@@ -194,27 +177,22 @@ export default function Provider({ children }) {
           publicFacet,
         ).getUserSaleHistoryNotifier();
 
-        console.log('userOwnedNftsNotifier:', userSaleHistoryNotifier);
         for await (const userSaleHistory of iterateNotifier(
           userSaleHistoryNotifier,
         )) {
-          console.log('userNfts:', userSaleHistory);
           dispatch(setUserNfts(userSaleHistory.value));
         }
       }
       watchOffers().catch((err) => console.log('got watchOffer errs', err));
 
       async function watchSale() {
-        console.log('watch offer');
         const userSaleHistoryNotifier = await E(
           publicFacet,
         ).getUserSaleHistoryNotifier();
 
-        console.log('userOwnedNftsNotifier:', userSaleHistoryNotifier);
         for await (const userSaleHistory of iterateNotifier(
           userSaleHistoryNotifier,
         )) {
-          console.log('userNfts:', userSaleHistory);
           dispatch(setUserNfts(userSaleHistory.value));
         }
       }
@@ -230,7 +208,6 @@ export default function Provider({ children }) {
       for await (const cardsAvailableAmount of iterateNotifier(
         availableItemsNotifier,
       )) {
-        console.log('available Cards:', cardsAvailableAmount);
         dispatch(setAvailableCards(cardsAvailableAmount.value));
       }
     };
