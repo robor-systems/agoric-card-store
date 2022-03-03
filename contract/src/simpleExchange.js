@@ -51,7 +51,6 @@ const start = (zcf) => {
 
   function flattenOrders(seats) {
     const activeSeats = seats.filter((s) => !s.hasExited());
-    console.log('ActiveSeats:', activeSeats);
     return activeSeats.map((seat) => {
       return { sellerSeat: seat, proposal: dropExit(seat.getProposal()) };
     });
@@ -63,19 +62,6 @@ const start = (zcf) => {
       sells: flattenOrders(sellSeats),
     };
   }
-  // function mapSeatToInvitationDetail(seats) {
-  //   const activeSeats = seats.filter((s) => !s.hasExited());
-  //   console.log('ActiveSeats:', activeSeats);
-  //   return activeSeats.map((seat) => {
-  //     return { sellerSeat: seat, proposal: dropExit(seat.getProposal()) };
-  //   });
-  // }
-  // function getSellerSeatDetails() {
-  //   return {
-  //     sells: mapSeatToInvitationDetail(sellSeats),
-  //   };
-  // }
-
   // Tell the notifier that there has been a change to the book orders
   function bookOrdersChanged() {
     updater.updateState(getBookOrders());
@@ -85,20 +71,12 @@ const start = (zcf) => {
   // and return the seat for the matched offer. If not, return undefined, so
   // the caller can know to add the new offer to the book.
   function swapIfCanTrade(offers, seat) {
-    for (const offer of offers) {
-      console.log(
-        offer.getCurrentAllocation(),
-        seat.getCurrentAllocation(),
-        'currentallocations',
-      );
+    for (const offer of offers) {     
       const satisfiedBy = (xSeat, ySeat) => {
-        console.log('working3');
         return satisfies(zcf, xSeat, ySeat.getCurrentAllocation());
       };
       if (satisfiedBy(offer, seat) && satisfiedBy(seat, offer)) {
-        console.log('working4');
         swap(zcf, seat, offer);
-        console.log('working5');
         // return handle to remove
         return offer;
       }
@@ -113,7 +91,6 @@ const start = (zcf) => {
   function swapIfCanTradeAndUpdateBook(counterOffers, coOffers, seat) {
     const offer = swapIfCanTrade(counterOffers, seat);
 
-    console.log(offer, 'working7');
     if (offer) {
       // remove the matched offer.
       counterOffers = counterOffers.filter((value) => value !== offer);
@@ -121,7 +98,6 @@ const start = (zcf) => {
       // Save the order in the book
       coOffers.push(seat);
     }
-    console.log('working8');
     bookOrdersChanged();
     return counterOffers;
   }
@@ -131,10 +107,7 @@ const start = (zcf) => {
       give: { Asset: null },
       want: { Price: null },
     });
-    console.log('working11');
     buySeats = swapIfCanTradeAndUpdateBook(buySeats, sellSeats, seat);
-    console.log(buySeats);
-    console.log('working12');
     return 'Order Added';
   };
 
@@ -143,10 +116,7 @@ const start = (zcf) => {
       give: { Price: null },
       want: { Asset: null },
     });
-    console.log('working2');
     sellSeats = swapIfCanTradeAndUpdateBook(sellSeats, buySeats, seat);
-    console.log(sellSeats);
-    console.log('working9');
     return 'Order Added';
   };
 
@@ -154,12 +124,10 @@ const start = (zcf) => {
   const exchangeOfferHandler = (seat) => {
     // Buy Order
     if (seat.getProposal().want.Asset) {
-      console.log('working1');
       return buy(seat);
     }
     // Sell Order
     if (seat.getProposal().give.Asset) {
-      console.log('working10');
       return sell(seat);
     }
     // Eject because the offer must be invalid

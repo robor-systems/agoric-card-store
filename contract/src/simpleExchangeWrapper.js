@@ -28,12 +28,9 @@ const start = async (zcf) => {
   const getAvailableOffers = () => availableOffers;
 
   const updateAvailableOffers = (cardAmount) => {
-    console.log('availableOffers:', availableOffers);
-    console.log('cardAmount:', cardAmount);
     availableOffers = AmountMath.subtract(availableOffers, cardAmount);
     availableOfferUpdater.updateState(availableOffers);
   };
-  console.log(simpleExchangePublicFacet, 'simpleExchangePublicFacet');
   const makeSellerOffer = async ({
     cardDetail,
     sellingPrice,
@@ -86,13 +83,11 @@ const start = async (zcf) => {
     };
     // CMT (haseeb.asim@robor.systems): Adding the offer to the wallet. We get an offerId associated to the offer we sent to the wallet.
     const offerId = await E(walletP).addOffer(offerConfig);
-    console.log(offerId);
     const cardOffer = {
       ...cardDetail,
       sellingPrice,
     };
     const cardOfferAmount = AmountMath.make(brands.Asset, harden([cardOffer]));
-    console.log(cardOfferAmount);
     return { offerId, cardOfferAmount };
   };
   const makeBuyerOffer = async ({
@@ -161,7 +156,6 @@ const start = async (zcf) => {
         if (id === offerId) {
           if (status === 'pending') {
             availableOffers = AmountMath.add(availableOffers, cardOfferAmount);
-            console.log(availableOffers);
             availableOfferUpdater.updateState(availableOffers);
             return true;
           } else if (status === 'decline') {
@@ -226,15 +220,10 @@ const start = async (zcf) => {
   const getSellerSeat = async ({ id }) => {
     const seatNotifier = E(simpleExchangePublicFacet).getNotifier();
     for await (const BookOrders of iterateNotifier(seatNotifier)) {
-      console.log('BookOrders:', BookOrders);
-      // const sellerSeat = bookOrders.sells;
-      // console.log('seller Seats', sellerSeat);
       if (BookOrders.sells.length > 0) {
-        console.log('proposal details:', BookOrders.sells[0].proposal.give);
         const filtered = BookOrders.sells.filter(
           (item) => item.proposal.give.Asset.value[0].id === id,
         );
-        console.log('filtered:', filtered);
         return filtered;
       }
     }
