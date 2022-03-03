@@ -42,7 +42,6 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
       return map;
     }, new Map());
     const mergedMap = { ...userCardsMap, ...pendingOfferMap };
-    console.log('mergedMap:', mergedMap);
     const allUserCards = [];
     if (mergedMap) {
       for (const keys in mergedMap) {

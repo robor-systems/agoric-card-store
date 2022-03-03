@@ -29,7 +29,6 @@ const Header = () => {
         break;
       }
     }
-    console.log('the header useEffect is working');
   }, [activeTab]);
 
   const TabButton = ({ tabIndex, text, width }) => {
@@ -37,7 +36,6 @@ const Header = () => {
       <div
         onClick={() => {
           dispatch(setActiveTab(tabIndex));
-          console.log(tabIndex);
           switch (tabIndex) {
             case 0:
               dispatch(setType('Sell Product'));
