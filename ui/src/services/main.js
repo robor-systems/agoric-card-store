@@ -17,7 +17,6 @@ const Main = (
   dispatch,
   walletP,
   publicFacet,
-  publicFacetSwap,
   publicFacetSimpleExchange,
   MAIN_CONTRACT_BOARD_INSTANCE_ID,
   CARD_BRAND_BOARD_ID,
@@ -89,7 +88,6 @@ const Main = (
       walletP,
       sellerSeat,
       BuyerExclusiveInvitation,
-      publicFacetSwap,
       publicFacet,
       publicFacetSimpleExchange,
       setLoading,
@@ -108,7 +106,6 @@ const Main = (
       (item) => item.id === activeCard.id,
     )[0];
     const params = {
-      publicFacetSwap,
       sellingPrice: BigInt(price),
       walletP,
       cardPurse,
@@ -130,7 +127,6 @@ const Main = (
     await removeItemFromSale({
       cardDetail,
       cardPurse,
-      publicFacetSwap,
       publicFacetSimpleExchange,
     });
   };

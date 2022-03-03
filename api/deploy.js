@@ -71,8 +71,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
     INSTALLATION_BOARD_ID,
     AUCTION_INSTALLATION_BOARD_ID,
     AUCTION_ITEMS_INSTALLATION_BOARD_ID,
-    SWAP_INSTALLATION_BOARD_ID,
-    SWAP_WRAPPER_INSTALLATION_BOARD_ID,
     CONTRACT_NAME,
     SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
     SIMPLE_EXCHANGE_WRAPPER_INSTALLATION_BOARD_ID,
@@ -89,14 +87,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
   // CMT (haseeb.asim@robor.systems): Fetching the installation of the auction logic from the board.
   const auctionInstallation = await E(board).getValue(
     AUCTION_INSTALLATION_BOARD_ID,
-  );
-
-  // CMT (haseeb.asim@robor.systems): Fetching the installation of the secondary Store.js from the board.
-  const swapInstallation = await E(board).getValue(SWAP_INSTALLATION_BOARD_ID);
-
-  // CMT (haseeb.asim@robor.systems): Fetching the installation of the secondary Store Wrapper from the board.
-  const swapWrapperInstallation = await E(board).getValue(
-    SWAP_WRAPPER_INSTALLATION_BOARD_ID,
   );
 
   const simpleExchangeInstallation = await E(board).getValue(
@@ -187,21 +177,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
     Money: moneyIssuer,
   });
 
-  // CMT (haseeb.asim@robor.systems): Secondary Store Wrapper terms which can be accessed within the instance.
-  const swapWrapperTerms = harden({
-    swapInstallation,
-    cardMinter: minter,
-    auctionItemsCreator: creatorFacet,
-    userWallet: wallet,
-  });
-
-  // CMT (haseeb.asim@robor.systems): Creating an instance of the  secondary store wrapper and getting the instance.
-  const { instance: swapWrapperInstance } = await E(zoe).startInstance(
-    swapWrapperInstallation,
-    issuerKeywordRecord,
-    swapWrapperTerms,
-  );
-
   const {
     publicFacet: simpleExchangePublicFacet,
     instance: simpleExchangeInstance,
@@ -231,14 +206,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
     }),
   );
 
-  // console.log(
-  //   await E(simpleExchangeWrapperPublicFacet).makeSellerOffer({
-  //     cardDetail: { name: 'bob' },
-  //     sellingPrice: 2n,
-  //   }),
-  //   'isSimpleExchangeWrapper??????',
-  // );
-
   // CMT (haseeb.asim@robor.systems): Storing each important variable on the board and getting their board ids.
   const [
     INSTANCE_BOARD_ID,
@@ -248,8 +215,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
     MONEY_ISSUER_BOARD_ID,
     CARD_MINTER_BOARD_ID,
     INVITE_BRAND_BOARD_ID,
-    SWAP_INSTANCE_BOARD_ID,
-    SWAP_WRAPPER_INSTANCE_BOARD_ID,
     MAIN_CONTRACT_BOARD_INSTANCE_ID,
     SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
     SIMPLE_EXCHANGE_INSTANCE_BOARD_ID,
@@ -261,8 +226,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
     E(board).getId(moneyIssuer),
     E(board).getId(minter),
     E(board).getId(invitationBrand),
-    E(board).getId(swapInstallation),
-    E(board).getId(swapWrapperInstance),
     E(board).getId(baseballCardInstance),
     E(board).getId(simpleExchangeWrapperInstance),
     E(board).getId(simpleExchangeInstance),
@@ -273,10 +236,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
   console.log(`-- CARD_ISSUER_BOARD_ID: ${CARD_ISSUER_BOARD_ID}`);
   console.log(`-- CARD_BRAND_BOARD_ID: ${CARD_BRAND_BOARD_ID}`);
   console.log(`-- CARD_MINTER_BOARD_ID: ${CARD_MINTER_BOARD_ID}`);
-  console.log(`-- SWAP_INSTANCE_BOARD_ID: ${SWAP_INSTANCE_BOARD_ID}`);
-  console.log(
-    `-- SWAP_WRAPPER_INSTANCE_BOARD_ID: ${SWAP_WRAPPER_INSTANCE_BOARD_ID}`,
-  );
   console.log(
     `-- MAIN_CONTRACT_BOARD_INSTANCE_ID: ${MAIN_CONTRACT_BOARD_INSTANCE_ID}`,
   );
@@ -294,8 +253,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
     AUCTION_ITEMS_INSTALLATION_BOARD_ID,
     INVITE_BRAND_BOARD_ID,
     CARD_MINTER_BOARD_ID,
-    SWAP_INSTANCE_BOARD_ID,
-    SWAP_WRAPPER_INSTANCE_BOARD_ID,
     BRIDGE_URL: 'agoric-lookup:https://local.agoric.com?append=/bridge',
     brandBoardIds: {
       Card: CARD_BRAND_BOARD_ID,

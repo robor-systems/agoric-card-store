@@ -33,7 +33,6 @@ import {
 const {
   INSTANCE_BOARD_ID,
   INSTALLATION_BOARD_ID,
-  SWAP_WRAPPER_INSTANCE_BOARD_ID,
   MAIN_CONTRACT_BOARD_INSTANCE_ID,
   SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
   issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID },
@@ -43,11 +42,10 @@ const {
 /* eslint-disable */
 let walletP;
 let publicFacet;
-let publicFacetSwap;
 let publicFacetSimpleExchange;
 /* eslint-enable */
 
-export { walletP, publicFacet, publicFacetSwap, publicFacetSimpleExchange };
+export { walletP, publicFacet, publicFacetSimpleExchange };
 
 export const ApplicationContext = createContext();
 
@@ -58,7 +56,7 @@ export function useApplicationContext() {
 /* eslint-disable complexity, react/prop-types */
 export default function Provider({ children }) {
   const [state, dispatch] = useReducer(reducer, defaultState);
-  const { availableCards, userCards } = state;
+  const { availableCards } = state;
   useEffect(() => {
     // Receive callbacks from the wallet connection.
     const otherSide = Far('otherSide', {
@@ -149,13 +147,6 @@ export default function Provider({ children }) {
       const board = E(walletP).getBoard();
       const instance = await E(board).getValue(INSTANCE_BOARD_ID);
       publicFacet = E(zoe).getPublicFacet(instance);
-      //   publicFacetRef.current = publicFacet;
-      const swapWrapperInstance = await E(board).getValue(
-        SWAP_WRAPPER_INSTANCE_BOARD_ID,
-      );
-      publicFacetSwap = await E(zoe).getPublicFacet(swapWrapperInstance);
-
-      //   publicFacetSwapRef.current = publicFacetSwap;
       const simpleExchangeWrapperInstance = await E(board).getValue(
         SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
       );
@@ -238,7 +229,6 @@ export default function Provider({ children }) {
         dispatch,
         walletP,
         publicFacet,
-        publicFacetSwap,
         publicFacetSimpleExchange,
         CARD_BRAND_BOARD_ID,
         MAIN_CONTRACT_BOARD_INSTANCE_ID,

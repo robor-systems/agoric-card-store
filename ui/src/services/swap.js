@@ -79,7 +79,6 @@ const getSellerSeat = async ({
   // state,
   dispatch,
 }) => {
-  console.log(publicFacetSimpleExchange, 'publicFacetSwapinSwap:');
   const { offerId, cardOfferAmount } = await E(
     publicFacetSimpleExchange,
   ).makeSellerOffer({
