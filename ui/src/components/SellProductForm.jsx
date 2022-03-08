@@ -23,7 +23,6 @@ function SellProductForm({
       },
       true,
     );
-    console.log(cardPriceString);
     setPrice(cardPriceString);
   }, []);
 
@@ -38,13 +37,7 @@ function SellProductForm({
         onClick={async () => {
           setLoading(true);
           const amount = makeValue(price, tokenDisplayInfo);
-          console.log('amount is:', amount);
-
-          const result = await makeSwapInvitation({ price: amount });
-          if (result) {
-            setLoading(false);
-            onClose();
-          }
+          await makeSwapInvitation({ price: amount, setLoading, onClose });
         }}
         isLoading={isLoading}
         text="Place in Marketplace"

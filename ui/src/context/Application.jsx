@@ -27,13 +27,14 @@ import {
   setUserNfts,
   setUserOffers,
   setUserCards,
+  setPendingOffers,
 } from '../store/store';
 
 const {
   INSTANCE_BOARD_ID,
   INSTALLATION_BOARD_ID,
-  SWAP_WRAPPER_INSTANCE_BOARD_ID,
   MAIN_CONTRACT_BOARD_INSTANCE_ID,
+  SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
   issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID },
   brandBoardIds: { Money: MONEY_BRAND_BOARD_ID, Card: CARD_BRAND_BOARD_ID },
 } = dappConstants;
@@ -41,10 +42,10 @@ const {
 /* eslint-disable */
 let walletP;
 let publicFacet;
-let publicFacetSwap;
+let publicFacetSimpleExchange;
 /* eslint-enable */
 
-export { walletP, publicFacet, publicFacetSwap };
+export { walletP, publicFacet, publicFacetSimpleExchange };
 
 export const ApplicationContext = createContext();
 
@@ -112,7 +113,30 @@ export default function Provider({ children }) {
         }
       }
       watchPurses().catch((err) => console.error('got watchPurses err', err));
-
+      async function watchWallerOffers() {
+        const offerNotifier = E(walletP).getOffersNotifier();
+        try {
+          for await (const offers of iterateNotifier(offerNotifier)) {
+            let pendingOffersArray = offers.filter((offer) => {
+              if (offer.status === 'pending') {
+                if (offer?.proposalTemplate?.give?.Asset) {
+                  return true;
+                }
+              }
+              return false;
+            });
+            pendingOffersArray = pendingOffersArray?.map(
+              (offer) => offer?.proposalTemplate?.give?.Asset?.value[0],
+            );
+            dispatch(setPendingOffers(pendingOffersArray));
+          }
+        } catch (err) {
+          console.log('offers in application: error');
+        }
+      }
+      watchWallerOffers().catch((err) =>
+        console.error('got watchWalletoffer err', err),
+      );
       await Promise.all([
         E(walletP).suggestInstallation('Installation', INSTALLATION_BOARD_ID),
         E(walletP).suggestInstance('Instance', INSTANCE_BOARD_ID),
@@ -123,23 +147,20 @@ export default function Provider({ children }) {
       const board = E(walletP).getBoard();
       const instance = await E(board).getValue(INSTANCE_BOARD_ID);
       publicFacet = E(zoe).getPublicFacet(instance);
-      //   publicFacetRef.current = publicFacet;
-      const swapWrapperInstance = await E(board).getValue(
-        SWAP_WRAPPER_INSTANCE_BOARD_ID,
+      const simpleExchangeWrapperInstance = await E(board).getValue(
+        SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
       );
-      publicFacetSwap = await E(zoe).getPublicFacet(swapWrapperInstance);
-      //   publicFacetSwapRef.current = publicFacetSwap;
-
+      publicFacetSimpleExchange = await E(zoe).getPublicFacet(
+        simpleExchangeWrapperInstance,
+      );
       async function watchOffers() {
-        console.log('watch offer');
         const availableOfferNotifier = await E(
-          publicFacetSwap,
+          publicFacetSimpleExchange,
         ).getAvailableOfferNotifier();
 
         for await (const availableOffers of iterateNotifier(
           availableOfferNotifier,
         )) {
-          console.log('available offers from swap:', availableOffers);
           dispatch(setUserOffers(availableOffers.value || []));
         }
 
@@ -147,27 +168,22 @@ export default function Provider({ children }) {
           publicFacet,
         ).getUserSaleHistoryNotifier();
 
-        console.log('userOwnedNftsNotifier:', userSaleHistoryNotifier);
         for await (const userSaleHistory of iterateNotifier(
           userSaleHistoryNotifier,
         )) {
-          console.log('userNfts:', userSaleHistory);
           dispatch(setUserNfts(userSaleHistory.value));
         }
       }
       watchOffers().catch((err) => console.log('got watchOffer errs', err));
 
       async function watchSale() {
-        console.log('watch offer');
         const userSaleHistoryNotifier = await E(
           publicFacet,
         ).getUserSaleHistoryNotifier();
 
-        console.log('userOwnedNftsNotifier:', userSaleHistoryNotifier);
         for await (const userSaleHistory of iterateNotifier(
           userSaleHistoryNotifier,
         )) {
-          console.log('userNfts:', userSaleHistory);
           dispatch(setUserNfts(userSaleHistory.value));
         }
       }
@@ -183,7 +199,6 @@ export default function Provider({ children }) {
       for await (const cardsAvailableAmount of iterateNotifier(
         availableItemsNotifier,
       )) {
-        console.log('available Cards:', cardsAvailableAmount);
         dispatch(setAvailableCards(cardsAvailableAmount.value));
       }
     };
@@ -214,7 +229,7 @@ export default function Provider({ children }) {
         dispatch,
         walletP,
         publicFacet,
-        publicFacetSwap,
+        publicFacetSimpleExchange,
         CARD_BRAND_BOARD_ID,
         MAIN_CONTRACT_BOARD_INSTANCE_ID,
       }}

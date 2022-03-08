@@ -17,12 +17,11 @@ const Main = (
   dispatch,
   walletP,
   publicFacet,
-  publicFacetSwap,
+  publicFacetSimpleExchange,
   MAIN_CONTRACT_BOARD_INSTANCE_ID,
   CARD_BRAND_BOARD_ID,
 ) => {
-  const { cardPurse, tokenPurses, activeCard } = state;
-  console.log('main running');
+  const { cardPurse, tokenPurses, activeCard, userCards, userOffers } = state;
   const submitCardOffer = (
     name,
     price,
@@ -40,8 +39,7 @@ const Main = (
       price: BigInt(price),
       onClose,
       setFormState,
-    }).then((result) => {
-      console.log('Your offer id for this current offer:', result);
+    }).then(() => {
       dispatch(setNeedToApproveOffer(true));
     });
   };
@@ -73,9 +71,9 @@ const Main = (
     setLoading,
     onClose,
   }) => {
-    console.log('cardDetail:', cardDetail);
     const Obj = { ...cardDetail };
-    const { BuyerExclusiveInvitation, sellingPrice, boughtFor } = Obj;
+    const { BuyerExclusiveInvitation, sellingPrice, boughtFor, sellerSeat } =
+      Obj;
     delete Obj.sellerSeat;
     delete Obj.sellingPrice;
     delete Obj.boughtFor;
@@ -88,31 +86,48 @@ const Main = (
       sellingPrice,
       boughtFor,
       walletP,
+      sellerSeat,
       BuyerExclusiveInvitation,
-      publicFacetSwap,
       publicFacet,
+      publicFacetSimpleExchange,
       setLoading,
       onClose,
+      dispatch,
     });
     return result;
   };
 
-  const makeInvitationAndSellerSeat = async ({ price }) => {
+  const makeInvitationAndSellerSeat = async ({
+    price,
+    setLoading,
+    onClose,
+  }) => {
+    const currentCard = userCards.filter(
+      (item) => item.id === activeCard.id,
+    )[0];
     const params = {
-      publicFacetSwap,
       sellingPrice: BigInt(price),
       walletP,
+      cardPurse,
+      tokenPurses,
+      publicFacetSimpleExchange,
       cardDetail: activeCard,
+      currentCard,
+      setLoading,
+      onClose,
+      state,
+      dispatch,
     };
     const sellerSeatInvitation = await getSellerSeat(params);
     return sellerSeatInvitation;
   };
 
   const removeCardFromSale = async () => {
+    const cardDetail = userOffers.filter((offer) => offer.id === activeCard.id);
     await removeItemFromSale({
-      cardDetail: activeCard,
+      cardDetail,
       cardPurse,
-      publicFacetSwap,
+      publicFacetSimpleExchange,
     });
   };
 

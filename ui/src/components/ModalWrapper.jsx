@@ -32,7 +32,6 @@ const ModalWrapper = ({ open, onClose, children, style }) => {
         </div>
         <div
           onClick={() => {
-            console.log('clicking');
             onClose();
           }}
           className="opacity-25 absolute w-full h-full inset-0 z-40 bg-black"

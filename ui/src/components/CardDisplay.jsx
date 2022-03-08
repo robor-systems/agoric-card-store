@@ -17,60 +17,103 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
     userCards,
     userNfts,
     tokenDisplayInfo,
+    pendingOffers,
   } = state;
   // const isReady1 = cardPurse && cardPurse?.currentAmount?.value?.length > 0;
   // const isReady2 = userCards && userCards.length > 0;
   const isReady = cardList && cardList.length > 0;
   let cards;
+  const [menuOption, setMenuOption] = useState('Name');
+  // const [cards, setCards] = useState([]);
+  const [searchInput, setSearchInput] = useState('');
   const [secondaryLoader, setSecondaryLoader] = useState(true);
   const [myCardLoader, setMyCardLoader] = useState(true);
   const [myCards, setMyCards] = useState([]);
   const [secondaryCards, setSecondaryCards] = useState([]);
-  console.log(userCards, userOffers, userNfts, 'all card arrs');
+  let menuOptions;
+  console.log(userCards, userOffers, userNfts, pendingOffers, 'all card arrs');
   const getUserCards = (params) => {
-    console.log('params:', params);
+    const userCardsMap = params?.userCards.reduce((map, obj) => {
+      map[obj.id] = { ...obj };
+      return map;
+    }, new Map());
+    const pendingOfferMap = pendingOffers.reduce((map, obj) => {
+      map[obj.id] = { ...obj };
+      return map;
+    }, new Map());
+    const mergedMap = { ...userCardsMap, ...pendingOfferMap };
+    const allUserCards = [];
+    if (mergedMap) {
+      for (const keys in mergedMap) {
+        if (mergedMap[keys]) {
+          allUserCards.push(mergedMap[keys]);
+        }
+      }
+    }
     const userOffersMap = params?.userOffers.reduce((map, obj) => {
       map[obj.id] = { ...obj };
       return map;
     }, {});
-    console.log('userOfferMap:', userOffersMap);
     const userNftsMap = params?.userNfts.reduce((map, obj) => {
       map[obj.id] = { ...obj };
       return map;
     }, {});
-    console.log('userNftsMap:', userNftsMap);
-    const arr = params?.userCards.map((offer) => {
+
+    const arr = allUserCards.map((offer) => {
       let obj = {};
-      if (userOffersMap[offer.id]) obj = { ...userOffersMap[offer.id] };
+      if (userOffersMap[offer.id]) {
+        console.log(userOffersMap[offer.id]);
+        obj = { ...userOffersMap[offer.id] };
+      }
       if (userNftsMap[offer.id]) obj = { ...obj, ...userNftsMap[offer.id] };
       return obj;
     });
-    console.log('array:', arr);
     setMyCardLoader(false);
     return arr;
   };
   const getSecondaryCards = (params) => {
-    const ids = params?.userCards?.map((card) => card.id);
+    // const ids = params?.userCards?.map((card) => card.id);
     // change !== to === to filter user owned cards from secondaryMarketplace
-    const arr = params?.userOffers?.filter(
-      (card) => ids.indexOf(card.id) !== -1,
-    );
+    // console.log(ids, 'filterids');
+    // console.log(userOffers, 'useroffersfilter');
+    // const arr = params?.userOffers?.filter(
+    //   (card) => ids.indexOf(card.id) !== -1,
+    // );
+    // console.log(arr, 'filteredarr');
     setSecondaryLoader(false);
-    return arr;
+    // console.log('running getSecondaryCards:', arr);
+    console.log(params);
+    return userOffers;
   };
-
+  const getFilteredList = (list, option) => {
+    return list.filter((el) => {
+      if (searchInput === '') {
+        return el;
+      } else {
+        switch (option) {
+          case 'Name':
+            return el.name
+              .toLowerCase()
+              .includes(searchInput.toLocaleLowerCase());
+          case 'Author':
+            return el.creatorName
+              .toLowerCase()
+              .includes(searchInput.toLocaleLowerCase());
+          default:
+        }
+      }
+      return false;
+    });
+  };
   useEffect(() => {
-    console.log('userOffers:', userOffers);
-    userCards?.length > 0 &&
-      userNfts?.length > 0 &&
+    (pendingOffers.length > 0 ||
+      (userCards?.length > 0 && userNfts?.length > 0)) &&
       setMyCards(getUserCards({ userCards, userOffers, userNfts }));
     userCards?.length === 0 && userNfts?.length === 0 && setMyCardLoader(false);
-
     setSecondaryCards(getSecondaryCards({ userCards, userOffers }));
-  }, [userOffers, userCards, userNfts]);
+  }, [userOffers, userCards, userNfts, pendingOffers]);
   switch (activeTab) {
     case 0:
-      console.log(myCards, 'MyCards');
       cards =
         myCards?.length > 0 ? (
           <div className="grid sm:grid-cols-1  md:grid-cols-2 xl:grid-cols-3  gap-x-6 gap-y-10">
@@ -90,13 +133,14 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
           <h1> There are no cards in your wallet </h1>
         );
       break;
-    case 1:
-      console.log(userOffers, 'userCards');
+    case 1: {
+      menuOptions = ['Name', 'Author'];
+      console.log(secondaryCards, 'secondarycards');
+      const filteredList = getFilteredList(secondaryCards, menuOption);
       cards =
-        secondaryCards?.length !== 0 ? (
+        filteredList?.length !== 0 ? (
           <div className="grid sm:grid-cols-1  md:grid-cols-2 xl:grid-cols-3  gap-x-6 gap-y-10">
-            {secondaryCards?.map((cardDetail) => {
-              console.log(cardDetail, 'inside map ');
+            {filteredList?.map((cardDetail) => {
               return (
                 <div key={cardDetail.id}>
                   <BaseballCard
@@ -113,12 +157,13 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
           <h1>No nfts for sale currently</h1>
         );
       break;
-    case 2:
-      console.log('Cardlist:', cardList);
+    }
+    case 2: {
+      menuOptions = ['Name'];
+      const filtered = getFilteredList(cardList, menuOption);
       cards = (
         <div className="grid sm:grid-cols-1  md:grid-cols-2 xl:grid-cols-3  gap-x-6 gap-y-10">
-          {cardList.map((cardDetail) => {
-            console.log('cardDetail:', cardDetail);
+          {filtered.map((cardDetail) => {
             return (
               <div key={cardDetail.name}>
                 <BaseballCard
@@ -134,6 +179,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
         </div>
       );
       break;
+    }
     case 3:
       cards = (
         <AddNewNFTForm
@@ -145,9 +191,8 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
     default:
       break;
   }
-
   return (
-    <div className="display-card flex flex-col px-4 items-center max-w-6xl w-full">
+    <div className="display-card flex flex-col px-4 items-center max-w-6xl w-full pb-8">
       <h1 className="text-3xl font-semibold mb-14">
         {activeTab === 0 && 'My Cards'}
         {activeTab === 1 && 'Marketplace'}
@@ -158,8 +203,10 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
         <div className="flex flex-col gap-y-8 sm:flex-row gap-x-4 justify-center w-full px-2 mb-14">
           <div className="flex  sm:w-3/4 border justify-between px-4 border-alternativeLight rounded items-center">
             <input
-              className="outline-none focus:outline-none rounded h-12 text-lg"
+              className="outline-none focus:outline-none rounded h-12 text-lg w-full"
               placeholder="Search"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
             />
             <img
               className="w-4 h-4 relative"
@@ -175,8 +222,16 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
               backgroundPositionX: '95%',
             }}
             className="bg-no-repeat cursor-pointer text-primaryLight border border-alternativeLight bg-white rounded sm:w-1/5 h-12 px-3.5 text-lg outline-none focus:outline-none font-normal"
+            value={menuOption}
+            onChange={(e) => {
+              setMenuOption(e.target.value);
+            }}
           >
-            <option></option>
+            {menuOptions.map((item, i) => (
+              <option key={i} value={item}>
+                {item}
+              </option>
+            ))}
           </select>
         </div>
       )}
@@ -188,6 +243,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
         {myCardLoader && type === 'Sell Product' && <Loader />}
         {myCardLoader && type === 'Sell Product' && 'Fetching card list...'}
       </div>
+      {type === 'Mint Nft' && <>{cards}</>}
       {isReady && type === 'Bid Product' && <>{cards}</>}
       {!secondaryLoader && type === 'Buy Product' && <>{cards}</>}
       {!myCardLoader && type === 'Sell Product' && <>{cards}</>}

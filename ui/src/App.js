@@ -14,7 +14,7 @@ import ModalContent from './components/ModalContent';
 import Main from './services/main';
 import { useApplicationContext } from './context/Application';
 import NFTCreationSnackbar from './components/NFTCreationSnackbar';
-import { setActiveTab } from './store/store';
+import { setActiveTab, setType } from './store/store';
 import Loader from './components/common/Loader';
 import CheckIcon from './assets/icons/checkIcon.svg';
 
@@ -26,26 +26,38 @@ function App() {
     dispatch,
     walletP,
     publicFacet,
-    publicFacetSwap,
+    publicFacetSimpleExchange,
     MAIN_CONTRACT_BOARD_INSTANCE_ID,
     CARD_BRAND_BOARD_ID,
   } = useApplicationContext();
 
   const { activeCard, openExpandModal, addFormLoader, checkIcon } = state;
   useEffect(() => {
+    console.log('Inside Use effect:', activeTab);
     switch (activeTab) {
-      case 'mycards':
+      case 'mycards': {
         dispatch(setActiveTab(0));
+        dispatch(setType('Sell Product'));
         break;
-      case 'marketplace':
+      }
+
+      case 'marketplace': {
         dispatch(setActiveTab(1));
+        dispatch(setType('Buy Product'));
         break;
-      case 'primarysales':
+      }
+
+      case 'primarysales': {
         dispatch(setActiveTab(2));
+        dispatch(setType('Bid Product'));
         break;
-      case 'create':
+      }
+
+      case 'create': {
         dispatch(setActiveTab(3));
+        dispatch(setType('Mint Nft'));
         break;
+      }
 
       default:
         dispatch(setActiveTab(0));
@@ -67,7 +79,7 @@ function App() {
     dispatch,
     walletP,
     publicFacet,
-    publicFacetSwap,
+    publicFacetSimpleExchange,
     MAIN_CONTRACT_BOARD_INSTANCE_ID,
     CARD_BRAND_BOARD_ID,
   );

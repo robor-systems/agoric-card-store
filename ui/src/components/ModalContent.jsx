@@ -48,7 +48,6 @@ function ModalContent({
                 onClick={async () => {
                   setLoading(true);
                   const result = await removeCardFromSale();
-                  console.log('result:', result);
                   setLoading(false);
                   onClose();
                 }}
@@ -117,14 +116,11 @@ function ModalContent({
                 style="w-full text-white"
                 onClick={async () => {
                   setLoading(true);
-                  const result = await makeMatchingSeatInvitation({
+                  await makeMatchingSeatInvitation({
                     cardDetail,
                     setLoading,
                     onClose,
                   });
-                  console.log('result:', result);
-                  setLoading(false);
-                  onClose();
                 }}
                 styles="relative"
                 isLoading={isLoading}
