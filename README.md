@@ -1,22 +1,19 @@
 # Baseball Card Store Dapp
 
-TL;DR:
+The Baseball Card Store Dapp is a Marketplace place for nfts which in this case are baseball cards.
 
-The Baseball Card Store Dapp sells baseball cards as NFT tokens in
-exchange for money.
+There are four main views in the Card Store dapp:
 
-*This dapp requires the
-[Fungible Faucet Dapp](https://github.com/Agoric/dapp-fungible-faucet)to be running, so
-please [follow the
-instructions](https://github.com/Agoric/dapp-fungible-faucet) to set
-up the Fungible Faucet Dapp first and give yourself some tokens. This
-dapp runs on port 3001, whereas the Fungible Faucet Dapp runs on port 3000.*
+1. `MyCards Section` : Where a user can view the nfts that he owns and put a nft on sale if he wants.
+2. `Secondary Marketplace` : Using this a user can buy nfts put on sale by other users.
+3. `Primary Marketplace` : Here the user can buy the nfts put on sale by agoric.
+4. `Minting Nfts` : Any user can mint new nfts which will be deposited to user wallet as soon as minting completes.
 
 Install the
 [prerequisites](https://agoric.com/documentation/getting-started/before-using-agoric.html).
 
-
 Then in a first terminal in the directory where you want to put your dapp, install the dapp:
+
 ```sh
 agoric init --dapp-template dapp-card-store my-card-store
 cd my-card-store
@@ -35,7 +32,8 @@ purse.
 agoric deploy contract/deploy.js api/deploy.js
 ```
 
-In a third terminal, 
+In a third terminal,
+
 ```sh
 # Navigate to the `ui` directory and start a local server
 cd ui && yarn start
@@ -43,16 +41,16 @@ cd ui && yarn start
 
 ## Using the Dapp
 
-1. `yarn start` will open a page at  http://127.0.0.1:3001.
-3. A window for your wallet should open.
-4. Under "Dapps" in the wallet, enable the CardStore Dapp.
-5. Now you should be able to click on a card to make an offer to buy
-   it.
-6. Approve the offer in your wallet
+1. `yarn start` will open a page at http://127.0.0.1:3001.
+2. Follow the detail in the popup to connect to wallet.
+3. `agoric open` will open a window for your wallet.
+4. On accepting dapp connection nfts for sale should appear in primary marketplace.
+5. Now you should be able to click on a card to make an offer to buy it.
+6. Approve the offer in your wallet.
 7. View the card in your wallet.
 
 ![Card Store](./readme-assets/card-store.png)
 
 To learn more about how to build Agoric Dapps, please see the [Dapp Guide](https://agoric.com/documentation/dapps/).
 
-See the [Dapp Deployment Guide](https://github.com/Agoric/agoric-sdk/wiki/Dapp-Deployment-Guide) for how to deploy this Dapp on a public website, such as https://cardstore.testnet.agoric.com/
+To See the [Dapp Multi User Guide](https://agoric.com/documentation/guides/agoric-cli/starting-multiuser-dapps.html#example) for how to deploy this Dapp on a testnet and experience this dapp with multi user.
