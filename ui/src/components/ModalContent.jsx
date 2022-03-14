@@ -47,7 +47,7 @@ function ModalContent({
                 style="w-full text-white"
                 onClick={async () => {
                   setLoading(true);
-                  const result = await removeCardFromSale();
+                  await removeCardFromSale();
                   setLoading(false);
                   onClose();
                 }}
