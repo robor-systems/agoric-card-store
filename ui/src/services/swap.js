@@ -72,7 +72,7 @@ const removeItemFromSale = async ({
     id: cardDetail.id,
   });
   await E(sellerSeat[0].sellerSeat).exit();
-  const amount = AmountMath.make(cardPurse.brand, harden(cardDetail));
+  const amount = AmountMath.make(cardPurse.brand, harden([cardDetail]));
   await E(publicFacetMarketPlace).updateAvailableOffers(amount);
 };
 

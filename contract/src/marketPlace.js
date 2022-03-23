@@ -144,10 +144,12 @@ const start = (zcf) => {
   const exchangeOfferHandler = (seat) => {
     // Buy Order
     if (seat.getProposal().want.Asset) {
+      console.log('running buy orders:', seat.getProposal());
       return buy(seat);
     }
     // Sell Order
     if (seat.getProposal().give.Asset) {
+      console.log('running sell orders:', seat.getProposal());
       return sell(seat);
     }
     // Eject because the offer must be invalid
