@@ -34,7 +34,7 @@ const {
   INSTANCE_BOARD_ID,
   INSTALLATION_BOARD_ID,
   MAIN_CONTRACT_BOARD_INSTANCE_ID,
-  SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
+  MARKET_PLACE_INSTANCE_BOARD_ID,
   issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID },
   brandBoardIds: { Money: MONEY_BRAND_BOARD_ID, Card: CARD_BRAND_BOARD_ID },
 } = dappConstants;
@@ -42,10 +42,10 @@ const {
 /* eslint-disable */
 let walletP;
 let publicFacet;
-let publicFacetSimpleExchange;
+let publicFacetMarketPlace;
 /* eslint-enable */
 
-export { walletP, publicFacet, publicFacetSimpleExchange };
+export { walletP, publicFacet, publicFacetMarketPlace };
 
 export const ApplicationContext = createContext();
 
@@ -105,7 +105,6 @@ export default function Provider({ children }) {
         console.log('printing card purse:', newCardPurse);
         console.log('printing all cards:', availableCards);
       };
-
       async function watchPurses() {
         const pn = E(walletP).getPursesNotifier();
         for await (const purses of iterateNotifier(pn)) {
@@ -147,15 +146,19 @@ export default function Provider({ children }) {
       const board = E(walletP).getBoard();
       const instance = await E(board).getValue(INSTANCE_BOARD_ID);
       publicFacet = E(zoe).getPublicFacet(instance);
-      const simpleExchangeWrapperInstance = await E(board).getValue(
-        SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
+      // const simpleExchangeWrapperInstance = await E(board).getValue(
+      //   SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
+      // );
+      // publicFacetSimpleExchange = await E(zoe).getPublicFacet(
+      //   simpleExchangeWrapperInstance,
+      // );
+      const marketPlaceInstance = await E(board).getValue(
+        MARKET_PLACE_INSTANCE_BOARD_ID,
       );
-      publicFacetSimpleExchange = await E(zoe).getPublicFacet(
-        simpleExchangeWrapperInstance,
-      );
+      publicFacetMarketPlace = await E(zoe).getPublicFacet(marketPlaceInstance);
       async function watchOffers() {
         const availableOfferNotifier = await E(
-          publicFacetSimpleExchange,
+          publicFacetMarketPlace,
         ).getAvailableOfferNotifier();
 
         for await (const availableOffers of iterateNotifier(
@@ -229,7 +232,8 @@ export default function Provider({ children }) {
         dispatch,
         walletP,
         publicFacet,
-        publicFacetSimpleExchange,
+        publicFacetMarketPlace,
+        MARKET_PLACE_INSTANCE_BOARD_ID,
         CARD_BRAND_BOARD_ID,
         MAIN_CONTRACT_BOARD_INSTANCE_ID,
       }}

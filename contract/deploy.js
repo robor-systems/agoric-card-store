@@ -109,6 +109,13 @@ export default async function deployContract(
     simpleExchangeWrapperBundle,
   );
 
+  const marketPlaceBundleUrl = await importMetaResolve(
+    './src/marketPlace.js',
+    import.meta.url,
+  );
+  const marketPlaceBundlePath = new URL(marketPlaceBundleUrl).pathname;
+  const marketPlaceBundle = await bundleSource(marketPlaceBundlePath);
+  const marketPlaceBundleInstallation = await E(zoe).install(marketPlaceBundle);
   // Let's share this installation with other people, so that
   // they can run our contract code by making a contract
   // instance (see the api deploy script in this repo to see an
@@ -133,6 +140,9 @@ export default async function deployContract(
   const SIMPLE_EXCHANGE_WRAPPER_INSTALLATION_BOARD_ID = await E(board).getId(
     simpleExchangeWrapperInstallation,
   );
+  const MARKET_PLACE_INSTALLATION_BOARD_ID = await E(board).getId(
+    marketPlaceBundleInstallation,
+  );
   console.log('- SUCCESS! contract code installed on Zoe');
   console.log(`-- Contract Name: ${CONTRACT_NAME}`);
   console.log(`-- Installation Board Id: ${INSTALLATION_BOARD_ID}`);
@@ -142,6 +152,9 @@ export default async function deployContract(
   console.log(
     `-- Auction Items Installation Board Id: ${AUCTION_ITEMS_INSTALLATION_BOARD_ID}`,
   );
+  console.log(
+    `-- MarketPlace Installation Board Id: ${MARKET_PLACE_INSTALLATION_BOARD_ID}`,
+  );
   // Save the constants somewhere where the UI and api can find it.
   const dappConstants = {
     CONTRACT_NAME,
@@ -150,6 +163,7 @@ export default async function deployContract(
     AUCTION_ITEMS_INSTALLATION_BOARD_ID,
     SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
     SIMPLE_EXCHANGE_WRAPPER_INSTALLATION_BOARD_ID,
+    MARKET_PLACE_INSTALLATION_BOARD_ID,
   };
   const defaultsFolder = pathResolve(`../ui/src/conf`);
   const defaultsFile = pathResolve(`../ui/src/conf/installationConstants.js`);

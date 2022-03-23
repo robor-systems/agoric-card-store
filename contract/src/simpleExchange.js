@@ -71,7 +71,7 @@ const start = (zcf) => {
   // and return the seat for the matched offer. If not, return undefined, so
   // the caller can know to add the new offer to the book.
   function swapIfCanTrade(offers, seat) {
-    for (const offer of offers) {     
+    for (const offer of offers) {
       const satisfiedBy = (xSeat, ySeat) => {
         return satisfies(zcf, xSeat, ySeat.getCurrentAllocation());
       };

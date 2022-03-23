@@ -74,6 +74,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     CONTRACT_NAME,
     SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
     SIMPLE_EXCHANGE_WRAPPER_INSTALLATION_BOARD_ID,
+    MARKET_PLACE_INSTALLATION_BOARD_ID,
   } = installationConstants;
 
   // CMT (haseeb.asim@robor.systems): Fetching the installation of the contract.js from the board.
@@ -94,6 +95,9 @@ export default async function deployApi(homePromise, { pathResolve }) {
   );
   const simpleExchangeWrapperInstallation = await E(board).getValue(
     SIMPLE_EXCHANGE_WRAPPER_INSTALLATION_BOARD_ID,
+  );
+  const marketPlaceInstallation = await E(board).getValue(
+    MARKET_PLACE_INSTALLATION_BOARD_ID,
   );
   // Second, we can use the installation to create a new instance of
   // our contract code on Zoe. A contract instance is a running
@@ -170,13 +174,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
     invitationBrandP,
   ]);
 
-  // CMT (haseeb.asim@robor.systems): Creating issuerKeyWordRecord for Secondary Store Wrapper which contains
-  // all the issuer that are required in the contract.
-  const issuerKeywordRecord = harden({
-    Items: cardIssuer,
-    Money: moneyIssuer,
-  });
-
   const {
     publicFacet: simpleExchangePublicFacet,
     instance: simpleExchangeInstance,
@@ -206,6 +203,22 @@ export default async function deployApi(homePromise, { pathResolve }) {
     }),
   );
 
+  const {
+    // publicFacet: simpleExchangeWrapperPublicFacet,
+    instance: marketPlaceInstance,
+  } = await E(zoe).startInstance(
+    marketPlaceInstallation,
+    harden({
+      Asset: cardIssuer,
+      Price: moneyIssuer,
+    }),
+    harden({
+      cardMinter: minter,
+      auctionItemsCreator: creatorFacet,
+      userWallet: wallet,
+    }),
+  );
+
   // CMT (haseeb.asim@robor.systems): Storing each important variable on the board and getting their board ids.
   const [
     INSTANCE_BOARD_ID,
@@ -218,6 +231,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     MAIN_CONTRACT_BOARD_INSTANCE_ID,
     SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
     SIMPLE_EXCHANGE_INSTANCE_BOARD_ID,
+    MARKET_PLACE_INSTANCE_BOARD_ID,
   ] = await Promise.all([
     E(board).getId(instance),
     E(board).getId(cardBrand),
@@ -229,6 +243,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     E(board).getId(baseballCardInstance),
     E(board).getId(simpleExchangeWrapperInstance),
     E(board).getId(simpleExchangeInstance),
+    E(board).getId(marketPlaceInstance),
   ]);
 
   console.log(`-- Contract Name: ${CONTRACT_NAME}`);
@@ -242,6 +257,9 @@ export default async function deployApi(homePromise, { pathResolve }) {
 
   console.log(
     `-- SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID: ${SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID}`,
+  );
+  console.log(
+    `-- MARKET_PLACE_INSTANCE_BOARD_ID: ${MARKET_PLACE_INSTANCE_BOARD_ID}`,
   );
 
   const API_URL = process.env.API_URL || `http://127.0.0.1:${API_PORT || 8000}`;
@@ -269,6 +287,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
     SIMPLE_EXCHANGE_INSTANCE_BOARD_ID,
     SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
+    MARKET_PLACE_INSTANCE_BOARD_ID,
   };
   const defaultsFile = pathResolve(`../ui/src/conf/defaults.js`);
   console.log('writing', defaultsFile);
