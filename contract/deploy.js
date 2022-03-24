@@ -87,28 +87,6 @@ export default async function deployContract(
   const auctionBundle = await bundleSource(auctionBundlePath);
   const auctionInstallation = await E(zoe).install(auctionBundle);
 
-  const simpleExchangeBundleUrl = await importMetaResolve(
-    './src/simpleExchange.js',
-    import.meta.url,
-  );
-  const simpleExchangeBundlePath = new URL(simpleExchangeBundleUrl).pathname;
-  const simpleExchangeBundle = await bundleSource(simpleExchangeBundlePath);
-  const simpleExchangeInstallation = await E(zoe).install(simpleExchangeBundle);
-
-  const simpleExchangeWrapperBundleUrl = await importMetaResolve(
-    './src/simpleExchangeWrapper.js',
-    import.meta.url,
-  );
-  const simpleExchangeWrapperBundlePath = new URL(
-    simpleExchangeWrapperBundleUrl,
-  ).pathname;
-  const simpleExchangeWrapperBundle = await bundleSource(
-    simpleExchangeWrapperBundlePath,
-  );
-  const simpleExchangeWrapperInstallation = await E(zoe).install(
-    simpleExchangeWrapperBundle,
-  );
-
   const marketPlaceBundleUrl = await importMetaResolve(
     './src/marketPlace.js',
     import.meta.url,
@@ -134,12 +112,6 @@ export default async function deployContract(
     auctionInstallation,
   );
 
-  const SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID = await E(board).getId(
-    simpleExchangeInstallation,
-  );
-  const SIMPLE_EXCHANGE_WRAPPER_INSTALLATION_BOARD_ID = await E(board).getId(
-    simpleExchangeWrapperInstallation,
-  );
   const MARKET_PLACE_INSTALLATION_BOARD_ID = await E(board).getId(
     marketPlaceBundleInstallation,
   );
@@ -161,8 +133,6 @@ export default async function deployContract(
     INSTALLATION_BOARD_ID,
     AUCTION_INSTALLATION_BOARD_ID,
     AUCTION_ITEMS_INSTALLATION_BOARD_ID,
-    SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
-    SIMPLE_EXCHANGE_WRAPPER_INSTALLATION_BOARD_ID,
     MARKET_PLACE_INSTALLATION_BOARD_ID,
   };
   const defaultsFolder = pathResolve(`../ui/src/conf`);

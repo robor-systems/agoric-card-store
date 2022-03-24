@@ -146,12 +146,6 @@ export default function Provider({ children }) {
       const board = E(walletP).getBoard();
       const instance = await E(board).getValue(INSTANCE_BOARD_ID);
       publicFacet = E(zoe).getPublicFacet(instance);
-      // const simpleExchangeWrapperInstance = await E(board).getValue(
-      //   SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
-      // );
-      // publicFacetSimpleExchange = await E(zoe).getPublicFacet(
-      //   simpleExchangeWrapperInstance,
-      // );
       const marketPlaceInstance = await E(board).getValue(
         MARKET_PLACE_INSTANCE_BOARD_ID,
       );

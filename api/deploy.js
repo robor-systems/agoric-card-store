@@ -72,8 +72,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
     AUCTION_INSTALLATION_BOARD_ID,
     AUCTION_ITEMS_INSTALLATION_BOARD_ID,
     CONTRACT_NAME,
-    SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
-    SIMPLE_EXCHANGE_WRAPPER_INSTALLATION_BOARD_ID,
     MARKET_PLACE_INSTALLATION_BOARD_ID,
   } = installationConstants;
 
@@ -90,12 +88,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
     AUCTION_INSTALLATION_BOARD_ID,
   );
 
-  const simpleExchangeInstallation = await E(board).getValue(
-    SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
-  );
-  const simpleExchangeWrapperInstallation = await E(board).getValue(
-    SIMPLE_EXCHANGE_WRAPPER_INSTALLATION_BOARD_ID,
-  );
   const marketPlaceInstallation = await E(board).getValue(
     MARKET_PLACE_INSTALLATION_BOARD_ID,
   );
@@ -175,35 +167,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
   ]);
 
   const {
-    publicFacet: simpleExchangePublicFacet,
-    instance: simpleExchangeInstance,
-  } = await E(zoe).startInstance(
-    simpleExchangeInstallation,
-    harden({
-      Asset: cardIssuer,
-      Price: moneyIssuer,
-    }),
-  );
-
-  const {
-    // publicFacet: simpleExchangeWrapperPublicFacet,
-    instance: simpleExchangeWrapperInstance,
-  } = await E(zoe).startInstance(
-    simpleExchangeWrapperInstallation,
-    harden({
-      Asset: cardIssuer,
-      Price: moneyIssuer,
-    }),
-    harden({
-      simpleExchangeInstallation,
-      simpleExchangePublicFacet,
-      cardMinter: minter,
-      auctionItemsCreator: creatorFacet,
-      userWallet: wallet,
-    }),
-  );
-
-  const {
     // publicFacet: simpleExchangeWrapperPublicFacet,
     instance: marketPlaceInstance,
   } = await E(zoe).startInstance(
@@ -229,8 +192,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
     CARD_MINTER_BOARD_ID,
     INVITE_BRAND_BOARD_ID,
     MAIN_CONTRACT_BOARD_INSTANCE_ID,
-    SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
-    SIMPLE_EXCHANGE_INSTANCE_BOARD_ID,
     MARKET_PLACE_INSTANCE_BOARD_ID,
   ] = await Promise.all([
     E(board).getId(instance),
@@ -241,8 +202,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
     E(board).getId(minter),
     E(board).getId(invitationBrand),
     E(board).getId(baseballCardInstance),
-    E(board).getId(simpleExchangeWrapperInstance),
-    E(board).getId(simpleExchangeInstance),
     E(board).getId(marketPlaceInstance),
   ]);
 
@@ -253,10 +212,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
   console.log(`-- CARD_MINTER_BOARD_ID: ${CARD_MINTER_BOARD_ID}`);
   console.log(
     `-- MAIN_CONTRACT_BOARD_INSTANCE_ID: ${MAIN_CONTRACT_BOARD_INSTANCE_ID}`,
-  );
-
-  console.log(
-    `-- SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID: ${SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID}`,
   );
   console.log(
     `-- MARKET_PLACE_INSTANCE_BOARD_ID: ${MARKET_PLACE_INSTANCE_BOARD_ID}`,
@@ -284,9 +239,6 @@ export default async function deployApi(homePromise, { pathResolve }) {
     API_URL,
     CONTRACT_NAME,
     MAIN_CONTRACT_BOARD_INSTANCE_ID,
-    SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
-    SIMPLE_EXCHANGE_INSTANCE_BOARD_ID,
-    SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
     MARKET_PLACE_INSTANCE_BOARD_ID,
   };
   const defaultsFile = pathResolve(`../ui/src/conf/defaults.js`);

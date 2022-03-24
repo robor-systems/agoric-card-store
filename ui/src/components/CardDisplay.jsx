@@ -33,6 +33,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
   let menuOptions;
   console.log(userCards, userOffers, userNfts, pendingOffers, 'all card arrs');
   const getUserCards = (params) => {
+    console.log('params:', userCards, userOffers, userNfts, pendingOffers);
     const userCardsMap = params?.userCards.reduce((map, obj) => {
       map[obj.id] = { ...obj };
       return map;
@@ -41,7 +42,11 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
       map[obj.id] = { ...obj };
       return map;
     }, new Map());
+    console.log('merged1:', userCardsMap);
+    console.log('merged2:', pendingOfferMap);
     const mergedMap = { ...userCardsMap, ...pendingOfferMap };
+    console.log('merged3:', mergedMap);
+
     const allUserCards = [];
     if (mergedMap) {
       for (const keys in mergedMap) {
@@ -111,7 +116,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
       setMyCards(getUserCards({ userCards, userOffers, userNfts }));
     userCards?.length === 0 && userNfts?.length === 0 && setMyCardLoader(false);
     setSecondaryCards(getSecondaryCards({ userCards, userOffers }));
-  }, [userOffers, userCards, userNfts, pendingOffers]);
+  }, [userOffers, userNfts, pendingOffers, userCards]);
   switch (activeTab) {
     case 0:
       cards =
