@@ -82,20 +82,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
     setMyCardLoader(false);
     return arr;
   };
-  const getSecondaryCards = (params) => {
-    // const ids = params?.userCards?.map((card) => card.id);
-    // change !== to === to filter user owned cards from secondaryMarketplace
-    // console.log(ids, 'filterids');
-    // console.log(userOffers, 'useroffersfilter');
-    // const arr = params?.userOffers?.filter(
-    //   (card) => ids.indexOf(card.id) !== -1,
-    // );
-    // console.log(arr, 'filteredarr');
-    setSecondaryLoader(false);
-    // console.log('running getSecondaryCards:', arr);
-    console.log(params);
-    return userOffers;
-  };
+
   const getFilteredList = (list, option) => {
     return list.filter((el) => {
       if (searchInput === '') {
@@ -121,7 +108,8 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
       (userCards?.length > 0 && userNfts?.length > 0)) &&
       setMyCards(getUserCards({ userCards, userOffers, userNfts }));
     userCards?.length === 0 && userNfts?.length === 0 && setMyCardLoader(false);
-    setSecondaryCards(getSecondaryCards({ userCards, userOffers }));
+    setSecondaryCards(userOffers);
+    setSecondaryLoader(false);
   }, [userOffers, userNfts, pendingOffers, userCards]);
   switch (activeTab) {
     case 0:

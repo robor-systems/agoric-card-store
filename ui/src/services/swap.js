@@ -43,6 +43,7 @@ const makeMatchingInvitation = async ({
     simpleExchangeInstallationBoardId:
       dappConstants.MARKET_PLACE_INSTALLATION_BOARD_ID,
   });
+  console.log('after Make Offer');
   setLoading(false);
   onClose();
   dispatch(setBoughtCard(true));
