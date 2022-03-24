@@ -30,7 +30,7 @@ const makeMatchingInvitation = async ({
   console.log(walletP, 'walletp');
   console.log(publicFacetMarketPlace);
   console.log(cardOffer);
-
+  tokenPurses = tokenPurses.reverse();
   const offerId = await E(publicFacetMarketPlace).makeBuyerOffer({
     cardPurse,
     tokenPurses,

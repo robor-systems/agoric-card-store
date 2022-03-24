@@ -31,15 +31,21 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
   const [myCards, setMyCards] = useState([]);
   const [secondaryCards, setSecondaryCards] = useState([]);
   let menuOptions;
-  console.log(userCards, userOffers, userNfts, pendingOffers, 'all card arrs');
+  console.log(
+    userCards,
+    userOffers,
+    userNfts,
+    pendingOffers,
+    'all card arrs: userCards ,userOffers,userNfts,pendingOffers',
+  );
   const getUserCards = (params) => {
     console.log('params:', userCards, userOffers, userNfts, pendingOffers);
     const userCardsMap = params?.userCards.reduce((map, obj) => {
-      map[obj.id] = { ...obj };
+      map[obj.id] = { ...obj, onSale: false };
       return map;
     }, new Map());
     const pendingOfferMap = pendingOffers.reduce((map, obj) => {
-      map[obj.id] = { ...obj };
+      map[obj.id] = { ...obj, onSale: true };
       return map;
     }, new Map());
     console.log('merged1:', userCardsMap);
@@ -152,6 +158,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
                     cardDetail={cardDetail}
                     key={cardDetail.name}
                     handleClick={handleClick}
+                    onSale={cardDetail.onSale}
                     type={type}
                   />
                 </div>
