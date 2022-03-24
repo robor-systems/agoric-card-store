@@ -99,13 +99,13 @@ const getSellerSeat = async ({
       cardDetail,
       sellingPrice,
       cardPurse,
-      tokenPurses,
+      tokenPurses: tokenPurses.reverse(),
       walletP,
       _id: Date.now(),
       simpleExchangeInstallationBoardId:
-        dappConstants.SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
+        dappConstants.MARKET_PLACE_INSTALLATION_BOARD_ID,
       simpleExchangeInstanceBoardId:
-        dappConstants.SIMPLE_EXCHANGE_INSTANCE_BOARD_ID,
+        dappConstants.MARKET_PLACE_INSTANCE_BOARD_ID,
     });
     console.log('offerId:', offerId);
     setLoading(false);

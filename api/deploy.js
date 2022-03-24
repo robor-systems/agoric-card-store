@@ -239,6 +239,7 @@ export default async function deployApi(homePromise, { pathResolve }) {
     API_URL,
     CONTRACT_NAME,
     MAIN_CONTRACT_BOARD_INSTANCE_ID,
+    MARKET_PLACE_INSTALLATION_BOARD_ID,
     MARKET_PLACE_INSTANCE_BOARD_ID,
   };
   const defaultsFile = pathResolve(`../ui/src/conf/defaults.js`);

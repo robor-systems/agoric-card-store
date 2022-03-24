@@ -286,7 +286,10 @@ const start = (zcf) => {
             availableOffers = AmountMath.add(availableOffers, cardOfferAmount);
             availableOfferUpdater.updateState(availableOffers);
             return true;
-          } else if (status === 'decline' && checkConditon === 'accept') {
+          } else if (
+            (status === 'decline' || status === 'rejected') &&
+            checkConditon === 'accept'
+          ) {
             return false;
           } else if (status === 'cancel' && checkConditon === 'exit') {
             availableOffers = AmountMath.subtract(
