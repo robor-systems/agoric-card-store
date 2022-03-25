@@ -18,6 +18,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
     userNfts,
     tokenDisplayInfo,
     pendingOffers,
+    escrowedCards,
   } = state;
   // const isReady1 = cardPurse && cardPurse?.currentAmount?.value?.length > 0;
   // const isReady2 = userCards && userCards.length > 0;
@@ -39,6 +40,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
     'all card arrs: userCards ,userOffers,userNfts,pendingOffers',
   );
   const getUserCards = (params) => {
+    console.log('escrowed Cards:', escrowedCards);
     console.log('params:', userCards, userOffers, userNfts, pendingOffers);
     const userCardsMap = params?.userCards.reduce((map, obj) => {
       map[obj.id] = { ...obj, onSale: false };
@@ -48,9 +50,18 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
       map[obj.id] = { ...obj, onSale: true };
       return map;
     }, new Map());
+    const escrowedCardsMap = escrowedCards.reduce((map, obj) => {
+      map[obj.id] = { ...obj, onSale: true };
+      return map;
+    }, new Map());
+
     console.log('merged1:', userCardsMap);
     console.log('merged2:', pendingOfferMap);
-    const mergedMap = { ...userCardsMap, ...pendingOfferMap };
+    const mergedMap = {
+      ...userCardsMap,
+      ...pendingOfferMap,
+      ...escrowedCardsMap,
+    };
     console.log('merged3:', mergedMap);
 
     const allUserCards = [];

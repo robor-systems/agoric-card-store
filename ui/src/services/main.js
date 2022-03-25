@@ -21,7 +21,8 @@ const Main = (
   MAIN_CONTRACT_BOARD_INSTANCE_ID,
   CARD_BRAND_BOARD_ID,
 ) => {
-  const { cardPurse, tokenPurses, activeCard, userOffers } = state;
+  const { cardPurse, tokenPurses, activeCard, userOffers, escrowedCards } =
+    state;
   const submitCardOffer = (
     name,
     price,
@@ -104,6 +105,7 @@ const Main = (
   }) => {
     const userOffer = userOffers.filter((offer) => offer.id === activeCard.id);
     const params = {
+      escrowedCards,
       sellingPrice: BigInt(price),
       walletP,
       cardPurse,
@@ -124,6 +126,8 @@ const Main = (
       (offer) => offer.id === activeCard.id,
     )[0];
     await removeItemFromSale({
+      dispatch,
+      escrowedCards,
       cardDetail,
       cardPurse,
       publicFacetMarketPlace,

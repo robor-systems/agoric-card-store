@@ -1,7 +1,7 @@
 import { AmountMath } from '@agoric/ertp';
 import { E } from '@agoric/eventual-send';
 import dappConstants from '../utils/constants';
-import { setBoughtCard, setMessage } from '../store/store';
+import { setBoughtCard, setEscrowedCards, setMessage } from '../store/store';
 
 /*
  * This function should be called when the buyer buys a card from
@@ -64,11 +64,14 @@ const makeMatchingInvitation = async ({
 };
 
 const removeItemFromSale = async ({
+  dispatch,
+  escrowedCards,
   cardDetail,
   publicFacetMarketPlace,
   cardPurse,
 }) => {
-  console.log('removeItemFromSale:id', cardDetail);
+  dispatch(setEscrowedCards([...escrowedCards, cardDetail]));
+
   const sellerSeat = await E(publicFacetMarketPlace).getSellerSeat({
     id: cardDetail.id,
   });
@@ -82,6 +85,7 @@ const removeItemFromSale = async ({
  * which he own on sale in the secondary marketplace
  */
 const getSellerSeat = async ({
+  escrowedCards,
   cardDetail,
   userOffer,
   sellingPrice,
@@ -139,6 +143,8 @@ const getSellerSeat = async ({
       if (removeItem) {
         console.log('running removeItem');
         await removeItemFromSale({
+          escrowedCards,
+          dispatch,
           cardDetail: userOffer,
           publicFacetMarketPlace,
           cardPurse,
