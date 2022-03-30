@@ -14,20 +14,19 @@ function AddNewNFTForm({ tokenDisplayInfo, handleNFTMint }) {
     title: '',
     image: '',
     creatorName: '',
-    price: '',
+    boughtFor: '',
     description: '',
   });
-  // const [price, setPrice] = useState(null);
   const [attributes, setAttributes] = useState([]);
 
   const handleSubmit = async () => {
     try {
-      const amount = makeValue(Form.price, tokenDisplayInfo);
+      const amount = makeValue(Form.boughtFor, tokenDisplayInfo);
       const id = nanoid();
       const cardDetails = {
         id,
         name: Form.title,
-        price: amount,
+        boughtFor: amount,
         image: Form.image,
         creatorName: Form.creatorName,
         description: Form.description,
@@ -38,7 +37,7 @@ function AddNewNFTForm({ tokenDisplayInfo, handleNFTMint }) {
         title: '',
         image: '',
         creatorName: '',
-        price: '',
+        boughtFor: '',
         description: '',
       });
       setAttributes([]);
@@ -98,9 +97,9 @@ function AddNewNFTForm({ tokenDisplayInfo, handleNFTMint }) {
         type="text"
       />
       <Input
-        value={Form.price}
+        value={Form.boughtFor}
         handleChange={(val) => {
-          setForm({ ...Form, price: val });
+          setForm({ ...Form, boughtFor: val });
         }}
         label="Price"
         // type="text"

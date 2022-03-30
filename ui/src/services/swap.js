@@ -1,7 +1,7 @@
 import { AmountMath } from '@agoric/ertp';
 import { E } from '@agoric/eventual-send';
 import dappConstants from '../utils/constants';
-import { setBoughtCard, setMessage } from '../store/store';
+import { setBoughtCard, setEscrowedCards, setMessage } from '../store/store';
 
 /*
  * This function should be called when the buyer buys a card from
@@ -15,7 +15,7 @@ const makeMatchingInvitation = async ({
   sellingPrice,
   boughtFor,
   walletP,
-  publicFacetSimpleExchange,
+  publicFacetMarketPlace,
   cardOffer,
   setLoading,
   onClose,
@@ -28,10 +28,10 @@ const makeMatchingInvitation = async ({
   console.log(sellingPrice, 'sellingPrice');
   console.log(boughtFor, 'boughtFor');
   console.log(walletP, 'walletp');
-  console.log(publicFacetSimpleExchange);
+  console.log(publicFacetMarketPlace);
   console.log(cardOffer);
-
-  const offerId = await E(publicFacetSimpleExchange).makeBuyerOffer({
+  tokenPurses = tokenPurses.reverse();
+  const offerId = await E(publicFacetMarketPlace).makeBuyerOffer({
     cardPurse,
     tokenPurses,
     cardDetail,
@@ -41,10 +41,9 @@ const makeMatchingInvitation = async ({
     cardOffer,
     _id: Date.now(),
     simpleExchangeInstallationBoardId:
-      dappConstants.SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
-    simpleExchangeInstanceBoardId:
-      dappConstants.SIMPLE_EXCHANGE_INSTANCE_BOARD_ID,
+      dappConstants.MARKET_PLACE_INSTALLATION_BOARD_ID,
   });
+  console.log('after Make Offer');
   setLoading(false);
   onClose();
   dispatch(setBoughtCard(true));
@@ -52,7 +51,7 @@ const makeMatchingInvitation = async ({
     setMessage('Please accept offer from your wallet to complete purchase!'),
   );
   const result = await E(
-    publicFacetSimpleExchange,
+    publicFacetMarketPlace,
   ).updateNotfiersOnWalletOffersAtBuyer({
     offerId,
     cardOffer,
@@ -63,64 +62,99 @@ const makeMatchingInvitation = async ({
   });
   return result;
 };
+
+const removeItemFromSale = async ({
+  dispatch,
+  escrowedCards,
+  cardDetail,
+  publicFacetMarketPlace,
+  cardPurse,
+}) => {
+  dispatch(setEscrowedCards([...escrowedCards, cardDetail]));
+
+  const sellerSeat = await E(publicFacetMarketPlace).getSellerSeat({
+    id: cardDetail.id,
+  });
+  await E(sellerSeat[0].sellerSeat).exit();
+  const amount = AmountMath.make(cardPurse.brand, harden([cardDetail]));
+  await E(publicFacetMarketPlace).updateAvailableOffers(amount);
+};
+
 /*
  * This function should be called when the user puts a card
  * which he own on sale in the secondary marketplace
  */
 const getSellerSeat = async ({
+  escrowedCards,
   cardDetail,
+  userOffer,
   sellingPrice,
-  publicFacetSimpleExchange,
+  publicFacetMarketPlace,
   cardPurse,
   tokenPurses,
   walletP,
   setLoading,
   onClose,
-  // state,
   dispatch,
 }) => {
-  const { offerId, cardOfferAmount } = await E(
-    publicFacetSimpleExchange,
-  ).makeSellerOffer({
-    cardDetail,
-    sellingPrice,
-    cardPurse,
-    tokenPurses,
-    walletP,
-    _id: Date.now(),
-    simpleExchangeInstallationBoardId:
-      dappConstants.SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
-    simpleExchangeInstanceBoardId:
-      dappConstants.SIMPLE_EXCHANGE_INSTANCE_BOARD_ID,
-  });
-  console.log('offerId:', offerId);
-  setLoading(false);
-  onClose();
-  dispatch(setBoughtCard(true));
-  dispatch(
-    setMessage('Please accept offer from your wallet to put card on sale!'),
-  );
-  const result = await E(
-    publicFacetSimpleExchange,
-  ).updateNotfiersOnWalletOffersAtSeller({
-    offerId,
-    cardOfferAmount,
-    walletP,
-  });
-  return result;
-};
-
-const removeItemFromSale = async ({
-  cardDetail,
-  publicFacetSimpleExchange,
-  cardPurse,
-}) => {
-  const sellerSeat = await E(publicFacetSimpleExchange).getSellerSeat({
-    id: cardDetail[0].id,
-  });
-  await E(sellerSeat[0].sellerSeat).exit();
-  const amount = AmountMath.make(cardPurse.brand, harden(cardDetail));
-  await E(publicFacetSimpleExchange).updateAvailableOffers(amount);
+  try {
+    const { offerId, cardOfferAmount } = await E(
+      publicFacetMarketPlace,
+    ).makeSellerOffer({
+      cardDetail,
+      sellingPrice,
+      cardPurse,
+      tokenPurses: tokenPurses.reverse(),
+      walletP,
+      _id: Date.now(),
+      simpleExchangeInstallationBoardId:
+        dappConstants.MARKET_PLACE_INSTALLATION_BOARD_ID,
+      simpleExchangeInstanceBoardId:
+        dappConstants.MARKET_PLACE_INSTANCE_BOARD_ID,
+    });
+    console.log('offerId:', offerId);
+    setLoading(false);
+    onClose();
+    dispatch(setBoughtCard(true));
+    dispatch(
+      setMessage('Please accept offer from your wallet to put card on sale!'),
+    );
+    let checkConditon = 'accept';
+    const result = await E(
+      publicFacetMarketPlace,
+    ).updateNotfiersOnWalletOffersAtSeller({
+      checkConditon,
+      offerId,
+      cardOfferAmount,
+      walletP,
+    });
+    console.log('result1:', result);
+    if (result) {
+      checkConditon = 'exit';
+      const removeItem = await E(
+        publicFacetMarketPlace,
+      ).updateNotfiersOnWalletOffersAtSeller({
+        checkConditon,
+        offerId,
+        cardOfferAmount,
+        walletP,
+      });
+      console.log('removeItem1:', removeItem);
+      if (removeItem) {
+        console.log('running removeItem');
+        await removeItemFromSale({
+          escrowedCards,
+          dispatch,
+          cardDetail: userOffer,
+          publicFacetMarketPlace,
+          cardPurse,
+        });
+      }
+    }
+    console.log('afterremoveItem1:');
+  } catch (err) {
+    console.log('error:', err);
+  }
 };
 
 export { getSellerSeat, makeMatchingInvitation, removeItemFromSale };
