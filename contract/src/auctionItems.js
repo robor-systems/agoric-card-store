@@ -134,7 +134,6 @@ const start = (zcf) => {
       timeAuthority,
       bidDuration,
     });
-
     const { creatorInvitation, instance } = await E(zoeService).startInstance(
       auctionInstallation,
       issuerKeywordRecord,
@@ -195,7 +194,6 @@ const start = (zcf) => {
 
   const getOrCreateAuctionSession = async (itemKey, cardOffer) => {
     // assert.typeof(itemKey, 'string');
-
     if (!sellerSessions[itemKey]) {
       sellerSessions[itemKey] = await startAuctioningItem(itemKey, cardOffer);
     }

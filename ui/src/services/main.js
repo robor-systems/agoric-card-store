@@ -128,7 +128,7 @@ const Main = (
     await removeItemFromSale({
       dispatch,
       escrowedCards,
-      cardDetail: userOffer.proposal.offer.proposal.give.Asset.value[0],
+      cardDetail: userOffer.proposal.give.Asset.value[0],
       sellerSeat: userOffer.sellerSeat,
       cardPurse,
       publicFacetMarketPlace,

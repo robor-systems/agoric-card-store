@@ -128,6 +128,7 @@ export default function Provider({ children }) {
               (offer) => offer?.proposalTemplate?.give?.Asset?.value[0],
             );
             dispatch(setPendingOffers(pendingOffersArray) || []);
+            await E(publicFacetMarketPlace).updateNotifier();
           }
         } catch (err) {
           console.log('offers in application: error');

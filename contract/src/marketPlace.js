@@ -51,6 +51,7 @@ const start = (zcf) => {
   }
 
   function flattenOrders(seats) {
+    console.log('FlattenOrders-seats:', seats);
     const activeSeats = seats.filter((s) => !s.hasExited());
     return activeSeats.map((seat) => {
       return { sellerSeat: seat, proposal: dropExit(seat.getProposal()) };
@@ -120,7 +121,6 @@ const start = (zcf) => {
     sellSeats = swapIfCanTradeAndUpdateBook(sellSeats, buySeats, seat);
     return 'Order Added';
   };
-
   /** @type {OfferHandler} */
   const exchangeOfferHandler = (seat) => {
     // Buy Order
@@ -143,6 +143,7 @@ const start = (zcf) => {
     zcf.makeInvitation(exchangeOfferHandler, 'exchange');
 
   const publicFacet = Far('MarketPlacePublicFacet', {
+    updateNotifier: bookOrdersChanged,
     makeInvitation: makeExchangeInvitation,
     getNotifier: () => notifier,
   });

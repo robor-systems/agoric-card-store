@@ -1,4 +1,4 @@
-import { AmountMath } from '@agoric/ertp';
+// import { AmountMath } from '@agoric/ertp';
 import { E } from '@endo/eventual-send';
 import { setBoughtCard, setEscrowedCards, setMessage } from '../store/store';
 
@@ -36,6 +36,7 @@ const makeMatchingInvitation = async ({
   } catch (e) {
     console.error('Could not make buyer invitation', e);
   }
+  console.log('invitation Successful:', invitation);
   const id = Date.now();
   const proposalTemplate = {
     want: {
@@ -50,6 +51,7 @@ const makeMatchingInvitation = async ({
         value: sellingPrice,
       },
     },
+    exit: { onDemand: null },
   };
   const offerConfig = { id, invitation, proposalTemplate };
   try {
@@ -74,13 +76,17 @@ const removeItemFromSale = async ({
   cardDetail,
   sellerSeat,
   publicFacetMarketPlace,
-  cardPurse,
+  // cardPurse,
 }) => {
-  dispatch(setEscrowedCards([...escrowedCards, cardDetail]));
-
-  await E(sellerSeat).exit();
-  const amount = AmountMath.make(cardPurse.brand, harden([cardDetail]));
-  await E(publicFacetMarketPlace).updateAvailableOffers(amount);
+  try {
+    dispatch(setEscrowedCards([...escrowedCards, cardDetail]));
+    await E(sellerSeat).exit();
+    const isExited = await E(sellerSeat).hasExited();
+    console.log('Seat exited:', isExited);
+    await E(publicFacetMarketPlace).updateNotifier();
+  } catch (e) {
+    console.log('error in removeItemFromSale()');
+  }
 };
 
 /*
@@ -119,6 +125,7 @@ const getSellerSeat = async ({
         value: sellingPrice,
       },
     },
+    exit: { onDemand: null },
   };
   const offerConfig = { id, invitation, proposalTemplate };
   try {
