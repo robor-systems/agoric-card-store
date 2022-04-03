@@ -77,7 +77,7 @@ const Main = (
       Obj;
     delete Obj.sellerSeat;
     delete Obj.sellingPrice;
-    delete Obj.boughtFor;
+    // delete Obj.boughtFor;
     delete Obj.BuyerExclusiveInvitation;
     const result = await makeMatchingInvitation({
       cardPurse,
@@ -122,13 +122,14 @@ const Main = (
   };
 
   const removeCardFromSale = async () => {
-    const cardDetail = userOffers.filter(
-      (offer) => offer.id === activeCard.id,
-    )[0];
+    const userOffer = userOffers.filter((offer) => {
+      return offer.proposal.give.Asset.value[0].id === activeCard.id;
+    })[0];
     await removeItemFromSale({
       dispatch,
       escrowedCards,
-      cardDetail,
+      cardDetail: userOffer.proposal.offer.proposal.give.Asset.value[0],
+      sellerSeat: userOffer.sellerSeat,
       cardPurse,
       publicFacetMarketPlace,
     });

@@ -1,4 +1,4 @@
-import { E } from '@agoric/captp';
+import { E } from '@endo/eventual-send';
 // import { AmountMath } from '@agoric/ertp';
 import {
   setActiveTab,

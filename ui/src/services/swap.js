@@ -1,6 +1,5 @@
 import { AmountMath } from '@agoric/ertp';
-import { E } from '@agoric/eventual-send';
-import dappConstants from '../utils/constants';
+import { E } from '@endo/eventual-send';
 import { setBoughtCard, setEscrowedCards, setMessage } from '../store/store';
 
 /*
@@ -31,51 +30,55 @@ const makeMatchingInvitation = async ({
   console.log(publicFacetMarketPlace);
   console.log(cardOffer);
   tokenPurses = tokenPurses.reverse();
-  const offerId = await E(publicFacetMarketPlace).makeBuyerOffer({
-    cardPurse,
-    tokenPurses,
-    cardDetail,
-    sellingPrice,
-    boughtFor,
-    walletP,
-    cardOffer,
-    _id: Date.now(),
-    simpleExchangeInstallationBoardId:
-      dappConstants.MARKET_PLACE_INSTALLATION_BOARD_ID,
-  });
-  console.log('after Make Offer');
+  let invitation;
+  try {
+    invitation = await E(publicFacetMarketPlace).makeInvitation();
+  } catch (e) {
+    console.error('Could not make buyer invitation', e);
+  }
+  const id = Date.now();
+  const proposalTemplate = {
+    want: {
+      Asset: {
+        pursePetname: cardPurse.pursePetname,
+        value: harden([cardDetail]),
+      },
+    },
+    give: {
+      Price: {
+        pursePetname: tokenPurses[0].pursePetname,
+        value: sellingPrice,
+      },
+    },
+  };
+  const offerConfig = { id, invitation, proposalTemplate };
+  try {
+    await E(walletP).addOffer(offerConfig);
+  } catch (e) {
+    console.error('Could not add sell offer to wallet', e);
+  }
+  console.log('offerId:', id);
   setLoading(false);
   onClose();
   dispatch(setBoughtCard(true));
   dispatch(
-    setMessage('Please accept offer from your wallet to complete purchase!'),
+    setMessage(
+      'Please approve the offer from your wallet to complete the purchase!',
+    ),
   );
-  const result = await E(
-    publicFacetMarketPlace,
-  ).updateNotfiersOnWalletOffersAtBuyer({
-    offerId,
-    cardOffer,
-    cardDetail,
-    boughtFor,
-    sellingPrice,
-    walletP,
-  });
-  return result;
 };
 
 const removeItemFromSale = async ({
   dispatch,
   escrowedCards,
   cardDetail,
+  sellerSeat,
   publicFacetMarketPlace,
   cardPurse,
 }) => {
   dispatch(setEscrowedCards([...escrowedCards, cardDetail]));
 
-  const sellerSeat = await E(publicFacetMarketPlace).getSellerSeat({
-    id: cardDetail.id,
-  });
-  await E(sellerSeat[0].sellerSeat).exit();
+  await E(sellerSeat).exit();
   const amount = AmountMath.make(cardPurse.brand, harden([cardDetail]));
   await E(publicFacetMarketPlace).updateAvailableOffers(amount);
 };
@@ -85,9 +88,7 @@ const removeItemFromSale = async ({
  * which he own on sale in the secondary marketplace
  */
 const getSellerSeat = async ({
-  escrowedCards,
   cardDetail,
-  userOffer,
   sellingPrice,
   publicFacetMarketPlace,
   cardPurse,
@@ -97,64 +98,43 @@ const getSellerSeat = async ({
   onClose,
   dispatch,
 }) => {
+  let invitation;
   try {
-    const { offerId, cardOfferAmount } = await E(
-      publicFacetMarketPlace,
-    ).makeSellerOffer({
-      cardDetail,
-      sellingPrice,
-      cardPurse,
-      tokenPurses: tokenPurses.reverse(),
-      walletP,
-      _id: Date.now(),
-      simpleExchangeInstallationBoardId:
-        dappConstants.MARKET_PLACE_INSTALLATION_BOARD_ID,
-      simpleExchangeInstanceBoardId:
-        dappConstants.MARKET_PLACE_INSTANCE_BOARD_ID,
-    });
-    console.log('offerId:', offerId);
-    setLoading(false);
-    onClose();
-    dispatch(setBoughtCard(true));
-    dispatch(
-      setMessage('Please accept offer from your wallet to put card on sale!'),
-    );
-    let checkConditon = 'accept';
-    const result = await E(
-      publicFacetMarketPlace,
-    ).updateNotfiersOnWalletOffersAtSeller({
-      checkConditon,
-      offerId,
-      cardOfferAmount,
-      walletP,
-    });
-    console.log('result1:', result);
-    if (result) {
-      checkConditon = 'exit';
-      const removeItem = await E(
-        publicFacetMarketPlace,
-      ).updateNotfiersOnWalletOffersAtSeller({
-        checkConditon,
-        offerId,
-        cardOfferAmount,
-        walletP,
-      });
-      console.log('removeItem1:', removeItem);
-      if (removeItem) {
-        console.log('running removeItem');
-        await removeItemFromSale({
-          escrowedCards,
-          dispatch,
-          cardDetail: userOffer,
-          publicFacetMarketPlace,
-          cardPurse,
-        });
-      }
-    }
-    console.log('afterremoveItem1:');
-  } catch (err) {
-    console.log('error:', err);
+    invitation = await E(publicFacetMarketPlace).makeInvitation();
+  } catch (e) {
+    console.error('Could not make seller invitation', e);
   }
+
+  const id = Date.now();
+  const proposalTemplate = {
+    give: {
+      Asset: {
+        pursePetname: cardPurse.pursePetname,
+        value: harden([cardDetail]),
+      },
+    },
+    want: {
+      Price: {
+        pursePetname: tokenPurses[0].pursePetname,
+        value: sellingPrice,
+      },
+    },
+  };
+  const offerConfig = { id, invitation, proposalTemplate };
+  try {
+    await E(walletP).addOffer(offerConfig);
+  } catch (e) {
+    console.error('Could not add sell offer to wallet', e);
+  }
+  console.log('offerId:', id);
+  setLoading(false);
+  onClose();
+  dispatch(setBoughtCard(true));
+  dispatch(
+    setMessage(
+      'Please approve the offer from your wallet to put the card on sale!',
+    ),
+  );
 };
 
 export { getSellerSeat, makeMatchingInvitation, removeItemFromSale };

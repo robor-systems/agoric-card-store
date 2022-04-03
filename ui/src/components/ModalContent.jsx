@@ -28,7 +28,7 @@ function ModalContent({
   const populateContent = () => {
     switch (type) {
       case 'Sell Product':
-        return cardDetail.sellingPrice ? (
+        return cardDetail.onSale ? (
           <>
             <h1 className="text-2xl font-semibold text-center">
               Remove from Sale

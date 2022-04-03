@@ -1,8 +1,8 @@
 // @ts-check
 
 import { assert, details as X } from '@agoric/assert';
-import { Far } from '@agoric/marshal';
-import { E } from '@agoric/eventual-send';
+import { Far } from '@endo/marshal';
+import { E } from '@endo/eventual-send';
 import { AmountMath } from '@agoric/ertp';
 import { makeNotifierKit } from '@agoric/notifier';
 import {
@@ -49,10 +49,8 @@ const start = (zcf) => {
   let userSaleHistory = AmountMath.make(brands.Items, harden([]));
 
   // CMT (haseeb.asim@robor.systems):The notifiers that are used to notify the front-end about the existing sale history or update the front-end in case a new sale has been completed.
-  const {
-    notifier: userSaleHistoryNotifier,
-    updater: userSaleHistoryUpdater,
-  } = makeNotifierKit();
+  const { notifier: userSaleHistoryNotifier, updater: userSaleHistoryUpdater } =
+    makeNotifierKit();
 
   /** @type Record<string, AuctionSession> */
   const sellerSessions = {};
@@ -61,10 +59,8 @@ const start = (zcf) => {
 
   const { zcfSeat: sellerSeat } = zcf.makeEmptySeatKit();
 
-  const {
-    notifier: availableItemsNotifier,
-    updater: availableItemsUpdater,
-  } = makeNotifierKit();
+  const { notifier: availableItemsNotifier, updater: availableItemsUpdater } =
+    makeNotifierKit();
 
   const addToUserSaleHistory = (cardAmount) => {
     try {

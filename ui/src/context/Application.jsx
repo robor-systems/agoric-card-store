@@ -2,9 +2,9 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 // import 'json5';
 // import 'utils/installSESLockdown';
 
-import { makeCapTP, E } from '@agoric/captp';
+import { makeCapTP, E } from '@endo/captp';
 import { makeAsyncIterableFromNotifier as iterateNotifier } from '@agoric/notifier';
-import { Far } from '@agoric/marshal';
+import { Far } from '@endo/marshal';
 
 import {
   activateWebSocket,
@@ -127,7 +127,7 @@ export default function Provider({ children }) {
             pendingOffersArray = pendingOffersArray?.map(
               (offer) => offer?.proposalTemplate?.give?.Asset?.value[0],
             );
-            dispatch(setPendingOffers(pendingOffersArray));
+            dispatch(setPendingOffers(pendingOffersArray) || []);
           }
         } catch (err) {
           console.log('offers in application: error');
@@ -153,12 +153,13 @@ export default function Provider({ children }) {
       async function watchOffers() {
         const availableOfferNotifier = await E(
           publicFacetMarketPlace,
-        ).getAvailableOfferNotifier();
+        ).getNotifier();
 
         for await (const availableOffers of iterateNotifier(
           availableOfferNotifier,
         )) {
-          dispatch(setUserOffers(availableOffers.value || []));
+          console.log('GOT NOTIFIER!!!', availableOffers.sells);
+          dispatch(setUserOffers(availableOffers.sells || []));
         }
 
         const userSaleHistoryNotifier = await E(
