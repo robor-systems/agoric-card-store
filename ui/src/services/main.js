@@ -107,6 +107,8 @@ const Main = (
     onClose,
   }) => {
     const userOffer = userOffers.filter((offer) => offer.id === activeCard.id);
+    const Obj = { ...activeCard };
+    delete Obj.sellingPrice;
     const params = {
       escrowedCards,
       sellingPrice: BigInt(price),
@@ -115,7 +117,7 @@ const Main = (
       tokenPurses,
       publicFacet,
       publicFacetMarketPlace,
-      cardDetail: activeCard,
+      cardDetail: Obj,
       cardOffer: {
         ...activeCard,
         sellingPrice: BigInt(price),

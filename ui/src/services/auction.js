@@ -26,7 +26,7 @@ const makeBidOfferForCard = async ({
   console.log('invitation Successful:', invitation);
   const offerConfig = {
     // JSONable ID for this offer.  This is scoped to the origin.
-    id: Date.now(),
+    id: 'dsdsdssd',
     invitation,
     proposalTemplate: {
       want: {

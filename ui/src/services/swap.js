@@ -132,7 +132,7 @@ const getSellerSeat = async ({
   } catch (e) {
     console.error('Could not make seller invitation', e);
   }
-
+  console.log('cardDetail in app:', cardDetail);
   const id = Date.now();
   const proposalTemplate = {
     give: {
