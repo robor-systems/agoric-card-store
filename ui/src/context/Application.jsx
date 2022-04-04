@@ -28,6 +28,7 @@ import {
   setUserOffers,
   setUserCards,
   setPendingOffers,
+  setWalletOffers,
 } from '../store/store';
 
 const {
@@ -56,7 +57,30 @@ export function useApplicationContext() {
 /* eslint-disable complexity, react/prop-types */
 export default function Provider({ children }) {
   const [state, dispatch] = useReducer(reducer, defaultState);
-  const { availableCards } = state;
+  const { availableCards, userOffers, userCards } = state;
+  useEffect(() => {
+    const func = async () => {
+      console.log('changing userOffers, userCards');
+      const cardIds = userCards.map(({ id }) => id);
+      const exitedOffers = userOffers.filter((offer) => {
+        console.log(
+          'Result in useEffect:',
+          cardIds.includes(offer.proposal.give.Asset.value[0].id),
+        );
+        return cardIds.includes(offer.proposal.give.Asset.value[0].id);
+      });
+      try {
+        await exitedOffers.forEach(async (offer) => {
+          await E(offer.sellerSeat).exit();
+        });
+      } catch (err) {
+        console.log('error exiting seat');
+      }
+      await E(publicFacetMarketPlace).updateNotifier();
+      console.log('filteredOffers:', exitedOffers);
+    };
+    func();
+  }, [userOffers, userCards]);
   useEffect(() => {
     // Receive callbacks from the wallet connection.
     const otherSide = Far('otherSide', {
@@ -102,6 +126,7 @@ export default function Provider({ children }) {
         dispatch(setTokenPetname(newTokenPurses[0].brandPetname));
         dispatch(setCardPurse(newCardPurse));
         dispatch(setUserCards(newCardPurse?.currentAmount?.value));
+
         console.log('printing card purse:', newCardPurse);
         console.log('printing all cards:', availableCards);
       };
@@ -116,6 +141,7 @@ export default function Provider({ children }) {
         const offerNotifier = E(walletP).getOffersNotifier();
         try {
           for await (const offers of iterateNotifier(offerNotifier)) {
+            dispatch(setWalletOffers(offers));
             let pendingOffersArray = offers.filter((offer) => {
               if (offer.status === 'pending') {
                 if (offer?.proposalTemplate?.give?.Asset) {
@@ -128,7 +154,6 @@ export default function Provider({ children }) {
               (offer) => offer?.proposalTemplate?.give?.Asset?.value[0],
             );
             dispatch(setPendingOffers(pendingOffersArray) || []);
-            await E(publicFacetMarketPlace).updateNotifier();
           }
         } catch (err) {
           console.log('offers in application: error');
@@ -161,6 +186,24 @@ export default function Provider({ children }) {
         )) {
           console.log('GOT NOTIFIER!!!', availableOffers.sells);
           dispatch(setUserOffers(availableOffers.sells || []));
+          // const len = walletOffers?.length;
+          // if (len >= 1 && walletOffers[len - 1].status === 'cancel') {
+          //   console.log('offers in application:', walletOffers[len - 1]);
+          //   const cardId =
+          //     walletOffers[len - 1].proposalTemplate.give.Asset.value[0].id;
+          //   console.log('cardId in application:', cardId);
+          //   const canceledOffer = userOffers.filter((offer) => {
+          //     console.log(
+          //       'id in offer:',
+          //       offer.proposal.give.Asset.value[0].id,
+          //     );
+          //     return offer.proposal.give.Asset.value[0].id === cardId;
+          //   });
+          //   console.log('cancleOffer in application:', canceledOffer);
+          //   console.log('userOffers:', userOffers);
+          // await E(canceledOffer.sellerSeat).exit();
+          // await E(publicFacetMarketPlace).updateNotifier();
+          // }
         }
 
         const userSaleHistoryNotifier = await E(
@@ -170,7 +213,7 @@ export default function Provider({ children }) {
         for await (const userSaleHistory of iterateNotifier(
           userSaleHistoryNotifier,
         )) {
-          dispatch(setUserNfts(userSaleHistory.value));
+          dispatch(setUserNfts(userSaleHistory.value) || []);
         }
       }
       watchOffers().catch((err) => console.log('got watchOffer errs', err));

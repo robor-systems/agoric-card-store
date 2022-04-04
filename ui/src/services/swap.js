@@ -69,7 +69,20 @@ const makeMatchingInvitation = async ({
     ),
   );
 };
-
+const updateExitedSeats = async ({ userCards, userOffers }) => {
+  const cardIds = userCards.map(({ id }) => id);
+  console.log('cardsIds', cardIds);
+  console.log('userOffers HERE:', userOffers);
+  userOffers.forEach((offer) => {
+    console.log(
+      'boolean:',
+      cardIds.includes(offer.sells.proposal.Asset.value[0].id),
+    );
+    if (cardIds.includes(offer.sells.proposal.Asset.value[0].id)) {
+      console.log('sellerSeat in application:', offer.sellerSeat);
+    }
+  });
+};
 const removeItemFromSale = async ({
   dispatch,
   escrowedCards,
@@ -144,4 +157,9 @@ const getSellerSeat = async ({
   );
 };
 
-export { getSellerSeat, makeMatchingInvitation, removeItemFromSale };
+export {
+  getSellerSeat,
+  makeMatchingInvitation,
+  removeItemFromSale,
+  updateExitedSeats,
+};
