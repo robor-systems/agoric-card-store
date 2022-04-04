@@ -54,7 +54,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
       map[obj.id] = { ...obj, onSale: true };
       return map;
     }, new Map());
-
+    console.log('escrowed Cards:', escrowedCards);
     console.log('merged1:', userCardsMap);
     console.log('merged2:', pendingOfferMap);
     const mergedMap = {

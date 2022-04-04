@@ -29,6 +29,7 @@ import {
   setUserCards,
   setPendingOffers,
   setWalletOffers,
+  setEscrowedCards,
 } from '../store/store';
 
 const {
@@ -57,7 +58,7 @@ export function useApplicationContext() {
 /* eslint-disable complexity, react/prop-types */
 export default function Provider({ children }) {
   const [state, dispatch] = useReducer(reducer, defaultState);
-  const { availableCards, userOffers, userCards } = state;
+  const { availableCards, userOffers, userCards, escrowedCards } = state;
   useEffect(() => {
     const sellSeatsOnCancel = async () => {
       try {
@@ -67,6 +68,17 @@ export default function Provider({ children }) {
         });
         await exitedOffers?.forEach(async (offer) => {
           const alreadyExited = await E(offer.sellerSeat).hasExited();
+          console.log('escrowed Array:', [
+            ...escrowedCards,
+            offer.proposal.give.Asset.value[0],
+          ]);
+          !alreadyExited &&
+            dispatch(
+              setEscrowedCards([
+                ...escrowedCards,
+                offer.proposal.give.Asset.value[0],
+              ]),
+            );
           !alreadyExited && (await E(offer.sellerSeat).exit());
         });
         await E(publicFacetMarketPlace).updateNotifier();
@@ -75,7 +87,7 @@ export default function Provider({ children }) {
         console.log('error exiting seat');
       }
     };
-    userCards.length > 0 && userOffers && sellSeatsOnCancel();
+    sellSeatsOnCancel();
   }, [userCards]);
   useEffect(() => {
     // Receive callbacks from the wallet connection.
@@ -182,24 +194,6 @@ export default function Provider({ children }) {
         )) {
           console.log('GOT NOTIFIER!!!', availableOffers.sells);
           dispatch(setUserOffers(availableOffers.sells || []));
-          // const len = walletOffers?.length;
-          // if (len >= 1 && walletOffers[len - 1].status === 'cancel') {
-          //   console.log('offers in application:', walletOffers[len - 1]);
-          //   const cardId =
-          //     walletOffers[len - 1].proposalTemplate.give.Asset.value[0].id;
-          //   console.log('cardId in application:', cardId);
-          //   const canceledOffer = userOffers.filter((offer) => {
-          //     console.log(
-          //       'id in offer:',
-          //       offer.proposal.give.Asset.value[0].id,
-          //     );
-          //     return offer.proposal.give.Asset.value[0].id === cardId;
-          //   });
-          //   console.log('cancleOffer in application:', canceledOffer);
-          //   console.log('userOffers:', userOffers);
-          // await E(canceledOffer.sellerSeat).exit();
-          // await E(publicFacetMarketPlace).updateNotifier();
-          // }
         }
 
         const userSaleHistoryNotifier = await E(
