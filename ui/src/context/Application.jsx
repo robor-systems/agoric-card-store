@@ -28,7 +28,6 @@ import {
   setUserOffers,
   setUserCards,
   setPendingOffers,
-  setWalletOffers,
   setEscrowedCards,
 } from '../store/store';
 
@@ -58,37 +57,54 @@ export function useApplicationContext() {
 /* eslint-disable complexity, react/prop-types */
 export default function Provider({ children }) {
   const [state, dispatch] = useReducer(reducer, defaultState);
-  const { availableCards, userOffers, userCards, escrowedCards } = state;
+  const { availableCards, escrowedCards, userCards } = state;
   useEffect(() => {
-    const sellSeatsOnCancel = async () => {
+    async function watchWallerOffers() {
+      await E(publicFacetMarketPlace).updateNotifier();
+      const offerNotifier = E(walletP).getOffersNotifier();
       try {
-        const cardIds = userCards?.map(({ id }) => id);
-        const exitedOffers = userOffers?.filter((offer) => {
-          return cardIds.includes(offer.proposal.give.Asset.value[0].id);
-        });
-        await exitedOffers?.forEach(async (offer) => {
-          const alreadyExited = await E(offer.sellerSeat).hasExited();
-          console.log('escrowed Array:', [
-            ...escrowedCards,
-            offer.proposal.give.Asset.value[0],
-          ]);
-          !alreadyExited &&
-            dispatch(
-              setEscrowedCards([
-                ...escrowedCards,
-                offer.proposal.give.Asset.value[0],
-              ]),
-            );
-          !alreadyExited && (await E(offer.sellerSeat).exit());
-        });
-        await E(publicFacetMarketPlace).updateNotifier();
-        console.log('filteredOffers:', exitedOffers);
+        for await (const offers of iterateNotifier(offerNotifier)) {
+          const userCardIds = userCards.map(({ id }) => id);
+          console.log('userCardIds', userCardIds);
+          const exitedOffers = offers
+            .filter((offer) => {
+              console.log('condtion 1', offer.status === 'cancel');
+              console.log(
+                'condtion 2',
+                offer?.proposalTemplate?.give?.Asset?.value.length === 1,
+              );
+              console.log(
+                'condtion 3',
+                userCardIds.includes(
+                  offer?.proposalTemplate?.give?.Asset?.value[0].id,
+                ),
+              );
+              if (
+                offer.status === 'cancel' &&
+                offer?.proposalTemplate?.give?.Asset?.value.length === 1 &&
+                !userCardIds.includes(
+                  offer?.proposalTemplate?.give?.Asset?.value[0].id,
+                )
+              ) {
+                return true;
+              } else {
+                return false;
+              }
+            })
+            .map((offer) => offer?.proposalTemplate?.give?.Asset?.value[0]);
+          dispatch(setEscrowedCards([...exitedOffers]));
+        }
       } catch (err) {
-        console.log('error exiting seat');
+        console.log('offers in application: error');
       }
-    };
-    sellSeatsOnCancel();
+    }
+    watchWallerOffers().catch((err) =>
+      console.error('got watchWalletoffer err', err),
+    );
   }, [userCards]);
+  useEffect(() => {
+    console.log('escorwedCards in application:', escrowedCards);
+  }, [escrowedCards]);
   useEffect(() => {
     // Receive callbacks from the wallet connection.
     const otherSide = Far('otherSide', {
@@ -134,7 +150,6 @@ export default function Provider({ children }) {
         dispatch(setTokenPetname(newTokenPurses[0].brandPetname));
         dispatch(setCardPurse(newCardPurse));
         dispatch(setUserCards(newCardPurse?.currentAmount?.value));
-
         console.log('printing card purse:', newCardPurse);
         console.log('printing all cards:', availableCards);
       };
@@ -149,7 +164,6 @@ export default function Provider({ children }) {
         const offerNotifier = E(walletP).getOffersNotifier();
         try {
           for await (const offers of iterateNotifier(offerNotifier)) {
-            dispatch(setWalletOffers(offers));
             let pendingOffersArray = offers.filter((offer) => {
               if (offer.status === 'pending') {
                 if (offer?.proposalTemplate?.give?.Asset) {
