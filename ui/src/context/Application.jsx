@@ -60,10 +60,10 @@ export default function Provider({ children }) {
   const { availableCards, escrowedCards, userCards } = state;
   useEffect(() => {
     async function watchWallerOffers() {
-      await E(publicFacetMarketPlace).updateNotifier();
       const offerNotifier = E(walletP).getOffersNotifier();
       try {
         for await (const offers of iterateNotifier(offerNotifier)) {
+          await E(publicFacetMarketPlace).updateNotifier();
           const userCardIds = userCards.map(({ id }) => id);
           console.log('userCardIds', userCardIds);
           const exitedOffers = offers
@@ -208,16 +208,6 @@ export default function Provider({ children }) {
         )) {
           console.log('GOT NOTIFIER!!!', availableOffers.sells);
           dispatch(setUserOffers(availableOffers.sells || []));
-        }
-
-        const userSaleHistoryNotifier = await E(
-          publicFacet,
-        ).getUserSaleHistoryNotifier();
-
-        for await (const userSaleHistory of iterateNotifier(
-          userSaleHistoryNotifier,
-        )) {
-          dispatch(setUserNfts(userSaleHistory.value) || []);
         }
       }
       watchOffers().catch((err) => console.log('got watchOffer errs', err));

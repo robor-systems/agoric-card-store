@@ -1,4 +1,5 @@
 // import { AmountMath } from '@agoric/ertp';
+import { AmountMath } from '@agoric/ertp';
 import { E } from '@endo/eventual-send';
 import { setBoughtCard, setEscrowedCards, setMessage } from '../store/store';
 
@@ -6,16 +7,31 @@ import { setBoughtCard, setEscrowedCards, setMessage } from '../store/store';
  * This function should be called when the buyer buys a card from
  * secondary market place
  */
-
+const updateCardSaleHistory = async ({
+  cardDetail,
+  cardOffer,
+  cardPurse,
+  publicFacet,
+}) => {
+  const cardOfferAmount = AmountMath.make(cardPurse.brand, harden([cardOffer]));
+  console.log('updated Amount:', cardOfferAmount);
+  await E(publicFacet).removeFromUserSaleHistory(
+    AmountMath.make(cardPurse.brand, harden([cardDetail])),
+  );
+  await E(publicFacet).addToUserSaleHistory(
+    AmountMath.make(cardPurse.brand, harden([cardOffer])),
+  );
+};
 const makeMatchingInvitation = async ({
   cardPurse,
   tokenPurses,
+  cardOffer,
   cardDetail,
   sellingPrice,
   boughtFor,
   walletP,
+  publicFacet,
   publicFacetMarketPlace,
-  cardOffer,
   setLoading,
   onClose,
   dispatch,
@@ -28,7 +44,6 @@ const makeMatchingInvitation = async ({
   console.log(boughtFor, 'boughtFor');
   console.log(walletP, 'walletp');
   console.log(publicFacetMarketPlace);
-  console.log(cardOffer);
   tokenPurses = tokenPurses.reverse();
   let invitation;
   try {
@@ -60,6 +75,12 @@ const makeMatchingInvitation = async ({
     console.error('Could not add sell offer to wallet', e);
   }
   console.log('offerId:', id);
+  await updateCardSaleHistory({
+    cardDetail,
+    cardOffer,
+    cardPurse,
+    publicFacet,
+  });
   setLoading(false);
   onClose();
   dispatch(setBoughtCard(true));
@@ -69,27 +90,13 @@ const makeMatchingInvitation = async ({
     ),
   );
 };
-const updateExitedSeats = async ({ userCards, userOffers }) => {
-  const cardIds = userCards.map(({ id }) => id);
-  console.log('cardsIds', cardIds);
-  console.log('userOffers HERE:', userOffers);
-  userOffers.forEach((offer) => {
-    console.log(
-      'boolean:',
-      cardIds.includes(offer.sells.proposal.Asset.value[0].id),
-    );
-    if (cardIds.includes(offer.sells.proposal.Asset.value[0].id)) {
-      console.log('sellerSeat in application:', offer.sellerSeat);
-    }
-  });
-};
+
 const removeItemFromSale = async ({
   dispatch,
   escrowedCards,
   cardDetail,
   sellerSeat,
   publicFacetMarketPlace,
-  // cardPurse,
 }) => {
   try {
     dispatch(setEscrowedCards([...escrowedCards, cardDetail]));
@@ -107,8 +114,10 @@ const removeItemFromSale = async ({
  * which he own on sale in the secondary marketplace
  */
 const getSellerSeat = async ({
+  cardOffer,
   cardDetail,
   sellingPrice,
+  publicFacet,
   publicFacetMarketPlace,
   cardPurse,
   tokenPurses,
@@ -146,6 +155,12 @@ const getSellerSeat = async ({
   } catch (e) {
     console.error('Could not add sell offer to wallet', e);
   }
+  await updateCardSaleHistory({
+    cardDetail,
+    cardOffer,
+    cardPurse,
+    publicFacet,
+  });
   console.log('offerId:', id);
   setLoading(false);
   onClose();
@@ -161,5 +176,5 @@ export {
   getSellerSeat,
   makeMatchingInvitation,
   removeItemFromSale,
-  updateExitedSeats,
+  updateCardSaleHistory,
 };

@@ -80,7 +80,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
       map[obj.id] = { ...obj };
       return map;
     }, {});
-
+    console.log('userNftsMap:', userNftsMap);
     const arr = allUserCards.map((offer) => {
       let obj = {};
       if (userOffersMap[offer.id]) {
@@ -136,7 +136,12 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
       }),
     );
     setSecondaryCards(
-      userOffers?.map((offer) => offer.proposal.give.Asset.value[0]),
+      userOffers?.map((offer) => {
+        return {
+          ...offer.proposal.give.Asset.value[0],
+          sellingPrice: offer.proposal.want.Price.value,
+        };
+      }),
     );
     setSecondaryLoader(false);
   }, [userOffers, userNfts, pendingOffers, userCards]);
