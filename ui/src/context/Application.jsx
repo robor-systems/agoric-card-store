@@ -59,28 +59,24 @@ export default function Provider({ children }) {
   const [state, dispatch] = useReducer(reducer, defaultState);
   const { availableCards, userOffers, userCards } = state;
   useEffect(() => {
-    const func = async () => {
-      console.log('changing userOffers, userCards');
-      const cardIds = userCards.map(({ id }) => id);
-      const exitedOffers = userOffers.filter((offer) => {
-        console.log(
-          'Result in useEffect:',
-          cardIds.includes(offer.proposal.give.Asset.value[0].id),
-        );
-        return cardIds.includes(offer.proposal.give.Asset.value[0].id);
-      });
+    const sellSeatsOnCancel = async () => {
       try {
-        await exitedOffers.forEach(async (offer) => {
-          await E(offer.sellerSeat).exit();
+        const cardIds = userCards?.map(({ id }) => id);
+        const exitedOffers = userOffers?.filter((offer) => {
+          return cardIds.includes(offer.proposal.give.Asset.value[0].id);
         });
+        await exitedOffers?.forEach(async (offer) => {
+          const alreadyExited = await E(offer.sellerSeat).hasExited();
+          !alreadyExited && (await E(offer.sellerSeat).exit());
+        });
+        await E(publicFacetMarketPlace).updateNotifier();
+        console.log('filteredOffers:', exitedOffers);
       } catch (err) {
         console.log('error exiting seat');
       }
-      await E(publicFacetMarketPlace).updateNotifier();
-      console.log('filteredOffers:', exitedOffers);
     };
-    func();
-  }, [userOffers, userCards]);
+    userCards.length > 0 && userOffers && sellSeatsOnCancel();
+  }, [userCards]);
   useEffect(() => {
     // Receive callbacks from the wallet connection.
     const otherSide = Far('otherSide', {
