@@ -20,18 +20,18 @@ import CheckIcon from './assets/icons/checkIcon.svg';
 
 function App() {
   const { activeTab } = useParams();
-
   const {
     state,
     dispatch,
     walletP,
     publicFacet,
-    publicFacetSimpleExchange,
+    publicFacetMarketPlace,
     MAIN_CONTRACT_BOARD_INSTANCE_ID,
     CARD_BRAND_BOARD_ID,
   } = useApplicationContext();
 
   const { activeCard, openExpandModal, addFormLoader, checkIcon } = state;
+
   useEffect(() => {
     console.log('Inside Use effect:', activeTab);
     switch (activeTab) {
@@ -79,7 +79,7 @@ function App() {
     dispatch,
     walletP,
     publicFacet,
-    publicFacetSimpleExchange,
+    publicFacetMarketPlace,
     MAIN_CONTRACT_BOARD_INSTANCE_ID,
     CARD_BRAND_BOARD_ID,
   );
@@ -128,7 +128,6 @@ function App() {
           />
         </div>
       </ModalWrapper>
-
       <EnableAppDialog />
       <ApproveOfferSnackbar />
       <BoughtCardSnackbar />

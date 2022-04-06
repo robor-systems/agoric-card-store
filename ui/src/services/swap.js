@@ -1,22 +1,37 @@
+// import { AmountMath } from '@agoric/ertp';
 import { AmountMath } from '@agoric/ertp';
-import { E } from '@agoric/eventual-send';
-import dappConstants from '../utils/constants';
-import { setBoughtCard, setMessage } from '../store/store';
+import { E } from '@endo/eventual-send';
+import { setBoughtCard, setEscrowedCards, setMessage } from '../store/store';
 
 /*
  * This function should be called when the buyer buys a card from
  * secondary market place
  */
-
+const updateCardSaleHistory = async ({
+  cardDetail,
+  cardOffer,
+  cardPurse,
+  publicFacet,
+}) => {
+  const cardOfferAmount = AmountMath.make(cardPurse.brand, harden([cardOffer]));
+  console.log('updated Amount:', cardOfferAmount);
+  await E(publicFacet).removeFromUserSaleHistory(
+    AmountMath.make(cardPurse.brand, harden([cardDetail])),
+  );
+  await E(publicFacet).addToUserSaleHistory(
+    AmountMath.make(cardPurse.brand, harden([cardOffer])),
+  );
+};
 const makeMatchingInvitation = async ({
   cardPurse,
   tokenPurses,
+  cardOffer,
   cardDetail,
   sellingPrice,
   boughtFor,
   walletP,
-  publicFacetSimpleExchange,
-  cardOffer,
+  publicFacet,
+  publicFacetMarketPlace,
   setLoading,
   onClose,
   dispatch,
@@ -28,99 +43,138 @@ const makeMatchingInvitation = async ({
   console.log(sellingPrice, 'sellingPrice');
   console.log(boughtFor, 'boughtFor');
   console.log(walletP, 'walletp');
-  console.log(publicFacetSimpleExchange);
-  console.log(cardOffer);
-
-  const offerId = await E(publicFacetSimpleExchange).makeBuyerOffer({
-    cardPurse,
-    tokenPurses,
+  console.log(publicFacetMarketPlace);
+  tokenPurses = tokenPurses.reverse();
+  let invitation;
+  try {
+    invitation = await E(publicFacetMarketPlace).makeInvitation();
+  } catch (e) {
+    console.error('Could not make buyer invitation', e);
+  }
+  console.log('invitation Successful:', invitation);
+  const id = Date.now();
+  const proposalTemplate = {
+    want: {
+      Asset: {
+        pursePetname: cardPurse.pursePetname,
+        value: harden([cardDetail]),
+      },
+    },
+    give: {
+      Price: {
+        pursePetname: tokenPurses[0].pursePetname,
+        value: sellingPrice,
+      },
+    },
+    exit: { onDemand: null },
+  };
+  const offerConfig = { id, invitation, proposalTemplate };
+  try {
+    await E(walletP).addOffer(offerConfig);
+  } catch (e) {
+    console.error('Could not add sell offer to wallet', e);
+  }
+  console.log('offerId:', id);
+  await updateCardSaleHistory({
     cardDetail,
-    sellingPrice,
-    boughtFor,
-    walletP,
     cardOffer,
-    _id: Date.now(),
-    simpleExchangeInstallationBoardId:
-      dappConstants.SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
-    simpleExchangeInstanceBoardId:
-      dappConstants.SIMPLE_EXCHANGE_INSTANCE_BOARD_ID,
+    cardPurse,
+    publicFacet,
   });
   setLoading(false);
   onClose();
   dispatch(setBoughtCard(true));
   dispatch(
-    setMessage('Please accept offer from your wallet to complete purchase!'),
+    setMessage(
+      'Please approve the offer from your wallet to complete the purchase!',
+    ),
   );
-  const result = await E(
-    publicFacetSimpleExchange,
-  ).updateNotfiersOnWalletOffersAtBuyer({
-    offerId,
-    cardOffer,
-    cardDetail,
-    boughtFor,
-    sellingPrice,
-    walletP,
-  });
-  return result;
 };
+
+const removeItemFromSale = async ({
+  dispatch,
+  escrowedCards,
+  cardDetail,
+  sellerSeat,
+  publicFacetMarketPlace,
+}) => {
+  try {
+    dispatch(setEscrowedCards([...escrowedCards, cardDetail]));
+    await E(sellerSeat).exit();
+    const isExited = await E(sellerSeat).hasExited();
+    console.log('Seat exited:', isExited);
+    await E(publicFacetMarketPlace).updateNotifier();
+  } catch (e) {
+    console.log('error in removeItemFromSale()');
+  }
+};
+
 /*
  * This function should be called when the user puts a card
  * which he own on sale in the secondary marketplace
  */
 const getSellerSeat = async ({
+  cardOffer,
   cardDetail,
   sellingPrice,
-  publicFacetSimpleExchange,
+  publicFacet,
+  publicFacetMarketPlace,
   cardPurse,
   tokenPurses,
   walletP,
   setLoading,
   onClose,
-  // state,
   dispatch,
 }) => {
-  const { offerId, cardOfferAmount } = await E(
-    publicFacetSimpleExchange,
-  ).makeSellerOffer({
+  let invitation;
+  try {
+    invitation = await E(publicFacetMarketPlace).makeInvitation();
+  } catch (e) {
+    console.error('Could not make seller invitation', e);
+  }
+  console.log('cardDetail in app:', cardDetail);
+  const id = Date.now();
+  const proposalTemplate = {
+    give: {
+      Asset: {
+        pursePetname: cardPurse.pursePetname,
+        value: harden([cardDetail]),
+      },
+    },
+    want: {
+      Price: {
+        pursePetname: tokenPurses[0].pursePetname,
+        value: sellingPrice,
+      },
+    },
+    exit: { onDemand: null },
+  };
+  const offerConfig = { id, invitation, proposalTemplate };
+  try {
+    await E(walletP).addOffer(offerConfig);
+  } catch (e) {
+    console.error('Could not add sell offer to wallet', e);
+  }
+  await updateCardSaleHistory({
     cardDetail,
-    sellingPrice,
+    cardOffer,
     cardPurse,
-    tokenPurses,
-    walletP,
-    _id: Date.now(),
-    simpleExchangeInstallationBoardId:
-      dappConstants.SIMPLE_EXCHANGE_INSTALLATION_BOARD_ID,
-    simpleExchangeInstanceBoardId:
-      dappConstants.SIMPLE_EXCHANGE_INSTANCE_BOARD_ID,
+    publicFacet,
   });
-  console.log('offerId:', offerId);
+  console.log('offerId:', id);
   setLoading(false);
   onClose();
   dispatch(setBoughtCard(true));
   dispatch(
-    setMessage('Please accept offer from your wallet to put card on sale!'),
+    setMessage(
+      'Please approve the offer from your wallet to put the card on sale!',
+    ),
   );
-  const result = await E(
-    publicFacetSimpleExchange,
-  ).updateNotfiersOnWalletOffersAtSeller({
-    offerId,
-    cardOfferAmount,
-    walletP,
-  });
-  return result;
 };
 
-const removeItemFromSale = async ({
-  cardDetail,
-  publicFacetSimpleExchange,
-  cardPurse,
-}) => {
-  const sellerSeat = await E(publicFacetSimpleExchange).getSellerSeat({
-    id: cardDetail[0].id,
-  });
-  await E(sellerSeat[0].sellerSeat).exit();
-  const amount = AmountMath.make(cardPurse.brand, harden(cardDetail));
-  await E(publicFacetSimpleExchange).updateAvailableOffers(amount);
+export {
+  getSellerSeat,
+  makeMatchingInvitation,
+  removeItemFromSale,
+  updateCardSaleHistory,
 };
-
-export { getSellerSeat, makeMatchingInvitation, removeItemFromSale };

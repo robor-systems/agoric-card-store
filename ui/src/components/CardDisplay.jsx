@@ -18,6 +18,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
     userNfts,
     tokenDisplayInfo,
     pendingOffers,
+    escrowedCards,
   } = state;
   // const isReady1 = cardPurse && cardPurse?.currentAmount?.value?.length > 0;
   // const isReady2 = userCards && userCards.length > 0;
@@ -31,17 +32,38 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
   const [myCards, setMyCards] = useState([]);
   const [secondaryCards, setSecondaryCards] = useState([]);
   let menuOptions;
-  console.log(userCards, userOffers, userNfts, pendingOffers, 'all card arrs');
+  console.log(
+    userCards,
+    userOffers,
+    userNfts,
+    pendingOffers,
+    'all card arrs: userCards ,userOffers,userNfts,pendingOffers',
+  );
   const getUserCards = (params) => {
+    console.log('escrowed Cards:', escrowedCards);
+    console.log('params:', userCards, userOffers, userNfts, pendingOffers);
     const userCardsMap = params?.userCards.reduce((map, obj) => {
-      map[obj.id] = { ...obj };
+      map[obj.id] = { ...obj, onSale: false };
       return map;
     }, new Map());
     const pendingOfferMap = pendingOffers.reduce((map, obj) => {
-      map[obj.id] = { ...obj };
+      map[obj.id] = { ...obj, onSale: true };
       return map;
     }, new Map());
-    const mergedMap = { ...userCardsMap, ...pendingOfferMap };
+    const escrowedCardsMap = escrowedCards.reduce((map, obj) => {
+      map[obj.id] = { ...obj, onSale: true };
+      return map;
+    }, new Map());
+    console.log('escrowed Cards:', escrowedCards);
+    console.log('merged1:', userCardsMap);
+    console.log('merged2:', pendingOfferMap);
+    const mergedMap = {
+      ...userCardsMap,
+      ...pendingOfferMap,
+      ...escrowedCardsMap,
+    };
+    console.log('merged3:', mergedMap);
+
     const allUserCards = [];
     if (mergedMap) {
       for (const keys in mergedMap) {
@@ -51,14 +73,14 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
       }
     }
     const userOffersMap = params?.userOffers.reduce((map, obj) => {
-      map[obj.id] = { ...obj };
+      map[obj.id] = { ...obj, onSale: true };
       return map;
     }, {});
     const userNftsMap = params?.userNfts.reduce((map, obj) => {
       map[obj.id] = { ...obj };
       return map;
     }, {});
-
+    console.log('userNftsMap:', userNftsMap);
     const arr = allUserCards.map((offer) => {
       let obj = {};
       if (userOffersMap[offer.id]) {
@@ -69,22 +91,10 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
       return obj;
     });
     setMyCardLoader(false);
+    console.log('myCards:', arr);
     return arr;
   };
-  const getSecondaryCards = (params) => {
-    // const ids = params?.userCards?.map((card) => card.id);
-    // change !== to === to filter user owned cards from secondaryMarketplace
-    // console.log(ids, 'filterids');
-    // console.log(userOffers, 'useroffersfilter');
-    // const arr = params?.userOffers?.filter(
-    //   (card) => ids.indexOf(card.id) !== -1,
-    // );
-    // console.log(arr, 'filteredarr');
-    setSecondaryLoader(false);
-    // console.log('running getSecondaryCards:', arr);
-    console.log(params);
-    return userOffers;
-  };
+
   const getFilteredList = (list, option) => {
     return list.filter((el) => {
       if (searchInput === '') {
@@ -108,10 +118,33 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
   useEffect(() => {
     (pendingOffers.length > 0 ||
       (userCards?.length > 0 && userNfts?.length > 0)) &&
-      setMyCards(getUserCards({ userCards, userOffers, userNfts }));
+      setMyCards(
+        getUserCards({
+          userCards,
+          userOffers: userOffers?.map(
+            (offer) => offer.proposal.give.Asset.value[0],
+          ),
+          userNfts,
+        }),
+      );
     userCards?.length === 0 && userNfts?.length === 0 && setMyCardLoader(false);
-    setSecondaryCards(getSecondaryCards({ userCards, userOffers }));
-  }, [userOffers, userCards, userNfts, pendingOffers]);
+    console.log(
+      'item value:',
+      userOffers?.map((offer) => {
+        console.log('offer item:', offer.proposal.give.Asset.value);
+        return offer.proposal.give.Asset.value;
+      }),
+    );
+    setSecondaryCards(
+      userOffers?.map((offer) => {
+        return {
+          ...offer.proposal.give.Asset.value[0],
+          sellingPrice: offer.proposal.want.Price.value,
+        };
+      }),
+    );
+    setSecondaryLoader(false);
+  }, [userOffers, userNfts, pendingOffers, userCards]);
   switch (activeTab) {
     case 0:
       cards =
@@ -124,7 +157,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
                   key={cardDetail.name}
                   handleClick={handleClick}
                   type={type}
-                  onSale={cardDetail.sellingPrice}
+                  onSale={cardDetail.onSale}
                 />
               </div>
             ))}
@@ -147,6 +180,7 @@ const CardDisplay = ({ handleClick, handleNFTMint }) => {
                     cardDetail={cardDetail}
                     key={cardDetail.name}
                     handleClick={handleClick}
+                    onSale={cardDetail.onSale}
                     type={type}
                   />
                 </div>

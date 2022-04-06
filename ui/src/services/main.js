@@ -17,11 +17,12 @@ const Main = (
   dispatch,
   walletP,
   publicFacet,
-  publicFacetSimpleExchange,
+  publicFacetMarketPlace,
   MAIN_CONTRACT_BOARD_INSTANCE_ID,
   CARD_BRAND_BOARD_ID,
 ) => {
-  const { cardPurse, tokenPurses, activeCard, userCards, userOffers } = state;
+  const { cardPurse, tokenPurses, activeCard, userOffers, escrowedCards } =
+    state;
   const submitCardOffer = (
     name,
     price,
@@ -76,20 +77,23 @@ const Main = (
       Obj;
     delete Obj.sellerSeat;
     delete Obj.sellingPrice;
-    delete Obj.boughtFor;
+    // delete Obj.boughtFor;
     delete Obj.BuyerExclusiveInvitation;
     const result = await makeMatchingInvitation({
       cardPurse,
       tokenPurses,
       cardDetail: harden(Obj),
-      cardOffer: cardDetail,
+      cardOffer: {
+        ...cardDetail,
+        boughtFor,
+      },
       sellingPrice,
       boughtFor,
       walletP,
       sellerSeat,
       BuyerExclusiveInvitation,
       publicFacet,
-      publicFacetSimpleExchange,
+      publicFacetMarketPlace,
       setLoading,
       onClose,
       dispatch,
@@ -102,20 +106,25 @@ const Main = (
     setLoading,
     onClose,
   }) => {
-    const currentCard = userCards.filter(
-      (item) => item.id === activeCard.id,
-    )[0];
+    const userOffer = userOffers.filter((offer) => offer.id === activeCard.id);
+    const Obj = { ...activeCard };
+    delete Obj.sellingPrice;
     const params = {
+      escrowedCards,
       sellingPrice: BigInt(price),
       walletP,
       cardPurse,
       tokenPurses,
-      publicFacetSimpleExchange,
-      cardDetail: activeCard,
-      currentCard,
+      publicFacet,
+      publicFacetMarketPlace,
+      cardDetail: Obj,
+      cardOffer: {
+        ...activeCard,
+        sellingPrice: BigInt(price),
+      },
+      userOffer,
       setLoading,
       onClose,
-      state,
       dispatch,
     };
     const sellerSeatInvitation = await getSellerSeat(params);
@@ -123,11 +132,16 @@ const Main = (
   };
 
   const removeCardFromSale = async () => {
-    const cardDetail = userOffers.filter((offer) => offer.id === activeCard.id);
+    const userOffer = userOffers.filter((offer) => {
+      return offer.proposal.give.Asset.value[0].id === activeCard.id;
+    })[0];
     await removeItemFromSale({
-      cardDetail,
+      dispatch,
+      escrowedCards,
+      cardDetail: userOffer.proposal.give.Asset.value[0],
+      sellerSeat: userOffer.sellerSeat,
       cardPurse,
-      publicFacetSimpleExchange,
+      publicFacetMarketPlace,
     });
   };
 
@@ -136,7 +150,6 @@ const Main = (
       cardDetails,
       MAIN_CONTRACT_BOARD_INSTANCE_ID,
       walletP,
-      publicFacet,
       CARD_BRAND_BOARD_ID,
       cardPurse,
       dispatch,

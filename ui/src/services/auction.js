@@ -1,4 +1,4 @@
-import { E } from '@agoric/eventual-send';
+import { E } from '@endo/eventual-send';
 // import { AmountMath } from '@agoric/ertp';
 import { assert, details as X } from '@agoric/assert';
 // import { makeAsyncIterableFromNotifier as iterateNotifier } from '@agoric/notifier';
@@ -23,10 +23,10 @@ const makeBidOfferForCard = async ({
     card,
     cardOffer,
   );
-
+  console.log('invitation Successful:', invitation);
   const offerConfig = {
     // JSONable ID for this offer.  This is scoped to the origin.
-    id: Date.now(),
+    id: 'dsdsdssd',
     invitation,
     proposalTemplate: {
       want: {
@@ -43,6 +43,7 @@ const makeBidOfferForCard = async ({
       },
     },
   };
+  console.log('offer is:', offerConfig);
   const offerId = await E(walletP).addOffer(offerConfig);
   onClose();
   setFormState({

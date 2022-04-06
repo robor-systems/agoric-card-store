@@ -1,5 +1,5 @@
 import React from 'react';
-// import Tag from '../assets/icons/tag.png';
+import Tag from '../assets/icons/tag.png';
 import User from '../assets/icons/user.png';
 import Expand from '../assets/icons/expand.png';
 import Button from './common/Button';
@@ -69,7 +69,7 @@ const BaseballCard = ({
         <div className="px-3">
           <div className="flex justify-between items-center">
             <p className="text-lg mb-1">{cardDetail?.name}</p>
-            {/* {onSale && <img className="w-6 h-6" src={Tag} alt="sale-tag" />} */}
+            {onSale && <img className="w-6 h-6" src={Tag} alt="sale-tag" />}
           </div>
           <div className="flex items-center">
             <img className="w-6 h-6 mr-2" src={User} alt="user-icon" />

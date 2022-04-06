@@ -1,8 +1,10 @@
 // @ts-check
 
-import { makeNotifierKit } from '@agoric/notifier';
-import { Far } from '@agoric/marshal';
-
+import { Far } from '@endo/marshal';
+import {
+  makeAsyncIterableFromNotifier as iterateNotifier,
+  makeNotifierKit,
+} from '@agoric/notifier';
 import '@agoric/zoe/exported';
 import {
   swap,
@@ -30,15 +32,14 @@ import {
  *
  * The publicFacet is returned from the contract.
  *
- * @type {ContractStartFn}
+ * @param {ZCF} zcf
  */
+
 const start = (zcf) => {
   let sellSeats = [];
   let buySeats = [];
   // eslint-disable-next-line no-use-before-define
   const { notifier, updater } = makeNotifierKit(getBookOrders());
-  // const { notifier: sellerSeatNotifier, updater: sellerNotifierUpdater } =
-  //   makeNotifierKit(getSellerSeatDetails());
 
   assertIssuerKeywords(zcf, harden(['Asset', 'Price']));
 
@@ -50,6 +51,7 @@ const start = (zcf) => {
   }
 
   function flattenOrders(seats) {
+    console.log('FlattenOrders-seats:', seats);
     const activeSeats = seats.filter((s) => !s.hasExited());
     return activeSeats.map((seat) => {
       return { sellerSeat: seat, proposal: dropExit(seat.getProposal()) };
@@ -71,7 +73,7 @@ const start = (zcf) => {
   // and return the seat for the matched offer. If not, return undefined, so
   // the caller can know to add the new offer to the book.
   function swapIfCanTrade(offers, seat) {
-    for (const offer of offers) {     
+    for (const offer of offers) {
       const satisfiedBy = (xSeat, ySeat) => {
         return satisfies(zcf, xSeat, ySeat.getCurrentAllocation());
       };
@@ -119,15 +121,16 @@ const start = (zcf) => {
     sellSeats = swapIfCanTradeAndUpdateBook(sellSeats, buySeats, seat);
     return 'Order Added';
   };
-
   /** @type {OfferHandler} */
   const exchangeOfferHandler = (seat) => {
     // Buy Order
     if (seat.getProposal().want.Asset) {
+      console.log('running buy orders:', seat.getProposal());
       return buy(seat);
     }
     // Sell Order
     if (seat.getProposal().give.Asset) {
+      console.log('running sell orders:', seat.getProposal());
       return sell(seat);
     }
     // Eject because the offer must be invalid
@@ -139,14 +142,13 @@ const start = (zcf) => {
   const makeExchangeInvitation = () =>
     zcf.makeInvitation(exchangeOfferHandler, 'exchange');
 
-  /** @type {SimpleExchangePublicFacet} */
-  const publicFacet = Far('SimpleExchangePublicFacet', {
+  const publicFacet = Far('MarketPlacePublicFacet', {
+    updateNotifier: bookOrdersChanged,
     makeInvitation: makeExchangeInvitation,
     getNotifier: () => notifier,
   });
-
-  // set the initial state of the notifier
   bookOrdersChanged();
+
   return harden({ publicFacet });
 };
 

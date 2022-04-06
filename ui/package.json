@@ -89,13 +89,13 @@
     "watcherGlob": "**/*.html"
   },
   "dependencies": {
-    "@agoric/assert": "*",
-    "@agoric/captp": "*",
-    "@agoric/ertp": "*",
-    "@agoric/eventual-send": "*",
-    "@agoric/marshal": "*",
-    "@agoric/notifier": "*",
-    "@agoric/ui-components": "*",
+    "@agoric/assert": "dev",
+    "@endo/captp": "^1.10.12",
+    "@agoric/ertp": "dev",
+    "@endo/eventual-send": "^0.14.4",
+    "@endo/marshal": "^0.5.4",
+    "@agoric/notifier": "dev",
+    "@agoric/ui-components": "dev",
     "@craco/craco": "^6.4.3",
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
@@ -107,11 +107,11 @@
     "axios": "0.25.0",
     "nanoid": "^3.2.0",
     "autodux": "^5.0.3",
-    "react-router-dom":"5.3.0"
+    "react-router-dom": "5.3.0"
   },
   "devDependencies": {
     "@babel/eslint-plugin": "^7.12.1",
-    "agoric": "*",
+    "agoric": "dev",
     "autoprefixer": "^9.8.6",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.23.0",

@@ -2,9 +2,9 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 // import 'json5';
 // import 'utils/installSESLockdown';
 
-import { makeCapTP, E } from '@agoric/captp';
+import { makeCapTP, E } from '@endo/captp';
 import { makeAsyncIterableFromNotifier as iterateNotifier } from '@agoric/notifier';
-import { Far } from '@agoric/marshal';
+import { Far } from '@endo/marshal';
 
 import {
   activateWebSocket,
@@ -28,13 +28,14 @@ import {
   setUserOffers,
   setUserCards,
   setPendingOffers,
+  setEscrowedCards,
 } from '../store/store';
 
 const {
   INSTANCE_BOARD_ID,
   INSTALLATION_BOARD_ID,
   MAIN_CONTRACT_BOARD_INSTANCE_ID,
-  SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
+  MARKET_PLACE_INSTANCE_BOARD_ID,
   issuerBoardIds: { Card: CARD_ISSUER_BOARD_ID },
   brandBoardIds: { Money: MONEY_BRAND_BOARD_ID, Card: CARD_BRAND_BOARD_ID },
 } = dappConstants;
@@ -42,10 +43,10 @@ const {
 /* eslint-disable */
 let walletP;
 let publicFacet;
-let publicFacetSimpleExchange;
+let publicFacetMarketPlace;
 /* eslint-enable */
 
-export { walletP, publicFacet, publicFacetSimpleExchange };
+export { walletP, publicFacet, publicFacetMarketPlace };
 
 export const ApplicationContext = createContext();
 
@@ -56,7 +57,54 @@ export function useApplicationContext() {
 /* eslint-disable complexity, react/prop-types */
 export default function Provider({ children }) {
   const [state, dispatch] = useReducer(reducer, defaultState);
-  const { availableCards } = state;
+  const { availableCards, escrowedCards, userCards } = state;
+  useEffect(() => {
+    async function watchWallerOffers() {
+      const offerNotifier = E(walletP).getOffersNotifier();
+      try {
+        for await (const offers of iterateNotifier(offerNotifier)) {
+          await E(publicFacetMarketPlace).updateNotifier();
+          const userCardIds = userCards.map(({ id }) => id);
+          console.log('userCardIds', userCardIds);
+          const exitedOffers = offers
+            .filter((offer) => {
+              console.log('condtion 1', offer.status === 'cancel');
+              console.log(
+                'condtion 2',
+                offer?.proposalTemplate?.give?.Asset?.value.length === 1,
+              );
+              console.log(
+                'condtion 3',
+                userCardIds.includes(
+                  offer?.proposalTemplate?.give?.Asset?.value[0].id,
+                ),
+              );
+              if (
+                offer.status === 'cancel' &&
+                offer?.proposalTemplate?.give?.Asset?.value.length === 1 &&
+                !userCardIds.includes(
+                  offer?.proposalTemplate?.give?.Asset?.value[0].id,
+                )
+              ) {
+                return true;
+              } else {
+                return false;
+              }
+            })
+            .map((offer) => offer?.proposalTemplate?.give?.Asset?.value[0]);
+          dispatch(setEscrowedCards([...exitedOffers]));
+        }
+      } catch (err) {
+        console.log('offers in application: error');
+      }
+    }
+    watchWallerOffers().catch((err) =>
+      console.error('got watchWalletoffer err', err),
+    );
+  }, [userCards]);
+  useEffect(() => {
+    console.log('escorwedCards in application:', escrowedCards);
+  }, [escrowedCards]);
   useEffect(() => {
     // Receive callbacks from the wallet connection.
     const otherSide = Far('otherSide', {
@@ -105,7 +153,6 @@ export default function Provider({ children }) {
         console.log('printing card purse:', newCardPurse);
         console.log('printing all cards:', availableCards);
       };
-
       async function watchPurses() {
         const pn = E(walletP).getPursesNotifier();
         for await (const purses of iterateNotifier(pn)) {
@@ -128,7 +175,7 @@ export default function Provider({ children }) {
             pendingOffersArray = pendingOffersArray?.map(
               (offer) => offer?.proposalTemplate?.give?.Asset?.value[0],
             );
-            dispatch(setPendingOffers(pendingOffersArray));
+            dispatch(setPendingOffers(pendingOffersArray) || []);
           }
         } catch (err) {
           console.log('offers in application: error');
@@ -147,31 +194,20 @@ export default function Provider({ children }) {
       const board = E(walletP).getBoard();
       const instance = await E(board).getValue(INSTANCE_BOARD_ID);
       publicFacet = E(zoe).getPublicFacet(instance);
-      const simpleExchangeWrapperInstance = await E(board).getValue(
-        SIMPLE_EXCHANGE_WRAPPER_INSTANCE_BOARD_ID,
+      const marketPlaceInstance = await E(board).getValue(
+        MARKET_PLACE_INSTANCE_BOARD_ID,
       );
-      publicFacetSimpleExchange = await E(zoe).getPublicFacet(
-        simpleExchangeWrapperInstance,
-      );
+      publicFacetMarketPlace = await E(zoe).getPublicFacet(marketPlaceInstance);
       async function watchOffers() {
         const availableOfferNotifier = await E(
-          publicFacetSimpleExchange,
-        ).getAvailableOfferNotifier();
+          publicFacetMarketPlace,
+        ).getNotifier();
 
         for await (const availableOffers of iterateNotifier(
           availableOfferNotifier,
         )) {
-          dispatch(setUserOffers(availableOffers.value || []));
-        }
-
-        const userSaleHistoryNotifier = await E(
-          publicFacet,
-        ).getUserSaleHistoryNotifier();
-
-        for await (const userSaleHistory of iterateNotifier(
-          userSaleHistoryNotifier,
-        )) {
-          dispatch(setUserNfts(userSaleHistory.value));
+          console.log('GOT NOTIFIER!!!', availableOffers.sells);
+          dispatch(setUserOffers(availableOffers.sells || []));
         }
       }
       watchOffers().catch((err) => console.log('got watchOffer errs', err));
@@ -229,7 +265,8 @@ export default function Provider({ children }) {
         dispatch,
         walletP,
         publicFacet,
-        publicFacetSimpleExchange,
+        publicFacetMarketPlace,
+        MARKET_PLACE_INSTANCE_BOARD_ID,
         CARD_BRAND_BOARD_ID,
         MAIN_CONTRACT_BOARD_INSTANCE_ID,
       }}
